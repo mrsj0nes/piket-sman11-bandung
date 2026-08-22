@@ -797,7 +797,7 @@
 
             <div class="space-y-2 text-xs">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Firebase Config JSON [Opsional / Mandiri]</label>
+                    <label class="block font-bold text-slate-700 mb-1">Firebase Config JSON Custom [Opsional]</label>
                     <textarea id="input-firebase-config" rows="5" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "..."}' class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"></textarea>
                 </div>
             </div>
@@ -817,7 +817,18 @@
         const DEFAULT_PIN = "112233";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'piket-sman11-bandung';
         
-        let firebaseConfig = null;
+        // KONFIGURASI DEFAULT FIREBASE UNTUK SMAN 11 BANDUNG
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWlFsCfw",
+            authDomain: "piket-sman11-bandung.firebaseapp.com",
+            projectId: "piket-sman11-bandung",
+            storageBucket: "piket-sman11-bandung.firebasestorage.app",
+            messagingSenderId: "491348176450",
+            appId: "1:491348176450:web:cfa74d4fedee9efb2347db"
+        };
+
+        let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
+
         try {
             if (typeof __firebase_config !== 'undefined') {
                 firebaseConfig = JSON.parse(__firebase_config);
@@ -871,7 +882,7 @@
 
         async function setupFirebase() {
             if (!firebaseConfig) {
-                updateCloudStatusBadge(false, "Offline / Local Mode");
+                updateCloudStatusBadge(false, "Offline Mode");
                 return;
             }
 
