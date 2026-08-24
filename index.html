@@ -212,7 +212,6 @@
 
         <!-- PRINT FORM MENGAJI HARIAN -->
         <section id="section-print-form-mengaji" class="hidden">
-            <!-- KOP SURAT RESMI -->
             <div class="kop-surat mb-3 print:mb-2">
                 <div class="flex items-center justify-between gap-2 border-b-4 border-double border-slate-900 pb-2 text-center">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Coat_of_arms_of_West_Java.svg/180px-Coat_of_arms_of_West_Java.svg.png" 
@@ -882,6 +881,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -921,6 +921,13 @@
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`X ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XI ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XII ${i}`);
+
+        // FUNGSI PEMBANTU: Mendapatkan bobot/urutan kelas untuk sorting (X 1 - X 12, XI 1 - XI 12, XII 1 - XII 12)
+        function getClassRank(clsStr) {
+            const cleaned = cleanClassName(clsStr);
+            const idx = ALL_CLASSES.indexOf(cleaned);
+            return idx !== -1 ? idx : 999;
+        }
 
         const DEFAULT_TEACHERS = [
             "Hj. Laela, S.Pd.", "Dhiah Kuswarini, S.Pd., M.M.Pd.", "Syam Ahmad, S.Pd.", "Muhamad Hatta, S.Pd.", 
@@ -1488,7 +1495,11 @@
             tbody.innerHTML = '';
 
             const todayKey = getTodayKey();
-            const list = studentAbsenceList.filter(item => item.date === todayKey);
+            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
+            const list = studentAbsenceList
+                .filter(item => item.date === todayKey)
+                .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
+            
             badge.innerText = `${list.length} Siswa`;
 
             if (list.length === 0) {
@@ -1499,7 +1510,7 @@
             emptyState.classList.add('hidden');
 
             list.forEach((item, index) => {
-                const globalIndex = studentAbsenceList.findIndex(x => x === item);
+                const globalIndex = studentAbsenceList.indexOf(item);
                 let badgeClass = "bg-blue-100 text-blue-800";
                 if (item.status === 'I') badgeClass = "bg-amber-100 text-amber-800";
                 if (item.status === 'A') badgeClass = "bg-rose-100 text-rose-800";
@@ -1539,7 +1550,11 @@
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
-            const list = studentLateList.filter(item => item.date === todayKey);
+            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
+            const list = studentLateList
+                .filter(item => item.date === todayKey)
+                .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
+            
             badge.innerText = `${list.length} Siswa`;
 
             if (list.length === 0) {
@@ -1550,7 +1565,7 @@
             emptyState.classList.add('hidden');
 
             list.forEach((item) => {
-                const globalIndex = studentLateList.findIndex(x => x === item);
+                const globalIndex = studentLateList.indexOf(item);
                 const card = document.createElement('div');
                 card.className = "p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between gap-2";
                 card.innerHTML = `
@@ -1586,7 +1601,11 @@
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
-            const list = studentEarlyList.filter(item => item.date === todayKey);
+            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
+            const list = studentEarlyList
+                .filter(item => item.date === todayKey)
+                .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
+            
             badge.innerText = `${list.length} Siswa`;
 
             if (list.length === 0) {
@@ -1597,7 +1616,7 @@
             emptyState.classList.add('hidden');
 
             list.forEach((item) => {
-                const globalIndex = studentEarlyList.findIndex(x => x === item);
+                const globalIndex = studentEarlyList.indexOf(item);
                 const card = document.createElement('div');
                 card.className = "p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between gap-2";
                 card.innerHTML = `
