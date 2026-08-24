@@ -35,6 +35,14 @@
             .page-break { page-break-before: always; }
             table { font-size: 8.5pt; border-collapse: collapse !important; width: 100% !important; }
             th, td { border: 1px solid #333 !important; padding: 2px 4px !important; }
+            .sticky-col, .sticky-col-header { position: static !important; }
+            
+            /* Sembunyikan lembar mengaji harian saat cetak biasa / rekap */
+            #section-print-form-mengaji { display: none !important; }
+            
+            /* Tampilkan lembar mengaji harian HANYA ketika tombol 'Cetak Lembar' diklik */
+            body.print-mengaji-only main { display: none !important; }
+            body.print-mengaji-only #section-print-form-mengaji { display: block !important; }
         }
         .sticky-col {
             position: sticky;
@@ -199,7 +207,7 @@
         </section>
 
         <!-- PRINT FORM MENGAJI HARIAN -->
-        <section id="section-print-form-mengaji" class="hidden print:block">
+        <section id="section-print-form-mengaji" class="hidden">
             <div class="text-right font-bold text-xs uppercase mb-2">
                 PEMANTAUAN BACA AL QUR'AN <br>
                 <span id="print-form-mengaji-date" class="normal-case font-normal">-</span>
@@ -1224,7 +1232,11 @@
                 tbody.appendChild(tr);
             }
 
+            document.body.classList.add('print-mengaji-only');
             window.print();
+            setTimeout(() => {
+                document.body.classList.remove('print-mengaji-only');
+            }, 500);
         };
 
         function updateCloudStatusBadge(active, textStr) {
