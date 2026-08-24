@@ -1191,29 +1191,56 @@
             return clsStr.replace(/^kelas\s+/i, '').trim();
         }
 
-        // FUNGSI PEMBANTU: Mencocokkan nama singkat/panggilan dari WA dengan Nama Lengkap di Master Data
+        // FUNGSI PEMBANTU: Normalisasi kunci kelas untuk pencocokan presisi (misal: "XII 9" -> "XII9")
+        function getNormalizedClassKey(clsStr) {
+            if (!clsStr) return '';
+            return clsStr.toString().replace(/^kelas\s*/i, '').replace(/[\s.\-_]+/g, '').toUpperCase();
+        }
+
+        // FUNGSI PEMBANTU: Mendapatkan Nama Lengkap dari Master Data secara Otomatis
         function resolveFullName(cls, inputName) {
             if (!inputName || !inputName.trim()) return '';
-            const masterList = studentMasterData[cls] || [];
             const q = inputName.trim().toLowerCase();
-            
-            // 1. Check Exact Match
-            let found = masterList.find(m => m.toLowerCase() === q);
-            if (found) return found;
+            const normTargetCls = getNormalizedClassKey(cls);
+            let masterList = [];
 
-            // 2. Check Substring Match (e.g., "Marfin" matches "MARFIN KAESAR RUSTIADI")
-            found = masterList.find(m => {
+            // 1. Cari berdasarkan kelas sasaran
+            if (studentMasterData) {
+                const foundKey = Object.keys(studentMasterData).find(k => getNormalizedClassKey(k) === normTargetCls);
+                if (foundKey && Array.isArray(studentMasterData[foundKey])) {
+                    masterList = studentMasterData[foundKey];
+                }
+            }
+
+            const isMatch = (m) => {
                 const mLower = m.toLowerCase();
-                return mLower.includes(q) || q.includes(mLower);
-            });
-            if (found) return found;
+                if (mLower === q) return true;
+                const mWords = mLower.split(/\s+/);
+                // Cocokkan kata (misal "Marfin" cocok dengan "MARFIN KAESAR RUSTIADI")
+                if (mWords.some(w => w === q)) return true;
+                if (q.length >= 2 && mWords.some(w => w.startsWith(q) || q.startsWith(w))) return true;
+                if (q.length >= 3 && (mLower.includes(q) || q.includes(mLower))) return true;
+                return false;
+            };
 
-            // 3. Check First Name Match
-            found = masterList.find(m => {
-                const firstName = m.toLowerCase().split(' ')[0];
-                return q.startsWith(firstName) || firstName.startsWith(q);
-            });
-            return found || inputName.trim();
+            // Cari di kelas pilihan dulu
+            if (masterList.length > 0) {
+                const match = masterList.find(isMatch);
+                if (match) return match;
+            }
+
+            // Jika tidak ditemukan di kelas tersebut, cari lintas seluruh Master Siswa
+            if (studentMasterData) {
+                for (const k of Object.keys(studentMasterData)) {
+                    const list = studentMasterData[k];
+                    if (Array.isArray(list)) {
+                        const match = list.find(isMatch);
+                        if (match) return match;
+                    }
+                }
+            }
+
+            return inputName.trim();
         }
 
         // FUNGSI PEMBANTU: Membandingkan nama di Log Presensi dengan nama di Master Rekap
@@ -1222,11 +1249,22 @@
             const l = logName.trim().toLowerCase();
             const m = masterName.trim().toLowerCase();
 
-            if (l === m || m.includes(l) || l.includes(m)) return true;
+            if (l === m) return true;
 
-            const lFirst = l.split(' ')[0];
-            const mFirst = m.split(' ')[0];
-            return (lFirst.length >= 2 && (lFirst === mFirst || m.startsWith(lFirst)));
+            const lWords = l.split(/\s+/).filter(w => w.length > 0);
+            const mWords = m.split(/\s+/).filter(w => w.length > 0);
+
+            if (lWords.length === 1) {
+                const single = lWords[0];
+                if (single.length >= 2) {
+                    return mWords.some(mw => mw === single || (single.length >= 3 && mw.startsWith(single)));
+                }
+            }
+
+            if (m.includes(l) || l.includes(m)) return true;
+            if (lWords[0].length >= 3 && mWords[0].length >= 3 && lWords[0] === mWords[0]) return true;
+
+            return false;
         }
 
         window.switchTab = function(tabId) {
@@ -1764,8 +1802,11 @@
             div.id = rowId;
             div.className = "batch-student-row bg-slate-50 p-2 border border-slate-200 rounded-xl flex items-center gap-1.5 text-xs";
             
+            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
+            const resolvedInitialName = nameVal ? resolveFullName(cls, nameVal) : '';
+
             div.innerHTML = `
-                <input type="text" class="batch-input-name font-semibold bg-white border border-slate-300 rounded-lg p-2 flex-1 min-w-0" placeholder="Nama Siswa..." value="${nameVal}">
+                <input type="text" onblur="autoResolveBatchRowName(this)" class="batch-input-name font-semibold bg-white border border-slate-300 rounded-lg p-2 flex-1 min-w-0" placeholder="Nama Siswa..." value="${resolvedInitialName}">
                 <select class="batch-select-status font-bold bg-white border border-slate-300 rounded-lg p-2 w-24 shrink-0">
                     <option value="S" ${statusVal === 'S' ? 'selected' : ''}>Sakit (S)</option>
                     <option value="I" ${statusVal === 'I' ? 'selected' : ''}>Izin (I)</option>
@@ -1781,6 +1822,15 @@
             
             container.appendChild(div);
             updateBatchRowCountBadge();
+        };
+
+        window.autoResolveBatchRowName = function(inputEl) {
+            if (!inputEl || !inputEl.value.trim()) return;
+            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
+            const resolved = resolveFullName(cls, inputEl.value.trim());
+            if (resolved && resolved !== inputEl.value) {
+                inputEl.value = resolved;
+            }
         };
 
         window.removeBatchStudentRow = function(rowId) {
@@ -1806,18 +1856,17 @@
             const lines = rawText.split('\n');
             let addedCount = 0;
 
-            lines.forEach(line => {
+            lines.forEach((line, lineIdx) => {
                 let cleanLine = line.trim();
                 if (!cleanLine) return;
 
-                // Cek apakah baris berupa header kelas (misal "XI.5" atau "XII-1")
-                const classMatch = cleanLine.match(/^(X|XI|XII)[\s.\-_]+(\d{1,2})/i);
-                if (classMatch && lines.indexOf(line) < 3) {
+                // Cek apakah baris berupa header kelas (misal "XI.5" atau "XII 9")
+                const classMatch = cleanLine.match(/^(X|XI|XII)[\s.\-_]*(\d{1,2})/i);
+                if (classMatch && lineIdx < 3) {
                     const matchedClass = `${classMatch[1].toUpperCase()} ${classMatch[2]}`;
                     const selectCls = document.getElementById('quick-student-class');
                     if (selectCls) {
                         selectCls.value = matchedClass;
-                        onQuickStudentClassChange();
                     }
                 }
 
@@ -1825,7 +1874,7 @@
                 cleanLine = cleanLine.replace(/^[\d\s.\-*)]+/, '').trim();
                 if (!cleanLine) return;
 
-                // Deteksi status dari tanda kurung atau kata kunci (sakit, izin, alpa, telat, dispen)
+                // Deteksi status dari kata kunci
                 let status = 'S';
                 let note = '';
 
@@ -1843,7 +1892,7 @@
                     note = 'Izin Pulang';
                 }
 
-                // Ekstrak Murni Nama Siswa dengan menghilangkan status dalam kurung misal "(sakit)"
+                // Ekstrak Murni Nama Siswa
                 let studentName = cleanLine.replace(/\(.*\)/g, '').replace(/sakit|izin|alpa|alpha|terlambat|telat|pulang|dispen/gi, '').trim();
 
                 if (studentName.length >= 2) {
@@ -1888,6 +1937,12 @@
         window.onQuickStudentClassChange = function() {
             document.getElementById('quick-student-name').value = '';
             document.getElementById('quick-student-suggestions').classList.add('hidden');
+            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
+            document.querySelectorAll('.batch-input-name').forEach(inputEl => {
+                if (inputEl.value.trim()) {
+                    inputEl.value = resolveFullName(cls, inputEl.value.trim());
+                }
+            });
         };
 
         window.onQuickStudentStatusChange = function() {
@@ -2245,7 +2300,8 @@
             const matrixBody = document.getElementById('siswa-matrix-body');
             matrixBody.innerHTML = '';
 
-            const studentList = studentMasterData[selectedClass] || [];
+            const masterKey = Object.keys(studentMasterData).find(k => getNormalizedClassKey(k) === getNormalizedClassKey(selectedClass)) || selectedClass;
+            const studentList = studentMasterData[masterKey] || [];
 
             studentList.forEach((studentName, idx) => {
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
@@ -2255,9 +2311,9 @@
                     const dayFormatted = String(d).padStart(2, '0');
                     const dateKey = `${monthStr}-${dayFormatted}`;
 
-                    const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
-                    const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
-                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
+                    const absLog = studentAbsenceList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
+                    const lateLog = studentLateList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
+                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
 
                     let cellContent = '-';
 
