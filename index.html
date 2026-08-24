@@ -1191,6 +1191,44 @@
             return clsStr.replace(/^kelas\s+/i, '').trim();
         }
 
+        // FUNGSI PEMBANTU: Mencocokkan nama singkat/panggilan dari WA dengan Nama Lengkap di Master Data
+        function resolveFullName(cls, inputName) {
+            if (!inputName || !inputName.trim()) return '';
+            const masterList = studentMasterData[cls] || [];
+            const q = inputName.trim().toLowerCase();
+            
+            // 1. Check Exact Match
+            let found = masterList.find(m => m.toLowerCase() === q);
+            if (found) return found;
+
+            // 2. Check Substring Match (e.g., "Marfin" matches "MARFIN KAESAR RUSTIADI")
+            found = masterList.find(m => {
+                const mLower = m.toLowerCase();
+                return mLower.includes(q) || q.includes(mLower);
+            });
+            if (found) return found;
+
+            // 3. Check First Name Match
+            found = masterList.find(m => {
+                const firstName = m.toLowerCase().split(' ')[0];
+                return q.startsWith(firstName) || firstName.startsWith(q);
+            });
+            return found || inputName.trim();
+        }
+
+        // FUNGSI PEMBANTU: Membandingkan nama di Log Presensi dengan nama di Master Rekap
+        function isSameStudentName(logName, masterName) {
+            if (!logName || !masterName) return false;
+            const l = logName.trim().toLowerCase();
+            const m = masterName.trim().toLowerCase();
+
+            if (l === m || m.includes(l) || l.includes(m)) return true;
+
+            const lFirst = l.split(' ')[0];
+            const mFirst = m.split(' ')[0];
+            return (lFirst.length >= 2 && (lFirst === mFirst || m.startsWith(lFirst)));
+        }
+
         window.switchTab = function(tabId) {
             const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'rekap-siswa', 'master-siswa', 'master-guru'];
             if (protectedTabs.includes(tabId) && !isAdminUnlocked) {
@@ -1809,7 +1847,9 @@
                 let studentName = cleanLine.replace(/\(.*\)/g, '').replace(/sakit|izin|alpa|alpha|terlambat|telat|pulang|dispen/gi, '').trim();
 
                 if (studentName.length >= 2) {
-                    addBatchStudentRow(studentName, status, note);
+                    const currentCls = cleanClassName(document.getElementById('quick-student-class').value);
+                    const fullStudentName = resolveFullName(currentCls, studentName);
+                    addBatchStudentRow(fullStudentName, status, note);
                     addedCount++;
                 }
             });
@@ -1924,11 +1964,12 @@
                 const rows = document.querySelectorAll('.batch-student-row');
                 
                 rows.forEach(row => {
-                    const name = row.querySelector('.batch-input-name').value.trim();
+                    const rawName = row.querySelector('.batch-input-name').value.trim();
                     const status = row.querySelector('.batch-select-status').value;
                     const note = row.querySelector('.batch-input-note').value.trim();
 
-                    if (name.length > 0) {
+                    if (rawName.length > 0) {
+                        const name = resolveFullName(cls, rawName);
                         if (status === 'TERLAMBAT') {
                             studentLateList.push({ date: todayKey, class: cls, name, time: note || '07.45', reason: 'Terlambat' });
                         } else if (status === 'PULANG') {
@@ -2214,9 +2255,9 @@
                     const dayFormatted = String(d).padStart(2, '0');
                     const dateKey = `${monthStr}-${dayFormatted}`;
 
-                    const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-                    const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+                    const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
+                    const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
+                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && isSameStudentName(x.name, studentName));
 
                     let cellContent = '-';
 
