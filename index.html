@@ -157,12 +157,12 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-xs sm:text-sm">Pencatatan Cepat HP (Quick Action)</h2>
-                    <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru dalam hitungan detik</p>
+                    <p class="text-[10px] text-brand-100">Catat presensi siswa (bisa masal 1 kelas) atau guru dalam hitungan detik</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <button onclick="openQuickStudentModal()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-plus"></i> + Catat Siswa (S/I/A/T/P)
+                    <i class="fa-solid fa-user-plus"></i> + Catat Siswa (1 Kelas / Bulk)
                 </button>
                 <button onclick="openAddAbsenceModal()" class="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-user-xmark"></i> + Catat Guru Absen
@@ -296,7 +296,7 @@
                 </div>
 
                 <button onclick="openQuickStudentModal('S')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-plus"></i> Catat Nama Siswa Tidak Hadir
+                    <i class="fa-solid fa-user-plus"></i> Catat Nama Siswa Tidak Hadir (Bisa Masal)
                 </button>
             </div>
 
@@ -716,23 +716,73 @@
         </div>
     </div>
 
-    <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-3">
+    <!-- MODAL CATAT PRESENSI SISWA (DIINGKATKAN: DUKUNG SISI1 KELAS BANYAK SISWA & PASTE WA) -->
+    <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-4 sm:p-5 space-y-3 max-h-[90vh] flex flex-col">
+            
+            <!-- Modal Header -->
             <div class="flex items-center justify-between border-b pb-2.5">
                 <h3 id="modal-quick-student-title" class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-amber-500"></i> Catat Presensi Siswa Cepat
+                    <i class="fa-solid fa-users text-amber-500 text-base"></i> Catat Presensi Siswa
                 </h3>
                 <button onclick="closeQuickStudentModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="space-y-3">
-                <div class="grid grid-cols-2 gap-2.5">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
-                        <select id="quick-student-class" onchange="onQuickStudentClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
+            <!-- Mode Switcher Tabs -->
+            <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-bold text-slate-600">
+                <button id="btn-mode-batch" onclick="switchQuickStudentMode('batch')" class="flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs">
+                    <i class="fa-solid fa-list-ol mr-1"></i> Mode 1 Kelas (Banyak Siswa / Paste WA)
+                </button>
+                <button id="btn-mode-single" onclick="switchQuickStudentMode('single')" class="flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800">
+                    <i class="fa-solid fa-user mr-1"></i> Input 1 Siswa
+                </button>
+            </div>
+
+            <!-- FORM WRAPPER -->
+            <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="flex-1 overflow-y-auto space-y-3 pr-1">
+
+                <!-- 1. KELAS UTAMA (DIATAS UNTUK KEDUA MODE) -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
+                    <select id="quick-student-class" onchange="onQuickStudentClassChange()" class="w-full text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
+                </div>
+
+                <!-- CONTAINER MODE BATCH / MULTI SISWA (DEFAULT) -->
+                <div id="container-batch-student-mode" class="space-y-3">
+                    
+                    <!-- Box Tempel Teks WhatsApp -->
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-extrabold text-amber-900 flex items-center gap-1.5">
+                                <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Tempel Teks Laporan Chat WhatsApp
+                            </span>
+                            <span class="text-[10px] text-amber-700">Otomatis Ekstrak Nama & Status</span>
+                        </div>
+                        <textarea id="quick-student-wa-paste" rows="3" placeholder="Contoh nempel dari WA:&#10;1. Arika (sakit)&#10;2. Sonia (izin)&#10;3. Aria (terlambat)&#10;4. Dicky (S)" class="w-full text-xs bg-white border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 font-mono"></textarea>
+                        <button type="button" onclick="parseAndPopulateWhatsAppText()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-1.5 rounded-lg shadow-xs transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-yellow-300"></i> Ekstrak Semua Nama & Status Siswa
+                        </button>
                     </div>
+
+                    <!-- Dynamic Student Rows -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 uppercase border-b pb-1">
+                            <span>Daftar Siswa Tidak Hadir / Catatan Kelas</span>
+                            <span id="batch-row-count-badge" class="text-amber-600">0 Baris Siswa</span>
+                        </div>
+                        
+                        <div id="batch-student-rows-container" class="space-y-2 max-h-[220px] overflow-y-auto p-1"></div>
+
+                        <button type="button" onclick="addBatchStudentRow()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-dashed border-slate-300 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-plus text-amber-500"></i> + Tambah Baris Siswa Manual
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTAINER MODE SINGLE SISWA (MODE DAHULU) -->
+                <div id="container-single-student-mode" class="space-y-3 hidden">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Status Keterangan *</label>
                         <select id="quick-student-status" onchange="onQuickStudentStatusChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
@@ -743,28 +793,28 @@
                             <option value="PULANG">Izin Pulang / Dispen (P)</option>
                         </select>
                     </div>
-                </div>
 
-                <div class="relative">
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Ketik Nama Siswa (Searchable) *</label>
-                    <input type="text" id="quick-student-name" oninput="onQuickStudentInput(this.value)" autocomplete="off" placeholder="Ketik nama siswa..." class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
-                    <div id="quick-student-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
-                </div>
-
-                <div id="quick-student-extra-fields" class="space-y-2.5 pt-1">
-                    <div id="field-container-time" class="hidden">
-                        <label id="label-quick-time" class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jam Kedatangan / Kepulangan</label>
-                        <input type="text" id="quick-student-time" placeholder="Contoh: 07.45 atau 10.30" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Ketik Nama Siswa (Searchable) *</label>
+                        <input type="text" id="quick-student-name" oninput="onQuickStudentInput(this.value)" autocomplete="off" placeholder="Ketik nama siswa..." class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                        <div id="quick-student-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                     </div>
-                    <div>
-                        <label id="label-quick-note" class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Alasan / Catatan Penjemput</label>
-                        <input type="text" id="quick-student-note" placeholder="Misal: Surat Dokter / Acara Keluarga / Demam" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+
+                    <div id="quick-student-extra-fields" class="space-y-2.5 pt-1">
+                        <div id="field-container-time" class="hidden">
+                            <label id="label-quick-time" class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jam Kedatangan / Kepulangan</label>
+                            <input type="text" id="quick-student-time" placeholder="Contoh: 07.45 atau 10.30" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                        <div>
+                            <label id="label-quick-note" class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Alasan / Catatan Penjemput</label>
+                            <input type="text" id="quick-student-note" placeholder="Misal: Surat Dokter / Acara Keluarga / Demam" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                    <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Siswa</button>
+                <div class="flex items-center gap-2 pt-2 border-t mt-3">
+                    <button type="button" onclick="closeQuickStudentModal()" class="w-1/3 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                    <button type="submit" class="w-2/3 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Kelas Ini</button>
                 </div>
             </form>
         </div>
@@ -959,6 +1009,7 @@
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
         let isAdminUnlocked = false;
+        let currentQuickStudentMode = 'batch'; // 'batch' (1 kelas banyak siswa) or 'single' (1 siswa)
 
         async function setupFirebase() {
             if (!firebaseConfig) {
@@ -1645,8 +1696,144 @@
             });
         };
 
+        // FUNGSI UNTUK MENGATUR MODE INPUT SISWA (BATCH / SINGLE)
+        window.switchQuickStudentMode = function(mode) {
+            currentQuickStudentMode = mode;
+            const btnBatch = document.getElementById('btn-mode-batch');
+            const btnSingle = document.getElementById('btn-mode-single');
+            const containerBatch = document.getElementById('container-batch-student-mode');
+            const containerSingle = document.getElementById('container-single-student-mode');
+
+            if (mode === 'batch') {
+                btnBatch.className = "flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs";
+                btnSingle.className = "flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800";
+                containerBatch.classList.remove('hidden');
+                containerSingle.classList.add('hidden');
+            } else {
+                btnSingle.className = "flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs";
+                btnBatch.className = "flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800";
+                containerSingle.classList.remove('hidden');
+                containerBatch.classList.add('hidden');
+            }
+        };
+
+        // TAMBAH BARIS SISWA MANUAL PADA MODE BATCH
+        window.addBatchStudentRow = function(nameVal = '', statusVal = 'S', noteVal = '') {
+            const container = document.getElementById('batch-student-rows-container');
+            const rowId = 'row-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
+            
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = "batch-student-row bg-slate-50 p-2 border border-slate-200 rounded-xl flex items-center gap-1.5 text-xs";
+            
+            div.innerHTML = `
+                <input type="text" class="batch-input-name font-semibold bg-white border border-slate-300 rounded-lg p-2 flex-1 min-w-0" placeholder="Nama Siswa..." value="${nameVal}">
+                <select class="batch-select-status font-bold bg-white border border-slate-300 rounded-lg p-2 w-24 shrink-0">
+                    <option value="S" ${statusVal === 'S' ? 'selected' : ''}>Sakit (S)</option>
+                    <option value="I" ${statusVal === 'I' ? 'selected' : ''}>Izin (I)</option>
+                    <option value="A" ${statusVal === 'A' ? 'selected' : ''}>Alpha (A)</option>
+                    <option value="TERLAMBAT" ${statusVal === 'TERLAMBAT' ? 'selected' : ''}>Telat (T)</option>
+                    <option value="PULANG" ${statusVal === 'PULANG' ? 'selected' : ''}>Pulang (P)</option>
+                </select>
+                <input type="text" class="batch-input-note bg-white border border-slate-300 rounded-lg p-2 w-28 shrink-0" placeholder="Ket/Jam..." value="${noteVal}">
+                <button type="button" onclick="removeBatchStudentRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            `;
+            
+            container.appendChild(div);
+            updateBatchRowCountBadge();
+        };
+
+        window.removeBatchStudentRow = function(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+            updateBatchRowCountBadge();
+        };
+
+        function updateBatchRowCountBadge() {
+            const count = document.querySelectorAll('.batch-student-row').length;
+            const badge = document.getElementById('batch-row-count-badge');
+            if (badge) badge.innerText = `${count} Baris Siswa`;
+        }
+
+        // AUTO PARSER TEKS DARI WHATSAPP CHAT
+        window.parseAndPopulateWhatsAppText = function() {
+            const rawText = document.getElementById('quick-student-wa-paste').value.trim();
+            if (!rawText) {
+                showToast('Tempelkan teks laporan dari WhatsApp terlebih dahulu!');
+                return;
+            }
+
+            const lines = rawText.split('\n');
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                let cleanLine = line.trim();
+                if (!cleanLine) return;
+
+                // Cek apakah baris berupa header kelas (misal "XI.5" atau "XII-1")
+                const classMatch = cleanLine.match(/^(X|XI|XII)[\s.\-_]+(\d{1,2})/i);
+                if (classMatch && lines.indexOf(line) < 3) {
+                    const matchedClass = `${classMatch[1].toUpperCase()} ${classMatch[2]}`;
+                    const selectCls = document.getElementById('quick-student-class');
+                    if (selectCls) {
+                        selectCls.value = matchedClass;
+                        onQuickStudentClassChange();
+                    }
+                }
+
+                // Bersihkan nomor urut di awal misal "1. Arika (sakit)" -> "Arika (sakit)"
+                cleanLine = cleanLine.replace(/^[\d\s.\-*)]+/, '').trim();
+                if (!cleanLine) return;
+
+                // Deteksi status dari tanda kurung atau kata kunci (sakit, izin, alpa, telat, dispen)
+                let status = 'S';
+                let note = '';
+
+                if (/sakit|\(s\)/i.test(cleanLine)) {
+                    status = 'S';
+                } else if (/izin|\(i\)/i.test(cleanLine)) {
+                    status = 'I';
+                } else if (/alpa|alpha|tanpa|\(a\)/i.test(cleanLine)) {
+                    status = 'A';
+                } else if (/terlambat|telat|\(t\)/i.test(cleanLine)) {
+                    status = 'TERLAMBAT';
+                    note = '07.45';
+                } else if (/pulang|dispen|\(p\)/i.test(cleanLine)) {
+                    status = 'PULANG';
+                    note = 'Izin Pulang';
+                }
+
+                // Ekstrak Murni Nama Siswa dengan menghilangkan status dalam kurung misal "(sakit)"
+                let studentName = cleanLine.replace(/\(.*\)/g, '').replace(/sakit|izin|alpa|alpha|terlambat|telat|pulang|dispen/gi, '').trim();
+
+                if (studentName.length >= 2) {
+                    addBatchStudentRow(studentName, status, note);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                showToast(`Berhasil mengekstrak ${addedCount} nama siswa dari WA!`);
+            } else {
+                showToast('Gagal mengekstrak nama. Pastikan format ada nama siswa.');
+            }
+        };
+
         window.openQuickStudentModal = function(defaultStatus = 'S') {
             document.getElementById('form-quick-student').reset();
+            document.getElementById('batch-student-rows-container').innerHTML = '';
+            document.getElementById('quick-student-wa-paste').value = '';
+            
+            // Default ke Mode Batch (1 Kelas Banyak Siswa)
+            switchQuickStudentMode('batch');
+            
+            // Tambahkan 3 baris kosong awal
+            addBatchStudentRow();
+            addBatchStudentRow();
+            addBatchStudentRow();
+
             document.getElementById('quick-student-status').value = defaultStatus;
             onQuickStudentStatusChange();
             onQuickStudentClassChange();
@@ -1729,34 +1916,76 @@
         window.saveQuickStudentForm = function(event) {
             event.preventDefault();
             const cls = cleanClassName(document.getElementById('quick-student-class').value);
-            const status = document.getElementById('quick-student-status').value;
-            const name = document.getElementById('quick-student-name').value.trim();
-            const time = document.getElementById('quick-student-time').value.trim();
-            const note = document.getElementById('quick-student-note').value.trim();
             const todayKey = getTodayKey();
+            let savedCount = 0;
 
-            if (!name) {
-                showToast('Ketik nama siswa terlebih dahulu!');
-                return;
-            }
+            if (currentQuickStudentMode === 'batch') {
+                // MODE BATCH (1 KELAS BANYAK SISWA)
+                const rows = document.querySelectorAll('.batch-student-row');
+                
+                rows.forEach(row => {
+                    const name = row.querySelector('.batch-input-name').value.trim();
+                    const status = row.querySelector('.batch-select-status').value;
+                    const note = row.querySelector('.batch-input-note').value.trim();
 
-            if (status === 'TERLAMBAT') {
-                studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
-                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
-                renderLateList();
-            } else if (status === 'PULANG') {
-                studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
-                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-                renderEarlyList();
-            } else {
-                studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
+                    if (name.length > 0) {
+                        if (status === 'TERLAMBAT') {
+                            studentLateList.push({ date: todayKey, class: cls, name, time: note || '07.45', reason: 'Terlambat' });
+                        } else if (status === 'PULANG') {
+                            studentEarlyList.push({ date: todayKey, class: cls, name, time: note || '10.30', reason: 'Izin Pulang' });
+                        } else {
+                            studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
+                        }
+                        savedCount++;
+                    }
+                });
+
+                if (savedCount === 0) {
+                    showToast('Isi minimal 1 nama siswa untuk disimpan!');
+                    return;
+                }
+
                 localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
-                renderStudentAbsenceTable();
-            }
+                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
 
-            closeQuickStudentModal();
-            showToast(`Presensi siswa (${name}) berhasil disimpan!`);
-            pushToCloud();
+                renderStudentAbsenceTable();
+                renderLateList();
+                renderEarlyList();
+                closeQuickStudentModal();
+                showToast(`Berhasil menyimpan ${savedCount} presensi siswa kelas ${cls}!`);
+                pushToCloud();
+
+            } else {
+                // MODE SINGLE (1 SISWA)
+                const status = document.getElementById('quick-student-status').value;
+                const name = document.getElementById('quick-student-name').value.trim();
+                const time = document.getElementById('quick-student-time').value.trim();
+                const note = document.getElementById('quick-student-note').value.trim();
+
+                if (!name) {
+                    showToast('Ketik nama siswa terlebih dahulu!');
+                    return;
+                }
+
+                if (status === 'TERLAMBAT') {
+                    studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
+                    localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                    renderLateList();
+                } else if (status === 'PULANG') {
+                    studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
+                    localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                    renderEarlyList();
+                } else {
+                    studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
+                    localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                    renderStudentAbsenceTable();
+                }
+
+                closeQuickStudentModal();
+                showToast(`Presensi siswa (${name}) berhasil disimpan!`);
+                pushToCloud();
+            }
         };
 
         window.openMasterJadwalModal = function() {
