@@ -157,12 +157,12 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-xs sm:text-sm">Pencatatan Cepat HP (Quick Action)</h2>
-                    <p class="text-[10px] text-brand-100">Catat presensi siswa (bisa masal 1 kelas) atau guru dalam hitungan detik</p>
+                    <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru dalam hitungan detik</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <button onclick="openQuickStudentModal()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-plus"></i> + Catat Siswa (1 Kelas / Bulk)
+                    <i class="fa-solid fa-user-plus"></i> + Catat Siswa (S/I/A/T/P)
                 </button>
                 <button onclick="openAddAbsenceModal()" class="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
                     <i class="fa-solid fa-user-xmark"></i> + Catat Guru Absen
@@ -296,7 +296,7 @@
                 </div>
 
                 <button onclick="openQuickStudentModal('S')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-plus"></i> Catat Nama Siswa Tidak Hadir (Bisa Masal)
+                    <i class="fa-solid fa-user-plus"></i> Catat Nama Siswa Tidak Hadir
                 </button>
             </div>
 
@@ -716,82 +716,46 @@
         </div>
     </div>
 
-    <!-- MODAL CATAT PRESENSI SISWA (DIINGKATKAN: DUKUNG SISI1 KELAS BANYAK SISWA & PASTE WA) -->
-    <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 hidden no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-4 sm:p-5 space-y-3 max-h-[90vh] flex flex-col">
-            
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b pb-2.5">
+    <!-- MODAL CATAT PRESENSI SISWA (DUAL MODE: 1 SISWA ATAU BANYAK SISWA DENGAN AUTOCOMPLETE & PASTE WA) -->
+    <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md sm:max-w-lg w-full overflow-hidden p-5 space-y-3 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
                 <h3 id="modal-quick-student-title" class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-users text-amber-500 text-base"></i> Catat Presensi Siswa
+                    <i class="fa-solid fa-user-plus text-amber-500"></i> Catat Presensi Siswa
                 </h3>
                 <button onclick="closeQuickStudentModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Mode Switcher Tabs -->
-            <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-bold text-slate-600">
-                <button id="btn-mode-batch" onclick="switchQuickStudentMode('batch')" class="flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs">
-                    <i class="fa-solid fa-list-ol mr-1"></i> Mode 1 Kelas (Banyak Siswa / Paste WA)
+            <!-- MODE SWITCHER TABS -->
+            <div class="flex border-b border-slate-200 shrink-0 text-xs font-semibold gap-2 pb-1">
+                <button type="button" id="tab-btn-qs-single" onclick="switchQuickStudentTab('single')" class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition">
+                    <i class="fa-solid fa-user mr-1"></i> 1 Siswa (Cepat)
                 </button>
-                <button id="btn-mode-single" onclick="switchQuickStudentMode('single')" class="flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800">
-                    <i class="fa-solid fa-user mr-1"></i> Input 1 Siswa
+                <button type="button" id="tab-btn-qs-batch" onclick="switchQuickStudentTab('batch')" class="px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-users mr-1"></i> Banyak Siswa (1 Kelas / WA)
                 </button>
             </div>
 
-            <!-- FORM WRAPPER -->
-            <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="flex-1 overflow-y-auto space-y-3 pr-1">
-
-                <!-- 1. KELAS UTAMA (DIATAS UNTUK KEDUA MODE) -->
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
-                    <select id="quick-student-class" onchange="onQuickStudentClassChange()" class="w-full text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
-                </div>
-
-                <!-- CONTAINER MODE BATCH / MULTI SISWA (DEFAULT) -->
-                <div id="container-batch-student-mode" class="space-y-3">
-                    
-                    <!-- Box Tempel Teks WhatsApp -->
-                    <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-extrabold text-amber-900 flex items-center gap-1.5">
-                                <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Tempel Teks Laporan Chat WhatsApp
-                            </span>
-                            <span class="text-[10px] text-amber-700">Otomatis Ekstrak Nama & Status</span>
+            <div class="overflow-y-auto flex-1 pr-1 space-y-3">
+                <!-- MODE 1: SINGLE STUDENT FORM (FITUR LAMA TERPELIHARA) -->
+                <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
+                            <select id="quick-student-class" onchange="onQuickStudentClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
                         </div>
-                        <textarea id="quick-student-wa-paste" rows="3" placeholder="Contoh nempel dari WA:&#10;1. Arika (sakit)&#10;2. Sonia (izin)&#10;3. Aria (terlambat)&#10;4. Dicky (S)" class="w-full text-xs bg-white border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 font-mono"></textarea>
-                        <button type="button" onclick="parseAndPopulateWhatsAppText()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-1.5 rounded-lg shadow-xs transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-wand-magic-sparkles text-yellow-300"></i> Ekstrak Semua Nama & Status Siswa
-                        </button>
-                    </div>
-
-                    <!-- Dynamic Student Rows -->
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 uppercase border-b pb-1">
-                            <span>Daftar Siswa Tidak Hadir / Catatan Kelas</span>
-                            <span id="batch-row-count-badge" class="text-amber-600">0 Baris Siswa</span>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Status Keterangan *</label>
+                            <select id="quick-student-status" onchange="onQuickStudentStatusChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                                <option value="S">Sakit (S)</option>
+                                <option value="I">Izin (I)</option>
+                                <option value="A">Alpha / Tanpa Ket (A)</option>
+                                <option value="TERLAMBAT">Terlambat Datang (T)</option>
+                                <option value="PULANG">Izin Pulang / Dispen (P)</option>
+                            </select>
                         </div>
-                        
-                        <div id="batch-student-rows-container" class="space-y-2 max-h-[220px] overflow-y-auto p-1"></div>
-
-                        <button type="button" onclick="addBatchStudentRow()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-dashed border-slate-300 transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-plus text-amber-500"></i> + Tambah Baris Siswa Manual
-                        </button>
-                    </div>
-                </div>
-
-                <!-- CONTAINER MODE SINGLE SISWA (MODE DAHULU) -->
-                <div id="container-single-student-mode" class="space-y-3 hidden">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Status Keterangan *</label>
-                        <select id="quick-student-status" onchange="onQuickStudentStatusChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
-                            <option value="S">Sakit (S)</option>
-                            <option value="I">Izin (I)</option>
-                            <option value="A">Alpha / Tanpa Ket (A)</option>
-                            <option value="TERLAMBAT">Terlambat Datang (T)</option>
-                            <option value="PULANG">Izin Pulang / Dispen (P)</option>
-                        </select>
                     </div>
 
                     <div class="relative">
@@ -810,13 +774,86 @@
                             <input type="text" id="quick-student-note" placeholder="Misal: Surat Dokter / Acara Keluarga / Demam" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
                         </div>
                     </div>
-                </div>
 
-                <div class="flex items-center gap-2 pt-2 border-t mt-3">
-                    <button type="button" onclick="closeQuickStudentModal()" class="w-1/3 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                    <button type="submit" class="w-2/3 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Kelas Ini</button>
+                    <div class="flex items-center gap-2 pt-2">
+                        <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                        <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Siswa</button>
+                    </div>
+                </form>
+
+                <!-- MODE 2: INPUT BANYAK SISWA DALAM 1 KELAS -->
+                <div id="container-qs-batch" class="hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas Target *</label>
+                            <select id="qs-batch-class" onchange="onBatchClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Baru</label>
+                            <select id="qs-batch-default-status" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                                <option value="S">Sakit (S)</option>
+                                <option value="I">Izin (I)</option>
+                                <option value="A">Alpha (A)</option>
+                                <option value="TERLAMBAT">Terlambat (T)</option>
+                                <option value="PULANG">Izin Pulang (P)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Search & Tambah Nama Siswa Manual ke List -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Siswa (Searchable) *</label>
+                        <div class="flex gap-1.5">
+                            <input type="text" id="qs-batch-search-name" oninput="onBatchSearchInput(this.value)" autocomplete="off" placeholder="Ketik nama siswa..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                            <button type="button" onclick="addCurrentSearchToBatch()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 shadow transition">
+                                + Tambah
+                            </button>
+                        </div>
+                        <div id="qs-batch-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
+                    </div>
+
+                    <!-- WA Text Auto Extract Box -->
+                    <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-2.5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-emerald-900 flex items-center gap-1">
+                                <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Tempel (Paste) Laporan dari WhatsApp
+                            </span>
+                            <button type="button" onclick="parseWaTextToBatch()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow transition">
+                                ⚡ Ekstrak Nama & Status WA
+                            </button>
+                        </div>
+                        <textarea id="qs-batch-wa-text" rows="3" placeholder="Contoh format WA:&#10;XI 5&#10;1. Arika (sakit)&#10;2. Sonia (izin)&#10;3. Latasya (Izin)" class="w-full text-xs font-mono bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500"></textarea>
+                    </div>
+
+                    <!-- Tabel Antrean Banyak Siswa -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Siswa Yang Diinput (<span id="qs-batch-count" class="text-amber-600">0</span> Siswa)</span>
+                            <button type="button" onclick="clearBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl overflow-hidden max-h-[180px] overflow-y-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-1.5 text-center w-7">#</th>
+                                        <th class="p-1.5">Nama Siswa</th>
+                                        <th class="p-1.5 w-24">Status</th>
+                                        <th class="p-1.5 w-24">Ket / Jam</th>
+                                        <th class="p-1.5 text-center w-8"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="qs-batch-table-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                        <button type="button" onclick="saveBatchStudentForm()" class="w-1/2 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Semua Siswa</button>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -966,6 +1003,7 @@
         let db = null;
         let auth = null;
         let isRemoteUpdate = false;
+        let batchStudents = [];
 
         const ALL_CLASSES = [];
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`X ${i}`);
@@ -1009,7 +1047,6 @@
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
         let isAdminUnlocked = false;
-        let currentQuickStudentMode = 'batch'; // 'batch' (1 kelas banyak siswa) or 'single' (1 siswa)
 
         async function setupFirebase() {
             if (!firebaseConfig) {
@@ -1156,7 +1193,8 @@
             const selectors = [
                 document.getElementById('rekap-siswa-class-select'),
                 document.getElementById('master-siswa-class-select'),
-                document.getElementById('quick-student-class')
+                document.getElementById('quick-student-class'),
+                document.getElementById('qs-batch-class')
             ];
 
             selectors.forEach(select => {
@@ -1189,82 +1227,6 @@
         function cleanClassName(clsStr) {
             if (!clsStr) return '';
             return clsStr.replace(/^kelas\s+/i, '').trim();
-        }
-
-        // FUNGSI PEMBANTU: Normalisasi kunci kelas untuk pencocokan presisi (misal: "XII 9" -> "XII9")
-        function getNormalizedClassKey(clsStr) {
-            if (!clsStr) return '';
-            return clsStr.toString().replace(/^kelas\s*/i, '').replace(/[\s.\-_]+/g, '').toUpperCase();
-        }
-
-        // FUNGSI PEMBANTU: Mendapatkan Nama Lengkap dari Master Data secara Otomatis
-        function resolveFullName(cls, inputName) {
-            if (!inputName || !inputName.trim()) return '';
-            const q = inputName.trim().toLowerCase();
-            const normTargetCls = getNormalizedClassKey(cls);
-            let masterList = [];
-
-            // 1. Cari berdasarkan kelas sasaran
-            if (studentMasterData) {
-                const foundKey = Object.keys(studentMasterData).find(k => getNormalizedClassKey(k) === normTargetCls);
-                if (foundKey && Array.isArray(studentMasterData[foundKey])) {
-                    masterList = studentMasterData[foundKey];
-                }
-            }
-
-            const isMatch = (m) => {
-                const mLower = m.toLowerCase();
-                if (mLower === q) return true;
-                const mWords = mLower.split(/\s+/);
-                // Cocokkan kata (misal "Marfin" cocok dengan "MARFIN KAESAR RUSTIADI")
-                if (mWords.some(w => w === q)) return true;
-                if (q.length >= 2 && mWords.some(w => w.startsWith(q) || q.startsWith(w))) return true;
-                if (q.length >= 3 && (mLower.includes(q) || q.includes(mLower))) return true;
-                return false;
-            };
-
-            // Cari di kelas pilihan dulu
-            if (masterList.length > 0) {
-                const match = masterList.find(isMatch);
-                if (match) return match;
-            }
-
-            // Jika tidak ditemukan di kelas tersebut, cari lintas seluruh Master Siswa
-            if (studentMasterData) {
-                for (const k of Object.keys(studentMasterData)) {
-                    const list = studentMasterData[k];
-                    if (Array.isArray(list)) {
-                        const match = list.find(isMatch);
-                        if (match) return match;
-                    }
-                }
-            }
-
-            return inputName.trim();
-        }
-
-        // FUNGSI PEMBANTU: Membandingkan nama di Log Presensi dengan nama di Master Rekap
-        function isSameStudentName(logName, masterName) {
-            if (!logName || !masterName) return false;
-            const l = logName.trim().toLowerCase();
-            const m = masterName.trim().toLowerCase();
-
-            if (l === m) return true;
-
-            const lWords = l.split(/\s+/).filter(w => w.length > 0);
-            const mWords = m.split(/\s+/).filter(w => w.length > 0);
-
-            if (lWords.length === 1) {
-                const single = lWords[0];
-                if (single.length >= 2) {
-                    return mWords.some(mw => mw === single || (single.length >= 3 && mw.startsWith(single)));
-                }
-            }
-
-            if (m.includes(l) || l.includes(m)) return true;
-            if (lWords[0].length >= 3 && mWords[0].length >= 3 && lWords[0] === mWords[0]) return true;
-
-            return false;
         }
 
         window.switchTab = function(tabId) {
@@ -1772,161 +1734,22 @@
             });
         };
 
-        // FUNGSI UNTUK MENGATUR MODE INPUT SISWA (BATCH / SINGLE)
-        window.switchQuickStudentMode = function(mode) {
-            currentQuickStudentMode = mode;
-            const btnBatch = document.getElementById('btn-mode-batch');
-            const btnSingle = document.getElementById('btn-mode-single');
-            const containerBatch = document.getElementById('container-batch-student-mode');
-            const containerSingle = document.getElementById('container-single-student-mode');
-
-            if (mode === 'batch') {
-                btnBatch.className = "flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs";
-                btnSingle.className = "flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800";
-                containerBatch.classList.remove('hidden');
-                containerSingle.classList.add('hidden');
-            } else {
-                btnSingle.className = "flex-1 py-1.5 rounded-lg text-center transition bg-white text-amber-600 shadow-xs";
-                btnBatch.className = "flex-1 py-1.5 rounded-lg text-center transition hover:text-slate-800";
-                containerSingle.classList.remove('hidden');
-                containerBatch.classList.add('hidden');
-            }
-        };
-
-        // TAMBAH BARIS SISWA MANUAL PADA MODE BATCH
-        window.addBatchStudentRow = function(nameVal = '', statusVal = 'S', noteVal = '') {
-            const container = document.getElementById('batch-student-rows-container');
-            const rowId = 'row-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
-            
-            const div = document.createElement('div');
-            div.id = rowId;
-            div.className = "batch-student-row bg-slate-50 p-2 border border-slate-200 rounded-xl flex items-center gap-1.5 text-xs";
-            
-            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
-            const resolvedInitialName = nameVal ? resolveFullName(cls, nameVal) : '';
-
-            div.innerHTML = `
-                <input type="text" onblur="autoResolveBatchRowName(this)" class="batch-input-name font-semibold bg-white border border-slate-300 rounded-lg p-2 flex-1 min-w-0" placeholder="Nama Siswa..." value="${resolvedInitialName}">
-                <select class="batch-select-status font-bold bg-white border border-slate-300 rounded-lg p-2 w-24 shrink-0">
-                    <option value="S" ${statusVal === 'S' ? 'selected' : ''}>Sakit (S)</option>
-                    <option value="I" ${statusVal === 'I' ? 'selected' : ''}>Izin (I)</option>
-                    <option value="A" ${statusVal === 'A' ? 'selected' : ''}>Alpha (A)</option>
-                    <option value="TERLAMBAT" ${statusVal === 'TERLAMBAT' ? 'selected' : ''}>Telat (T)</option>
-                    <option value="PULANG" ${statusVal === 'PULANG' ? 'selected' : ''}>Pulang (P)</option>
-                </select>
-                <input type="text" class="batch-input-note bg-white border border-slate-300 rounded-lg p-2 w-28 shrink-0" placeholder="Ket/Jam..." value="${noteVal}">
-                <button type="button" onclick="removeBatchStudentRow('${rowId}')" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
-            `;
-            
-            container.appendChild(div);
-            updateBatchRowCountBadge();
-        };
-
-        window.autoResolveBatchRowName = function(inputEl) {
-            if (!inputEl || !inputEl.value.trim()) return;
-            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
-            const resolved = resolveFullName(cls, inputEl.value.trim());
-            if (resolved && resolved !== inputEl.value) {
-                inputEl.value = resolved;
-            }
-        };
-
-        window.removeBatchStudentRow = function(rowId) {
-            const row = document.getElementById(rowId);
-            if (row) row.remove();
-            updateBatchRowCountBadge();
-        };
-
-        function updateBatchRowCountBadge() {
-            const count = document.querySelectorAll('.batch-student-row').length;
-            const badge = document.getElementById('batch-row-count-badge');
-            if (badge) badge.innerText = `${count} Baris Siswa`;
-        }
-
-        // AUTO PARSER TEKS DARI WHATSAPP CHAT
-        window.parseAndPopulateWhatsAppText = function() {
-            const rawText = document.getElementById('quick-student-wa-paste').value.trim();
-            if (!rawText) {
-                showToast('Tempelkan teks laporan dari WhatsApp terlebih dahulu!');
-                return;
-            }
-
-            const lines = rawText.split('\n');
-            let addedCount = 0;
-
-            lines.forEach((line, lineIdx) => {
-                let cleanLine = line.trim();
-                if (!cleanLine) return;
-
-                // Cek apakah baris berupa header kelas (misal "XI.5" atau "XII 9")
-                const classMatch = cleanLine.match(/^(X|XI|XII)[\s.\-_]*(\d{1,2})/i);
-                if (classMatch && lineIdx < 3) {
-                    const matchedClass = `${classMatch[1].toUpperCase()} ${classMatch[2]}`;
-                    const selectCls = document.getElementById('quick-student-class');
-                    if (selectCls) {
-                        selectCls.value = matchedClass;
-                    }
-                }
-
-                // Bersihkan nomor urut di awal misal "1. Arika (sakit)" -> "Arika (sakit)"
-                cleanLine = cleanLine.replace(/^[\d\s.\-*)]+/, '').trim();
-                if (!cleanLine) return;
-
-                // Deteksi status dari kata kunci
-                let status = 'S';
-                let note = '';
-
-                if (/sakit|\(s\)/i.test(cleanLine)) {
-                    status = 'S';
-                } else if (/izin|\(i\)/i.test(cleanLine)) {
-                    status = 'I';
-                } else if (/alpa|alpha|tanpa|\(a\)/i.test(cleanLine)) {
-                    status = 'A';
-                } else if (/terlambat|telat|\(t\)/i.test(cleanLine)) {
-                    status = 'TERLAMBAT';
-                    note = '07.45';
-                } else if (/pulang|dispen|\(p\)/i.test(cleanLine)) {
-                    status = 'PULANG';
-                    note = 'Izin Pulang';
-                }
-
-                // Ekstrak Murni Nama Siswa
-                let studentName = cleanLine.replace(/\(.*\)/g, '').replace(/sakit|izin|alpa|alpha|terlambat|telat|pulang|dispen/gi, '').trim();
-
-                if (studentName.length >= 2) {
-                    const currentCls = cleanClassName(document.getElementById('quick-student-class').value);
-                    const fullStudentName = resolveFullName(currentCls, studentName);
-                    addBatchStudentRow(fullStudentName, status, note);
-                    addedCount++;
-                }
-            });
-
-            if (addedCount > 0) {
-                showToast(`Berhasil mengekstrak ${addedCount} nama siswa dari WA!`);
-            } else {
-                showToast('Gagal mengekstrak nama. Pastikan format ada nama siswa.');
-            }
-        };
-
+        // ENHANCED STUDENT INPUT MODAL (SINGLE & BATCH INPUT FOR 1 CLASS)
         window.openQuickStudentModal = function(defaultStatus = 'S') {
             document.getElementById('form-quick-student').reset();
-            document.getElementById('batch-student-rows-container').innerHTML = '';
-            document.getElementById('quick-student-wa-paste').value = '';
-            
-            // Default ke Mode Batch (1 Kelas Banyak Siswa)
-            switchQuickStudentMode('batch');
-            
-            // Tambahkan 3 baris kosong awal
-            addBatchStudentRow();
-            addBatchStudentRow();
-            addBatchStudentRow();
-
             document.getElementById('quick-student-status').value = defaultStatus;
             onQuickStudentStatusChange();
             onQuickStudentClassChange();
             document.getElementById('quick-student-suggestions').classList.add('hidden');
+            
+            // Reset Batch States
+            batchStudents = [];
+            document.getElementById('qs-batch-wa-text').value = '';
+            document.getElementById('qs-batch-search-name').value = '';
+            document.getElementById('qs-batch-suggestions').classList.add('hidden');
+            renderBatchTable();
+
+            switchQuickStudentTab('single');
             document.getElementById('modal-quick-student').classList.remove('hidden');
         };
 
@@ -1934,15 +1757,34 @@
             document.getElementById('modal-quick-student').classList.add('hidden');
         };
 
+        window.switchQuickStudentTab = function(mode) {
+            const btnSingle = document.getElementById('tab-btn-qs-single');
+            const btnBatch = document.getElementById('tab-btn-qs-batch');
+            const formSingle = document.getElementById('form-quick-student');
+            const containerBatch = document.getElementById('container-qs-batch');
+
+            if (mode === 'single') {
+                btnSingle.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
+                btnBatch.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
+                formSingle.classList.remove('hidden');
+                containerBatch.classList.add('hidden');
+            } else {
+                btnBatch.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
+                btnSingle.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
+                formSingle.classList.add('hidden');
+                containerBatch.classList.remove('hidden');
+
+                const currentCls = document.getElementById('quick-student-class').value;
+                const batchClsSelect = document.getElementById('qs-batch-class');
+                if (batchClsSelect && currentCls) {
+                    batchClsSelect.value = currentCls;
+                }
+            }
+        };
+
         window.onQuickStudentClassChange = function() {
             document.getElementById('quick-student-name').value = '';
             document.getElementById('quick-student-suggestions').classList.add('hidden');
-            const cls = cleanClassName(document.getElementById('quick-student-class')?.value || '');
-            document.querySelectorAll('.batch-input-name').forEach(inputEl => {
-                if (inputEl.value.trim()) {
-                    inputEl.value = resolveFullName(cls, inputEl.value.trim());
-                }
-            });
         };
 
         window.onQuickStudentStatusChange = function() {
@@ -2011,77 +1853,278 @@
         window.saveQuickStudentForm = function(event) {
             event.preventDefault();
             const cls = cleanClassName(document.getElementById('quick-student-class').value);
+            const status = document.getElementById('quick-student-status').value;
+            const name = document.getElementById('quick-student-name').value.trim();
+            const time = document.getElementById('quick-student-time').value.trim();
+            const note = document.getElementById('quick-student-note').value.trim();
+            const todayKey = getTodayKey();
+
+            if (!name) {
+                showToast('Ketik nama siswa terlebih dahulu!');
+                return;
+            }
+
+            if (status === 'TERLAMBAT') {
+                studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
+                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                renderLateList();
+            } else if (status === 'PULANG') {
+                studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
+                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                renderEarlyList();
+            } else {
+                studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
+                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                renderStudentAbsenceTable();
+            }
+
+            closeQuickStudentModal();
+            showToast(`Presensi siswa (${name}) berhasil disimpan!`);
+            pushToCloud();
+        };
+
+        // FITUR BANYAK SISWA DALAM 1 KELAS (BATCH & AUTO PARSE WA)
+        window.onBatchClassChange = function() {
+            document.getElementById('qs-batch-search-name').value = '';
+            document.getElementById('qs-batch-suggestions').classList.add('hidden');
+        };
+
+        window.onBatchSearchInput = function(val) {
+            const select = document.getElementById('qs-batch-class');
+            const cls = cleanClassName(select.value);
+            const sugBox = document.getElementById('qs-batch-suggestions');
+            sugBox.innerHTML = '';
+
+            if (!val || val.trim().length === 0) {
+                sugBox.classList.add('hidden');
+                return;
+            }
+
+            const masterList = studentMasterData[cls] || [];
+            const query = val.toLowerCase();
+            const matches = masterList.filter(s => s.toLowerCase().includes(query));
+
+            if (matches.length === 0) {
+                const addDiv = document.createElement('div');
+                addDiv.className = "p-2.5 text-xs text-amber-600 font-bold hover:bg-amber-50 cursor-pointer";
+                addDiv.innerText = `➕ Tambah ke List: "${val}"`;
+                addDiv.onclick = () => {
+                    addStudentToBatchList(val);
+                    document.getElementById('qs-batch-search-name').value = '';
+                    sugBox.classList.add('hidden');
+                };
+                sugBox.appendChild(addDiv);
+                sugBox.classList.remove('hidden');
+                return;
+            }
+
+            matches.forEach(name => {
+                const div = document.createElement('div');
+                div.className = "p-2.5 text-xs hover:bg-slate-100 cursor-pointer border-b border-slate-100 flex items-center justify-between";
+                div.innerHTML = `<span class="font-semibold text-slate-800">${name}</span>`;
+                div.onclick = () => {
+                    addStudentToBatchList(name);
+                    document.getElementById('qs-batch-search-name').value = '';
+                    sugBox.classList.add('hidden');
+                };
+                sugBox.appendChild(div);
+            });
+
+            sugBox.classList.remove('hidden');
+        };
+
+        window.addCurrentSearchToBatch = function() {
+            const input = document.getElementById('qs-batch-search-name');
+            const val = input.value.trim();
+            if (val) {
+                addStudentToBatchList(val);
+                input.value = '';
+                document.getElementById('qs-batch-suggestions').classList.add('hidden');
+            }
+        };
+
+        function addStudentToBatchList(name, status = null, note = '') {
+            const defaultStatus = status || document.getElementById('qs-batch-default-status').value;
+            batchStudents.push({ name, status: defaultStatus, note });
+            renderBatchTable();
+        }
+
+        function renderBatchTable() {
+            const tbody = document.getElementById('qs-batch-table-body');
+            const countBadge = document.getElementById('qs-batch-count');
+            tbody.innerHTML = '';
+            countBadge.innerText = batchStudents.length;
+
+            if (batchStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic text-[11px]">Belum ada siswa dalam antrean. Ketik nama di atas atau paste pesan WA.</td></tr>`;
+                return;
+            }
+
+            batchStudents.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-1.5 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="p-1.5">
+                        <input type="text" value="${item.name}" onchange="updateBatchItem(${index}, 'name', this.value)" class="w-full text-xs font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-amber-500 focus:bg-white p-0.5 rounded">
+                    </td>
+                    <td class="p-1.5">
+                        <select onchange="updateBatchItem(${index}, 'status', this.value)" class="w-full text-[11px] font-bold bg-white border border-slate-200 rounded p-1">
+                            <option value="S" ${item.status === 'S' ? 'selected' : ''}>Sakit (S)</option>
+                            <option value="I" ${item.status === 'I' ? 'selected' : ''}>Izin (I)</option>
+                            <option value="A" ${item.status === 'A' ? 'selected' : ''}>Alpha (A)</option>
+                            <option value="TERLAMBAT" ${item.status === 'TERLAMBAT' ? 'selected' : ''}>Terlambat (T)</option>
+                            <option value="PULANG" ${item.status === 'PULANG' ? 'selected' : ''}>Pulang (P)</option>
+                        </select>
+                    </td>
+                    <td class="p-1.5">
+                        <input type="text" value="${item.note || ''}" placeholder="Ket/Jam" onchange="updateBatchItem(${index}, 'note', this.value)" class="w-full text-[11px] bg-slate-50 border border-slate-200 rounded p-1">
+                    </td>
+                    <td class="p-1.5 text-center">
+                        <button type="button" onclick="removeBatchRow(${index})" class="text-rose-500 hover:text-rose-700 text-xs p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.updateBatchItem = function(index, field, val) {
+            if (batchStudents[index]) {
+                batchStudents[index][field] = val;
+            }
+        };
+
+        window.removeBatchRow = function(index) {
+            batchStudents.splice(index, 1);
+            renderBatchTable();
+        };
+
+        window.clearBatchQueue = function() {
+            batchStudents = [];
+            renderBatchTable();
+        };
+
+        window.parseWaTextToBatch = function() {
+            const rawText = document.getElementById('qs-batch-wa-text').value.trim();
+            if (!rawText) {
+                showToast('Paste teks pesan WhatsApp terlebih dahulu!');
+                return;
+            }
+
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const select = document.getElementById('qs-batch-class');
+            
+            // Deteksi nama kelas secara otomatis dari pesan WA (contoh: XI.5, XI-5, XI 5, XII 1, X 2)
+            for (let line of lines) {
+                const clsMatch = line.match(/(X|XI|XII)[\.\-\s]?(\d{1,2})/i);
+                if (clsMatch) {
+                    const roman = clsMatch[1].toUpperCase();
+                    const num = clsMatch[2];
+                    const candidate = `${roman} ${num}`;
+                    if (ALL_CLASSES.includes(candidate)) {
+                        select.value = candidate;
+                        break;
+                    }
+                }
+            }
+
+            const targetClass = cleanClassName(select.value);
+            const masterList = studentMasterData[targetClass] || [];
+            let addedCount = 0;
+
+            lines.forEach(line => {
+                // Abaikan baris header / tanggal / nama kelas
+                if (line.match(/(X|XI|XII)[\.\-\s]?(\d{1,2})/i) || 
+                    line.toLowerCase().includes('senin') || line.toLowerCase().includes('selasa') || 
+                    line.toLowerCase().includes('rabu') || line.toLowerCase().includes('kamis') || 
+                    line.toLowerCase().includes('jumat') || line.toLowerCase().includes('sabtu') || 
+                    line.toLowerCase().includes('minggu') || line.toLowerCase().includes('agustus') || 
+                    line.toLowerCase().includes('september') || line.toLowerCase().includes('oktober')) {
+                    return;
+                }
+
+                // Bersihkan penomoran di depan baris (contoh: "1. ", "2) ", "- ")
+                let cleanLine = line.replace(/^[\d\.\)\-\*\s]+/, '').trim();
+                if (!cleanLine) return;
+
+                // Deteksi status dalam tanda kurung / setelah nama (contoh: (sakit), (izin), (S), (I), (terlambat))
+                let status = 'S';
+                let note = '';
+                let studentName = cleanLine;
+
+                const statusMatch = cleanLine.match(/^(.*?)\s*[\(\[\-\s]+(sakit|izin|alpa|alpha|terlambat|pulang|dispen|s|i|a|t|p)[\)\]]*$/i);
+                if (statusMatch) {
+                    studentName = statusMatch[1].trim();
+                    const stStr = statusMatch[2].toLowerCase();
+
+                    if (stStr === 'sakit' || stStr === 's') status = 'S';
+                    else if (stStr === 'izin' || stStr === 'i') status = 'I';
+                    else if (stStr === 'alpa' || stStr === 'alpha' || stStr === 'a') status = 'A';
+                    else if (stStr === 'terlambat' || stStr === 't') { status = 'TERLAMBAT'; note = '07.45'; }
+                    else if (stStr === 'pulang' || stStr === 'dispen' || stStr === 'p') { status = 'PULANG'; note = '10.30'; }
+                }
+
+                if (!studentName) return;
+
+                // Cari kecocokan nama terbaik dari Master Data Siswa kelas tersebut
+                let bestMatch = studentName;
+                if (masterList.length > 0) {
+                    const found = masterList.find(m => m.toLowerCase().includes(studentName.toLowerCase()) || studentName.toLowerCase().includes(m.toLowerCase()));
+                    if (found) bestMatch = found;
+                }
+
+                addStudentToBatchList(bestMatch, status, note);
+                addedCount++;
+            });
+
+            if (addedCount > 0) {
+                showToast(`${addedCount} nama siswa berhasil diekstrak!`);
+                document.getElementById('qs-batch-wa-text').value = '';
+            } else {
+                showToast('Tidak ada data siswa yang valid ditemukan dalam teks.');
+            }
+        };
+
+        window.saveBatchStudentForm = function() {
+            if (batchStudents.length === 0) {
+                showToast('Belum ada siswa dalam daftar!');
+                return;
+            }
+
+            const cls = cleanClassName(document.getElementById('qs-batch-class').value);
             const todayKey = getTodayKey();
             let savedCount = 0;
 
-            if (currentQuickStudentMode === 'batch') {
-                // MODE BATCH (1 KELAS BANYAK SISWA)
-                const rows = document.querySelectorAll('.batch-student-row');
-                
-                rows.forEach(row => {
-                    const rawName = row.querySelector('.batch-input-name').value.trim();
-                    const status = row.querySelector('.batch-select-status').value;
-                    const note = row.querySelector('.batch-input-note').value.trim();
+            batchStudents.forEach(item => {
+                const name = item.name.trim();
+                if (!name) return;
 
-                    if (rawName.length > 0) {
-                        const name = resolveFullName(cls, rawName);
-                        if (status === 'TERLAMBAT') {
-                            studentLateList.push({ date: todayKey, class: cls, name, time: note || '07.45', reason: 'Terlambat' });
-                        } else if (status === 'PULANG') {
-                            studentEarlyList.push({ date: todayKey, class: cls, name, time: note || '10.30', reason: 'Izin Pulang' });
-                        } else {
-                            studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
-                        }
-                        savedCount++;
-                    }
-                });
-
-                if (savedCount === 0) {
-                    showToast('Isi minimal 1 nama siswa untuk disimpan!');
-                    return;
-                }
-
-                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
-                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
-                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-
-                renderStudentAbsenceTable();
-                renderLateList();
-                renderEarlyList();
-                closeQuickStudentModal();
-                showToast(`Berhasil menyimpan ${savedCount} presensi siswa kelas ${cls}!`);
-                pushToCloud();
-
-            } else {
-                // MODE SINGLE (1 SISWA)
-                const status = document.getElementById('quick-student-status').value;
-                const name = document.getElementById('quick-student-name').value.trim();
-                const time = document.getElementById('quick-student-time').value.trim();
-                const note = document.getElementById('quick-student-note').value.trim();
-
-                if (!name) {
-                    showToast('Ketik nama siswa terlebih dahulu!');
-                    return;
-                }
-
-                if (status === 'TERLAMBAT') {
-                    studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
-                    localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
-                    renderLateList();
-                } else if (status === 'PULANG') {
-                    studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
-                    localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-                    renderEarlyList();
+                if (item.status === 'TERLAMBAT') {
+                    studentLateList.push({ date: todayKey, class: cls, name, time: item.note || '07.45', reason: 'Terlambat' });
+                } else if (item.status === 'PULANG') {
+                    studentEarlyList.push({ date: todayKey, class: cls, name, time: item.note || '10.30', reason: 'Izin Pulang' });
                 } else {
-                    studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
-                    localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
-                    renderStudentAbsenceTable();
+                    studentAbsenceList.push({ date: todayKey, class: cls, name, status: item.status, note: item.note || '' });
                 }
+                savedCount++;
+            });
 
-                closeQuickStudentModal();
-                showToast(`Presensi siswa (${name}) berhasil disimpan!`);
-                pushToCloud();
-            }
+            localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+            localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+            localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+
+            renderStudentAbsenceTable();
+            renderLateList();
+            renderEarlyList();
+
+            batchStudents = [];
+            renderBatchTable();
+            closeQuickStudentModal();
+
+            showToast(`${savedCount} presensi siswa kelas ${cls} berhasil disimpan!`);
+            pushToCloud();
         };
 
         window.openMasterJadwalModal = function() {
@@ -2300,8 +2343,7 @@
             const matrixBody = document.getElementById('siswa-matrix-body');
             matrixBody.innerHTML = '';
 
-            const masterKey = Object.keys(studentMasterData).find(k => getNormalizedClassKey(k) === getNormalizedClassKey(selectedClass)) || selectedClass;
-            const studentList = studentMasterData[masterKey] || [];
+            const studentList = studentMasterData[selectedClass] || [];
 
             studentList.forEach((studentName, idx) => {
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
@@ -2311,9 +2353,9 @@
                     const dayFormatted = String(d).padStart(2, '0');
                     const dateKey = `${monthStr}-${dayFormatted}`;
 
-                    const absLog = studentAbsenceList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
-                    const lateLog = studentLateList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
-                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && getNormalizedClassKey(x.class) === getNormalizedClassKey(selectedClass) && isSameStudentName(x.name, studentName));
+                    const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+                    const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+                    const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
 
                     let cellContent = '-';
 
