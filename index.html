@@ -455,7 +455,7 @@
 
             <!-- JUDUL REKAP PRESENSI GURU -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
-                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI KETIDAKHADIRAN PRESENSI GURU</h3>
+                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI GURU</h3>
             </div>
 
             <div class="bg-white p-3 rounded-xl border border-slate-200 no-print">
@@ -523,7 +523,7 @@
 
             <!-- JUDUL REKAP SISWA BULANAN -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
-                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI & KETIDAKHADIRAN SISWA</h3>
+                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI SISWA</h3>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
@@ -543,6 +543,18 @@
                     </thead>
                     <tbody id="siswa-matrix-body" class="divide-y divide-slate-200"></tbody>
                 </table>
+            </div>
+
+            <!-- KETERANGAN KODE PRESENSI SISWA -->
+            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-xs text-slate-700 flex flex-wrap items-center gap-x-6 gap-y-1.5">
+                <span class="font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-amber-500"></i> Keterangan Kode:
+                </span>
+                <span class="font-medium"><strong class="text-blue-600 font-bold">S</strong> = Sakit</span>
+                <span class="font-medium"><strong class="text-amber-600 font-bold">I</strong> = Izin</span>
+                <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpa</span>
+                <span class="font-medium"><strong class="text-rose-800 font-bold">T</strong> = Terlambat</span>
+                <span class="font-medium"><strong class="text-indigo-800 font-bold">P</strong> = Pulang</span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto p-4 space-y-3">
