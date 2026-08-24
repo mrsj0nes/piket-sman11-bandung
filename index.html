@@ -36,11 +36,7 @@
             table { font-size: 8.5pt; border-collapse: collapse !important; width: 100% !important; }
             th, td { border: 1px solid #333 !important; padding: 2px 4px !important; }
             .sticky-col, .sticky-col-header { position: static !important; }
-            
-            /* Sembunyikan lembar mengaji harian saat cetak biasa / rekap */
             #section-print-form-mengaji { display: none !important; }
-            
-            /* Tampilkan lembar mengaji harian HANYA ketika tombol 'Cetak Lembar' diklik */
             body.print-mengaji-only main { display: none !important; }
             body.print-mengaji-only #section-print-form-mengaji { display: block !important; }
         }
@@ -74,7 +70,6 @@
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800 flex flex-col">
 
-    <!-- TOP HEADER -->
     <header class="bg-brand-500 text-white shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -88,13 +83,11 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <!-- INDIKATOR CLOUD SYNC FIREBASE -->
                 <div id="cloud-status-badge" onclick="openCloudModal()" class="cursor-pointer flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                     <i id="cloud-status-icon" class="fa-solid fa-bolt text-xs text-yellow-300"></i>
                     <span id="cloud-status-text">Realtime Sync (Connecting)</span>
                 </div>
 
-                <!-- INDIKATOR STATUS PROTEKSI REKAP -->
                 <div id="admin-status-badge" onclick="handleAdminBadgeClick()" class="cursor-pointer flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition">
                     <i id="admin-status-icon" class="fa-solid fa-lock text-xs"></i>
                     <span id="admin-status-text">Rekap Terkunci</span>
@@ -108,7 +101,6 @@
         </div>
     </header>
 
-    <!-- NAVIGATION TABS -->
     <nav class="bg-white border-b border-slate-200 no-print sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-3 flex overflow-x-auto space-x-1 py-2 text-xs font-medium no-scrollbar">
             <button onclick="switchTab('input-mengaji')" id="tab-btn-input-mengaji" class="tab-btn active px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition bg-brand-50 text-brand-500 font-semibold border border-brand-100">
@@ -170,7 +162,6 @@
             </div>
         </div>
 
-        <!-- TAB 1: PEMANTAUAN MENGAJI HARIAN -->
         <section id="tab-input-mengaji" class="tab-content block space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex items-center gap-3">
@@ -210,7 +201,6 @@
             <div id="mengaji-36-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"></div>
         </section>
 
-        <!-- PRINT FORM MENGAJI HARIAN -->
         <section id="section-print-form-mengaji" class="hidden">
             <div class="kop-surat mb-3 print:mb-2">
                 <div class="flex items-center justify-between gap-2 border-b-4 border-double border-slate-900 pb-2 text-center">
@@ -259,7 +249,6 @@
             </table>
         </section>
 
-        <!-- TAB 2: KETIDAKHADIRAN GURU -->
         <section id="tab-input-presensi" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -282,7 +271,6 @@
             </div>
         </section>
 
-        <!-- TAB 3: PRESENSI SISWA -->
         <section id="tab-input-siswa" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex items-center gap-3">
@@ -336,7 +324,6 @@
             </div>
         </section>
 
-        <!-- TAB 4: KESISWAAN -->
         <section id="tab-input-kesiswaan" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex items-center gap-3">
@@ -390,7 +377,6 @@
             </div>
         </section>
 
-        <!-- TAB 5: REKAP MENGAJI -->
         <section id="tab-rekap-mengaji" class="tab-content hidden space-y-3">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex items-center gap-2">
@@ -407,7 +393,6 @@
                 </div>
             </div>
 
-            <!-- JUDUL REKAP MENGAJI -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
                 <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PEMANTAUAN BACA AL QUR'AN GURU</h3>
             </div>
@@ -435,7 +420,6 @@
             </div>
         </section>
 
-        <!-- TAB 6: REKAP PRESENSI GURU -->
         <section id="tab-rekap-presensi" class="tab-content hidden space-y-3">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex items-center gap-2">
@@ -452,7 +436,6 @@
                 </div>
             </div>
 
-            <!-- JUDUL REKAP PRESENSI GURU -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
                 <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI GURU</h3>
             </div>
@@ -483,7 +466,6 @@
                 </table>
             </div>
 
-            <!-- KETERANGAN KODE PRESENSI GURU -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-xs text-slate-700 flex flex-wrap items-center gap-x-6 gap-y-1.5">
                 <span class="font-bold text-slate-800 uppercase flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-info text-brand-500"></i> Keterangan Kode:
@@ -496,7 +478,6 @@
             </div>
         </section>
 
-        <!-- TAB 7: REKAP SISWA -->
         <section id="tab-rekap-siswa" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex flex-wrap items-center gap-2">
@@ -520,7 +501,6 @@
                 </div>
             </div>
 
-            <!-- JUDUL REKAP SISWA BULANAN -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
                 <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI SISWA</h3>
             </div>
@@ -544,7 +524,6 @@
                 </table>
             </div>
 
-            <!-- KETERANGAN KODE PRESENSI SISWA -->
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm text-xs text-slate-700 flex flex-wrap items-center gap-x-6 gap-y-1.5">
                 <span class="font-bold text-slate-800 uppercase flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-info text-amber-500"></i> Keterangan Kode:
@@ -578,7 +557,6 @@
             </div>
         </section>
 
-        <!-- TAB 8: MASTER SISWA -->
         <section id="tab-master-siswa" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -647,7 +625,6 @@
             </div>
         </section>
 
-        <!-- TAB 9: MASTER GURU -->
         <section id="tab-master-guru" class="tab-content hidden space-y-3">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
                 <div>
@@ -682,7 +659,6 @@
 
     </main>
 
-    <!-- MODALS -->
     <div id="modal-confirm-dialog" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-3 text-center">
             <div id="confirm-dialog-icon-bg" class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-lg">
@@ -716,9 +692,9 @@
         </div>
     </div>
 
-    <!-- MODAL CATAT PRESENSI SISWA (DUAL MODE: 1 SISWA ATAU BANYAK SISWA DENGAN AUTOCOMPLETE & PASTE WA) -->
+    <!-- MODAL QUICK STUDENT (WITH BATCH INPUT & SEARCHABLE NAMES) -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md sm:max-w-lg w-full overflow-hidden p-5 space-y-3 max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
                 <h3 id="modal-quick-student-title" class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-amber-500"></i> Catat Presensi Siswa
@@ -734,13 +710,14 @@
                     <i class="fa-solid fa-user mr-1"></i> 1 Siswa (Cepat)
                 </button>
                 <button type="button" id="tab-btn-qs-batch" onclick="switchQuickStudentTab('batch')" class="px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition">
-                    <i class="fa-solid fa-users mr-1"></i> Banyak Siswa (1 Kelas / WA)
+                    <i class="fa-solid fa-users mr-1"></i> Banyak Siswa (1 Kelas)
                 </button>
             </div>
 
-            <div class="overflow-y-auto flex-1 pr-1 space-y-3">
-                <!-- MODE 1: SINGLE STUDENT FORM (FITUR LAMA TERPELIHARA) -->
-                <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="space-y-3">
+            <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
+                
+                <!-- MODE 1 SISWA (SINGLE) -->
+                <div id="qs-container-single" class="space-y-3">
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
@@ -774,23 +751,18 @@
                             <input type="text" id="quick-student-note" placeholder="Misal: Surat Dokter / Acara Keluarga / Demam" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex items-center gap-2 pt-2">
-                        <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                        <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Siswa</button>
-                    </div>
-                </form>
-
-                <!-- MODE 2: INPUT BANYAK SISWA DALAM 1 KELAS -->
-                <div id="container-qs-batch" class="hidden space-y-3">
+                <!-- MODE BANYAK SISWA (BATCH 1 KELAS) -->
+                <div id="qs-container-batch" class="space-y-3 hidden">
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas Target *</label>
-                            <select id="qs-batch-class" onchange="onBatchClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
+                            <select id="quick-student-class-batch" onchange="onBatchClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Baru</label>
-                            <select id="qs-batch-default-status" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                            <select id="quick-student-status-batch" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
                                 <option value="S">Sakit (S)</option>
                                 <option value="I">Izin (I)</option>
                                 <option value="A">Alpha (A)</option>
@@ -812,48 +784,39 @@
                         <div id="qs-batch-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                     </div>
 
-                    <!-- WA Text Auto Extract Box -->
-                    <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-2.5 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold text-emerald-900 flex items-center gap-1">
-                                <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Tempel (Paste) Laporan dari WhatsApp
-                            </span>
-                            <button type="button" onclick="parseWaTextToBatch()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2.5 py-1 rounded-lg shadow transition">
-                                ⚡ Ekstrak Nama & Status WA
-                            </button>
-                        </div>
-                        <textarea id="qs-batch-wa-text" rows="3" placeholder="Contoh format WA:&#10;XI 5&#10;1. Arika (sakit)&#10;2. Sonia (izin)&#10;3. Latasya (Izin)" class="w-full text-xs font-mono bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500"></textarea>
-                    </div>
-
                     <!-- Tabel Antrean Banyak Siswa -->
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Siswa Yang Diinput (<span id="qs-batch-count" class="text-amber-600">0</span> Siswa)</span>
                             <button type="button" onclick="clearBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
                         </div>
-
-                        <div class="border border-slate-200 rounded-xl overflow-hidden max-h-[180px] overflow-y-auto">
-                            <table class="w-full text-xs text-left">
-                                <thead class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                        
+                        <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-[11px] text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
                                     <tr>
-                                        <th class="p-1.5 text-center w-7">#</th>
-                                        <th class="p-1.5">Nama Siswa</th>
-                                        <th class="p-1.5 w-24">Status</th>
-                                        <th class="p-1.5 w-24">Ket / Jam</th>
-                                        <th class="p-1.5 text-center w-8"></th>
+                                        <th class="p-2 text-center w-6">#</th>
+                                        <th class="p-2">Nama Siswa</th>
+                                        <th class="p-2 w-28">Status</th>
+                                        <th class="p-2">Ket / Jam</th>
+                                        <th class="p-2 text-center w-10">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="qs-batch-table-body" class="divide-y divide-slate-100"></tbody>
+                                <tbody id="qs-batch-table-body" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada siswa dalam antrean. Ketik nama di atas.</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-2 pt-2">
-                        <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                        <button type="button" onclick="saveBatchStudentForm()" class="w-1/2 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Semua Siswa</button>
-                    </div>
                 </div>
-            </div>
+
+                <div class="flex items-center gap-2 pt-2 shrink-0 border-t border-slate-100">
+                    <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                    <button type="submit" id="qs-submit-btn" class="w-1/2 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Presensi Siswa</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -968,7 +931,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1003,14 +965,12 @@
         let db = null;
         let auth = null;
         let isRemoteUpdate = false;
-        let batchStudents = [];
 
         const ALL_CLASSES = [];
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`X ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XI ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XII ${i}`);
 
-        // FUNGSI PEMBANTU: Mendapatkan bobot/urutan kelas untuk sorting (X 1 - X 12, XI 1 - XI 12, XII 1 - XII 12)
         function getClassRank(clsStr) {
             const cleaned = cleanClassName(clsStr);
             const idx = ALL_CLASSES.indexOf(cleaned);
@@ -1047,6 +1007,10 @@
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
         let isAdminUnlocked = false;
+
+        // Quick Student Batch Mode State Variables
+        let quickStudentMode = 'single';
+        let batchQueue = [];
 
         async function setupFirebase() {
             if (!firebaseConfig) {
@@ -1194,7 +1158,7 @@
                 document.getElementById('rekap-siswa-class-select'),
                 document.getElementById('master-siswa-class-select'),
                 document.getElementById('quick-student-class'),
-                document.getElementById('qs-batch-class')
+                document.getElementById('quick-student-class-batch')
             ];
 
             selectors.forEach(select => {
@@ -1584,7 +1548,6 @@
             tbody.innerHTML = '';
 
             const todayKey = getTodayKey();
-            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
             const list = studentAbsenceList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1639,7 +1602,6 @@
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
-            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
             const list = studentLateList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1690,7 +1652,6 @@
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
-            // SORTING DENGAN TERURUT BERDASARKAN KELAS TERKECIL HINGGA TERBESAR (X 1 - XII 12)
             const list = studentEarlyList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1734,22 +1695,20 @@
             });
         };
 
-        // ENHANCED STUDENT INPUT MODAL (SINGLE & BATCH INPUT FOR 1 CLASS)
         window.openQuickStudentModal = function(defaultStatus = 'S') {
             document.getElementById('form-quick-student').reset();
             document.getElementById('quick-student-status').value = defaultStatus;
+            document.getElementById('quick-student-status-batch').value = defaultStatus === 'TERLAMBAT' || defaultStatus === 'PULANG' ? defaultStatus : 'S';
+            
+            switchQuickStudentTab('single');
             onQuickStudentStatusChange();
             onQuickStudentClassChange();
-            document.getElementById('quick-student-suggestions').classList.add('hidden');
             
-            // Reset Batch States
-            batchStudents = [];
-            document.getElementById('qs-batch-wa-text').value = '';
-            document.getElementById('qs-batch-search-name').value = '';
+            batchQueue = [];
+            renderBatchQueueTable();
+            
+            document.getElementById('quick-student-suggestions').classList.add('hidden');
             document.getElementById('qs-batch-suggestions').classList.add('hidden');
-            renderBatchTable();
-
-            switchQuickStudentTab('single');
             document.getElementById('modal-quick-student').classList.remove('hidden');
         };
 
@@ -1758,33 +1717,36 @@
         };
 
         window.switchQuickStudentTab = function(mode) {
-            const btnSingle = document.getElementById('tab-btn-qs-single');
-            const btnBatch = document.getElementById('tab-btn-qs-batch');
-            const formSingle = document.getElementById('form-quick-student');
-            const containerBatch = document.getElementById('container-qs-batch');
+            quickStudentMode = mode;
+            const singleTabBtn = document.getElementById('tab-btn-qs-single');
+            const batchTabBtn = document.getElementById('tab-btn-qs-batch');
+            const singleContainer = document.getElementById('qs-container-single');
+            const batchContainer = document.getElementById('qs-container-batch');
+            const submitBtn = document.getElementById('qs-submit-btn');
 
             if (mode === 'single') {
-                btnSingle.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
-                btnBatch.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
-                formSingle.classList.remove('hidden');
-                containerBatch.classList.add('hidden');
+                singleTabBtn.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
+                batchTabBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
+                singleContainer.classList.remove('hidden');
+                batchContainer.classList.add('hidden');
+                submitBtn.innerText = "Simpan Presensi Siswa";
             } else {
-                btnBatch.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
-                btnSingle.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
-                formSingle.classList.add('hidden');
-                containerBatch.classList.remove('hidden');
-
-                const currentCls = document.getElementById('quick-student-class').value;
-                const batchClsSelect = document.getElementById('qs-batch-class');
-                if (batchClsSelect && currentCls) {
-                    batchClsSelect.value = currentCls;
-                }
+                batchTabBtn.className = "px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 font-bold border border-amber-200 transition";
+                singleTabBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 transition";
+                batchContainer.classList.remove('hidden');
+                singleContainer.classList.add('hidden');
+                submitBtn.innerText = "Simpan Semua Siswa";
             }
         };
 
         window.onQuickStudentClassChange = function() {
             document.getElementById('quick-student-name').value = '';
             document.getElementById('quick-student-suggestions').classList.add('hidden');
+        };
+
+        window.onBatchClassChange = function() {
+            document.getElementById('qs-batch-search-name').value = '';
+            document.getElementById('qs-batch-suggestions').classList.add('hidden');
         };
 
         window.onQuickStudentStatusChange = function() {
@@ -1850,48 +1812,8 @@
             sugBox.classList.remove('hidden');
         };
 
-        window.saveQuickStudentForm = function(event) {
-            event.preventDefault();
-            const cls = cleanClassName(document.getElementById('quick-student-class').value);
-            const status = document.getElementById('quick-student-status').value;
-            const name = document.getElementById('quick-student-name').value.trim();
-            const time = document.getElementById('quick-student-time').value.trim();
-            const note = document.getElementById('quick-student-note').value.trim();
-            const todayKey = getTodayKey();
-
-            if (!name) {
-                showToast('Ketik nama siswa terlebih dahulu!');
-                return;
-            }
-
-            if (status === 'TERLAMBAT') {
-                studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
-                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
-                renderLateList();
-            } else if (status === 'PULANG') {
-                studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
-                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-                renderEarlyList();
-            } else {
-                studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
-                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
-                renderStudentAbsenceTable();
-            }
-
-            closeQuickStudentModal();
-            showToast(`Presensi siswa (${name}) berhasil disimpan!`);
-            pushToCloud();
-        };
-
-        // FITUR BANYAK SISWA DALAM 1 KELAS (BATCH & AUTO PARSE WA)
-        window.onBatchClassChange = function() {
-            document.getElementById('qs-batch-search-name').value = '';
-            document.getElementById('qs-batch-suggestions').classList.add('hidden');
-        };
-
         window.onBatchSearchInput = function(val) {
-            const select = document.getElementById('qs-batch-class');
-            const cls = cleanClassName(select.value);
+            const cls = cleanClassName(document.getElementById('quick-student-class-batch').value);
             const sugBox = document.getElementById('qs-batch-suggestions');
             sugBox.innerHTML = '';
 
@@ -1907,9 +1829,9 @@
             if (matches.length === 0) {
                 const addDiv = document.createElement('div');
                 addDiv.className = "p-2.5 text-xs text-amber-600 font-bold hover:bg-amber-50 cursor-pointer";
-                addDiv.innerText = `➕ Tambah ke List: "${val}"`;
+                addDiv.innerText = `➕ Tambahkan: "${val}"`;
                 addDiv.onclick = () => {
-                    addStudentToBatchList(val);
+                    addStudentToBatch(val);
                     document.getElementById('qs-batch-search-name').value = '';
                     sugBox.classList.add('hidden');
                 };
@@ -1923,7 +1845,7 @@
                 div.className = "p-2.5 text-xs hover:bg-slate-100 cursor-pointer border-b border-slate-100 flex items-center justify-between";
                 div.innerHTML = `<span class="font-semibold text-slate-800">${name}</span>`;
                 div.onclick = () => {
-                    addStudentToBatchList(name);
+                    addStudentToBatch(name);
                     document.getElementById('qs-batch-search-name').value = '';
                     sugBox.classList.add('hidden');
                 };
@@ -1934,42 +1856,52 @@
         };
 
         window.addCurrentSearchToBatch = function() {
-            const input = document.getElementById('qs-batch-search-name');
-            const val = input.value.trim();
+            const val = document.getElementById('qs-batch-search-name').value.trim();
             if (val) {
-                addStudentToBatchList(val);
-                input.value = '';
+                addStudentToBatch(val);
+                document.getElementById('qs-batch-search-name').value = '';
                 document.getElementById('qs-batch-suggestions').classList.add('hidden');
             }
         };
 
-        function addStudentToBatchList(name, status = null, note = '') {
-            const defaultStatus = status || document.getElementById('qs-batch-default-status').value;
-            batchStudents.push({ name, status: defaultStatus, note });
-            renderBatchTable();
+        function addStudentToBatch(studentName, status = null) {
+            const cls = cleanClassName(document.getElementById('quick-student-class-batch').value);
+            const defaultStatus = status || document.getElementById('quick-student-status-batch').value;
+            
+            const existing = batchQueue.find(x => x.name.toLowerCase() === studentName.toLowerCase());
+            if (existing) {
+                existing.status = defaultStatus;
+            } else {
+                batchQueue.push({
+                    name: studentName,
+                    class: cls,
+                    status: defaultStatus,
+                    note: '',
+                    time: defaultStatus === 'TERLAMBAT' ? '07.45' : (defaultStatus === 'PULANG' ? '10.30' : '')
+                });
+            }
+            renderBatchQueueTable();
         }
 
-        function renderBatchTable() {
+        function renderBatchQueueTable() {
             const tbody = document.getElementById('qs-batch-table-body');
-            const countBadge = document.getElementById('qs-batch-count');
-            tbody.innerHTML = '';
-            countBadge.innerText = batchStudents.length;
+            const countElem = document.getElementById('qs-batch-count');
+            countElem.innerText = batchQueue.length;
 
-            if (batchStudents.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic text-[11px]">Belum ada siswa dalam antrean. Ketik nama di atas atau paste pesan WA.</td></tr>`;
+            if (batchQueue.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada siswa dalam antrean. Ketik nama di atas.</td></tr>`;
                 return;
             }
 
-            batchStudents.forEach((item, index) => {
+            tbody.innerHTML = '';
+            batchQueue.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
-                    <td class="p-1.5 text-center font-bold text-slate-400">${index + 1}</td>
-                    <td class="p-1.5">
-                        <input type="text" value="${item.name}" onchange="updateBatchItem(${index}, 'name', this.value)" class="w-full text-xs font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-amber-500 focus:bg-white p-0.5 rounded">
-                    </td>
-                    <td class="p-1.5">
-                        <select onchange="updateBatchItem(${index}, 'status', this.value)" class="w-full text-[11px] font-bold bg-white border border-slate-200 rounded p-1">
+                    <td class="p-2 text-center text-slate-400 font-bold">${index + 1}</td>
+                    <td class="p-2 font-bold text-slate-800">${item.name}</td>
+                    <td class="p-2">
+                        <select onchange="updateBatchItemStatus(${index}, this.value)" class="text-[11px] font-bold p-1 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-amber-500">
                             <option value="S" ${item.status === 'S' ? 'selected' : ''}>Sakit (S)</option>
                             <option value="I" ${item.status === 'I' ? 'selected' : ''}>Izin (I)</option>
                             <option value="A" ${item.status === 'A' ? 'selected' : ''}>Alpha (A)</option>
@@ -1977,11 +1909,11 @@
                             <option value="PULANG" ${item.status === 'PULANG' ? 'selected' : ''}>Pulang (P)</option>
                         </select>
                     </td>
-                    <td class="p-1.5">
-                        <input type="text" value="${item.note || ''}" placeholder="Ket/Jam" onchange="updateBatchItem(${index}, 'note', this.value)" class="w-full text-[11px] bg-slate-50 border border-slate-200 rounded p-1">
+                    <td class="p-2">
+                        <input type="text" value="${item.note || item.time || ''}" onchange="updateBatchItemNote(${index}, this.value)" placeholder="Ket / Jam..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
                     </td>
-                    <td class="p-1.5 text-center">
-                        <button type="button" onclick="removeBatchRow(${index})" class="text-rose-500 hover:text-rose-700 text-xs p-1">
+                    <td class="p-2 text-center">
+                        <button type="button" onclick="removeBatchQueueItem(${index})" class="text-rose-500 hover:text-rose-700">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -1990,141 +1922,97 @@
             });
         }
 
-        window.updateBatchItem = function(index, field, val) {
-            if (batchStudents[index]) {
-                batchStudents[index][field] = val;
-            }
+        window.removeBatchQueueItem = function(index) {
+            batchQueue.splice(index, 1);
+            renderBatchQueueTable();
         };
 
-        window.removeBatchRow = function(index) {
-            batchStudents.splice(index, 1);
-            renderBatchTable();
+        window.updateBatchItemStatus = function(index, newStatus) {
+            batchQueue[index].status = newStatus;
+            if (newStatus === 'TERLAMBAT' && !batchQueue[index].time) batchQueue[index].time = '07.45';
+            if (newStatus === 'PULANG' && !batchQueue[index].time) batchQueue[index].time = '10.30';
+            renderBatchQueueTable();
+        };
+
+        window.updateBatchItemNote = function(index, val) {
+            if (batchQueue[index].status === 'TERLAMBAT' || batchQueue[index].status === 'PULANG') {
+                batchQueue[index].time = val;
+            } else {
+                batchQueue[index].note = val;
+            }
         };
 
         window.clearBatchQueue = function() {
-            batchStudents = [];
-            renderBatchTable();
+            batchQueue = [];
+            renderBatchQueueTable();
         };
 
-        window.parseWaTextToBatch = function() {
-            const rawText = document.getElementById('qs-batch-wa-text').value.trim();
-            if (!rawText) {
-                showToast('Paste teks pesan WhatsApp terlebih dahulu!');
-                return;
-            }
+        window.saveQuickStudentForm = function(event) {
+            event.preventDefault();
+            const todayKey = getTodayKey();
 
-            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const select = document.getElementById('qs-batch-class');
-            
-            // Deteksi nama kelas secara otomatis dari pesan WA (contoh: XI.5, XI-5, XI 5, XII 1, X 2)
-            for (let line of lines) {
-                const clsMatch = line.match(/(X|XI|XII)[\.\-\s]?(\d{1,2})/i);
-                if (clsMatch) {
-                    const roman = clsMatch[1].toUpperCase();
-                    const num = clsMatch[2];
-                    const candidate = `${roman} ${num}`;
-                    if (ALL_CLASSES.includes(candidate)) {
-                        select.value = candidate;
-                        break;
-                    }
-                }
-            }
+            if (quickStudentMode === 'single') {
+                const cls = cleanClassName(document.getElementById('quick-student-class').value);
+                const status = document.getElementById('quick-student-status').value;
+                const name = document.getElementById('quick-student-name').value.trim();
+                const time = document.getElementById('quick-student-time').value.trim();
+                const note = document.getElementById('quick-student-note').value.trim();
 
-            const targetClass = cleanClassName(select.value);
-            const masterList = studentMasterData[targetClass] || [];
-            let addedCount = 0;
-
-            lines.forEach(line => {
-                // Abaikan baris header / tanggal / nama kelas
-                if (line.match(/(X|XI|XII)[\.\-\s]?(\d{1,2})/i) || 
-                    line.toLowerCase().includes('senin') || line.toLowerCase().includes('selasa') || 
-                    line.toLowerCase().includes('rabu') || line.toLowerCase().includes('kamis') || 
-                    line.toLowerCase().includes('jumat') || line.toLowerCase().includes('sabtu') || 
-                    line.toLowerCase().includes('minggu') || line.toLowerCase().includes('agustus') || 
-                    line.toLowerCase().includes('september') || line.toLowerCase().includes('oktober')) {
+                if (!name) {
+                    showToast('Ketik nama siswa terlebih dahulu!');
                     return;
                 }
 
-                // Bersihkan penomoran di depan baris (contoh: "1. ", "2) ", "- ")
-                let cleanLine = line.replace(/^[\d\.\)\-\*\s]+/, '').trim();
-                if (!cleanLine) return;
-
-                // Deteksi status dalam tanda kurung / setelah nama (contoh: (sakit), (izin), (S), (I), (terlambat))
-                let status = 'S';
-                let note = '';
-                let studentName = cleanLine;
-
-                const statusMatch = cleanLine.match(/^(.*?)\s*[\(\[\-\s]+(sakit|izin|alpa|alpha|terlambat|pulang|dispen|s|i|a|t|p)[\)\]]*$/i);
-                if (statusMatch) {
-                    studentName = statusMatch[1].trim();
-                    const stStr = statusMatch[2].toLowerCase();
-
-                    if (stStr === 'sakit' || stStr === 's') status = 'S';
-                    else if (stStr === 'izin' || stStr === 'i') status = 'I';
-                    else if (stStr === 'alpa' || stStr === 'alpha' || stStr === 'a') status = 'A';
-                    else if (stStr === 'terlambat' || stStr === 't') { status = 'TERLAMBAT'; note = '07.45'; }
-                    else if (stStr === 'pulang' || stStr === 'dispen' || stStr === 'p') { status = 'PULANG'; note = '10.30'; }
-                }
-
-                if (!studentName) return;
-
-                // Cari kecocokan nama terbaik dari Master Data Siswa kelas tersebut
-                let bestMatch = studentName;
-                if (masterList.length > 0) {
-                    const found = masterList.find(m => m.toLowerCase().includes(studentName.toLowerCase()) || studentName.toLowerCase().includes(m.toLowerCase()));
-                    if (found) bestMatch = found;
-                }
-
-                addStudentToBatchList(bestMatch, status, note);
-                addedCount++;
-            });
-
-            if (addedCount > 0) {
-                showToast(`${addedCount} nama siswa berhasil diekstrak!`);
-                document.getElementById('qs-batch-wa-text').value = '';
-            } else {
-                showToast('Tidak ada data siswa yang valid ditemukan dalam teks.');
-            }
-        };
-
-        window.saveBatchStudentForm = function() {
-            if (batchStudents.length === 0) {
-                showToast('Belum ada siswa dalam daftar!');
-                return;
-            }
-
-            const cls = cleanClassName(document.getElementById('qs-batch-class').value);
-            const todayKey = getTodayKey();
-            let savedCount = 0;
-
-            batchStudents.forEach(item => {
-                const name = item.name.trim();
-                if (!name) return;
-
-                if (item.status === 'TERLAMBAT') {
-                    studentLateList.push({ date: todayKey, class: cls, name, time: item.note || '07.45', reason: 'Terlambat' });
-                } else if (item.status === 'PULANG') {
-                    studentEarlyList.push({ date: todayKey, class: cls, name, time: item.note || '10.30', reason: 'Izin Pulang' });
+                if (status === 'TERLAMBAT') {
+                    studentLateList.push({ date: todayKey, class: cls, name, time, reason: note });
+                    localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                    renderLateList();
+                } else if (status === 'PULANG') {
+                    studentEarlyList.push({ date: todayKey, class: cls, name, time, reason: note });
+                    localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                    renderEarlyList();
                 } else {
-                    studentAbsenceList.push({ date: todayKey, class: cls, name, status: item.status, note: item.note || '' });
+                    studentAbsenceList.push({ date: todayKey, class: cls, name, status, note });
+                    localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                    renderStudentAbsenceTable();
                 }
-                savedCount++;
-            });
 
-            localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
-            localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
-            localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                closeQuickStudentModal();
+                showToast(`Presensi siswa (${name}) berhasil disimpan!`);
+                pushToCloud();
 
-            renderStudentAbsenceTable();
-            renderLateList();
-            renderEarlyList();
+            } else {
+                if (batchQueue.length === 0) {
+                    showToast('Antrean daftar siswa masih kosong!');
+                    return;
+                }
 
-            batchStudents = [];
-            renderBatchTable();
-            closeQuickStudentModal();
+                batchQueue.forEach(item => {
+                    if (item.status === 'TERLAMBAT') {
+                        studentLateList.push({ date: todayKey, class: item.class, name: item.name, time: item.time || '07.45', reason: item.note });
+                    } else if (item.status === 'PULANG') {
+                        studentEarlyList.push({ date: todayKey, class: item.class, name: item.name, time: item.time || '10.30', reason: item.note });
+                    } else {
+                        studentAbsenceList.push({ date: todayKey, class: item.class, name: item.name, status: item.status, note: item.note });
+                    }
+                });
 
-            showToast(`${savedCount} presensi siswa kelas ${cls} berhasil disimpan!`);
-            pushToCloud();
+                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+
+                renderStudentAbsenceTable();
+                renderLateList();
+                renderEarlyList();
+
+                const totalSaved = batchQueue.length;
+                batchQueue = [];
+                renderBatchQueueTable();
+
+                closeQuickStudentModal();
+                showToast(`${totalSaved} Presensi siswa berhasil disimpan!`);
+                pushToCloud();
+            }
         };
 
         window.openMasterJadwalModal = function() {
