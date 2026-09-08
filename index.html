@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- html2pdf for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -122,7 +124,7 @@
                 <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-table-list"></i> Rekap Presensi Guru
             </button>
             <button onclick="switchTab('rekap-siswa')" id="tab-btn-rekap-siswa" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-chart-pie"></i> Rekap Siswa Bulanan
+                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-chart-pie"></i> Rekap Siswa (Multi-Bulan)
             </button>
             <button onclick="switchTab('master-siswa')" id="tab-btn-master-siswa" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
                 <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-address-book text-emerald-600"></i> Master Siswa
@@ -478,48 +480,86 @@
             </div>
         </section>
 
+        <!-- TAB: REKAP SISWA (SUPPORT SINGLE & MULTI-MONTH RANGES) -->
         <section id="tab-rekap-siswa" class="tab-content hidden space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
-                <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex items-center gap-1.5">
-                        <label class="text-xs font-semibold text-slate-500 uppercase">Kelas:</label>
-                        <select id="rekap-siswa-class-select" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500"></select>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3 no-print">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-xs font-bold text-slate-600 uppercase">Kelas:</label>
+                            <select id="rekap-siswa-class-select" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500"></select>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-xs font-bold text-slate-600 uppercase">Tipe Rekap:</label>
+                            <select id="rekap-siswa-mode-select" onchange="toggleRekapSiswaModeControls(); renderRekapSiswa();" class="font-bold text-amber-700 bg-amber-50 border border-amber-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
+                                <option value="range" selected>🗓️ Rentang Bulan (Multi-Bulan)</option>
+                                <option value="single">📅 1 Bulan saja (Harian)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <label class="text-xs font-semibold text-slate-500 uppercase">Bulan:</label>
-                        <input type="month" id="month-select-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="openSendWalasModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
+                            <i class="fa-brands fa-whatsapp text-sm text-green-300"></i> Kirim WA Walas (PDF)
+                        </button>
+                        <button onclick="exportToExcel('siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Excel
+                        </button>
+                        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-print"></i> Cetak / PDF
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button onclick="exportToExcel('siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
-                        <i class="fa-solid fa-download"></i> Excel
-                    </button>
-                    <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
-                        <i class="fa-solid fa-print"></i> Cetak / PDF
-                    </button>
+                <!-- FILTER BULAN & PRESETS -->
+                <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <!-- SINGLE MONTH CONTROL -->
+                    <div id="container-single-month-ctrl" class="hidden items-center gap-1.5">
+                        <label class="font-semibold text-slate-500 uppercase">Pilih Bulan:</label>
+                        <input type="month" id="month-select-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
+                    </div>
+
+                    <!-- MULTI-MONTH RANGE CONTROLS -->
+                    <div id="container-range-month-ctrl" class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-slate-600">Dari:</span>
+                            <input type="month" id="month-start-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-slate-600">Sampai:</span>
+                            <input type="month" id="month-end-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
+                        </div>
+                    </div>
+
+                    <!-- QUICK PRESETS BUTTONS -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase mr-1">Preset Cepat:</span>
+                        <button type="button" onclick="setQuickMonthRange(7, 9)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
+                            ⚡ Juli - Sept
+                        </button>
+                        <button type="button" onclick="setQuickMonthRange(7, 10)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
+                            ⚡ Juli - Oktober
+                        </button>
+                        <button type="button" onclick="setQuickMonthRange(7, 12)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
+                            ⚡ Sem 1 (Juli-Des)
+                        </button>
+                        <button type="button" onclick="setQuickMonthRange(1, 6)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
+                            ⚡ Sem 2 (Jan-Jun)
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
-                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">REKAPITULASI PRESENSI SISWA</h3>
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm mb-3">
+                <h3 id="display-rekap-siswa-title" class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800 tracking-wide">
+                    REKAPITULASI PRESENSI SISWA PERIODE JULI - SEPTEMBER
+                </h3>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
                 <table id="table-rekap-siswa" class="w-full text-xs text-center border-collapse">
-                    <thead>
-                        <tr class="bg-amber-600 text-white font-bold">
-                            <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
-                            <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
-                            <th id="siswa-date-header-group" class="p-1 border border-amber-700 align-middle">TANGGAL (HARI KERJA)</th>
-                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-blue-700 align-middle">S</th>
-                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-amber-800 align-middle">I</th>
-                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-800 align-middle">A</th>
-                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-900 align-middle">T</th>
-                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-indigo-900 align-middle">P</th>
-                        </tr>
-                        <tr id="siswa-matrix-days-row" class="bg-slate-100 font-bold text-slate-700 text-[10px]"></tr>
-                    </thead>
+                    <thead id="siswa-matrix-header" class="bg-amber-600 text-white font-bold"></thead>
                     <tbody id="siswa-matrix-body" class="divide-y divide-slate-200"></tbody>
                 </table>
             </div>
@@ -533,6 +573,9 @@
                 <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpa</span>
                 <span class="font-medium"><strong class="text-rose-800 font-bold">T</strong> = Terlambat</span>
                 <span class="font-medium"><strong class="text-indigo-800 font-bold">P</strong> = Pulang</span>
+                <span class="font-medium flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 font-bold">
+                    <span class="bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full">⚠️ ≥ 4x</span> Sorotan Keterlambatan T (≥4 Kali)
+                </span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto p-4 space-y-3">
@@ -659,6 +702,7 @@
 
     </main>
 
+    <!-- MODAL CONFIRM DIALOG -->
     <div id="modal-confirm-dialog" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-3 text-center">
             <div id="confirm-dialog-icon-bg" class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-lg">
@@ -675,6 +719,7 @@
         </div>
     </div>
 
+    <!-- MODAL PIN AUTH -->
     <div id="modal-pin-auth" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-xs w-full overflow-hidden text-center p-5 space-y-3">
             <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner">
@@ -692,6 +737,53 @@
         </div>
     </div>
 
+    <!-- MODAL KIRIM WA WALAS (PDF) -->
+    <div id="modal-send-walas" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-4">
+            <div class="flex items-center justify-between border-b pb-2.5">
+                <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Kirim Rekap Presensi Siswa ke WA Walas
+                </h3>
+                <button onclick="closeSendWalasModal()" class="text-slate-400 hover:text-slate-600 text-base">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Kelas Target</label>
+                    <input type="text" id="walas-modal-class-display" readonly class="w-full font-extrabold text-brand-700 bg-slate-100 border border-slate-300 rounded-xl p-2.5">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Nomor WhatsApp Wali Kelas *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="walas-modal-phone" placeholder="Contoh: 08123456789 atau 628123456789" class="w-full pl-9 pr-3 py-2.5 font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-1">Nomor ini akan tersimpan otomatis untuk kelas ini.</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama Wali Kelas [Opsional]</label>
+                    <input type="text" id="walas-modal-name" placeholder="Contoh: Bapak Ahmad, S.Pd." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Preview Pesan WA</label>
+                    <textarea id="walas-modal-msg-preview" rows="4" class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-700" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeSendWalasModal()" class="w-1/3 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                <button type="button" onclick="executeSendToWalas()" class="w-2/3 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-file-pdf"></i> Unduh PDF & Buka WA
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL QUICK STUDENT (WITH BATCH INPUT & SEARCHABLE NAMES) -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
@@ -705,8 +797,6 @@
             </div>
 
             <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
-                
-                <!-- MODE BANYAK SISWA (BATCH 1 KELAS) -->
                 <div id="qs-container-batch" class="space-y-3">
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
@@ -725,7 +815,6 @@
                         </div>
                     </div>
 
-                    <!-- Search & Tambah Nama Siswa Manual ke List -->
                     <div class="relative">
                         <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Siswa (Searchable) *</label>
                         <div class="flex gap-1.5">
@@ -737,7 +826,6 @@
                         <div id="qs-batch-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                     </div>
 
-                    <!-- Tabel Antrean Banyak Siswa -->
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Siswa Yang Diinput (<span id="qs-batch-count" class="text-amber-600">0</span> Siswa)</span>
@@ -773,6 +861,7 @@
         </div>
     </div>
 
+    <!-- MODAL QUICK TEACHER -->
     <div id="modal-quick-teacher" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2.5">
@@ -826,6 +915,7 @@
         </div>
     </div>
 
+    <!-- MODAL MASTER JADWAL MENGAJI -->
     <div id="modal-master-jadwal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2.5">
@@ -858,6 +948,7 @@
         </div>
     </div>
 
+    <!-- MODAL FIREBASE REALTIME CONFIG -->
     <div id="modal-cloud-sync" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2 border-slate-100">
@@ -959,6 +1050,7 @@
         let studentAbsenceList = JSON.parse(localStorage.getItem('piket_student_absences')) || [];
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
+        let walasPhoneData = JSON.parse(localStorage.getItem('piket_walas_phone')) || {};
         let isAdminUnlocked = false;
 
         // Quick Student Batch Mode State Variables
@@ -999,6 +1091,7 @@
                         if (data.studentAbsenceList) studentAbsenceList = data.studentAbsenceList;
                         if (data.studentLateList) studentLateList = data.studentLateList;
                         if (data.studentEarlyList) studentEarlyList = data.studentEarlyList;
+                        if (data.walasPhoneData) walasPhoneData = data.walasPhoneData;
 
                         localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                         localStorage.setItem('piket_student_master', JSON.stringify(studentMasterData));
@@ -1008,6 +1101,7 @@
                         localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
                         localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
                         localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                        localStorage.setItem('piket_walas_phone', JSON.stringify(walasPhoneData));
 
                         renderMengaji36Grid();
                         renderTeacherAbsenceList();
@@ -1040,6 +1134,7 @@
                 studentLateList,
                 studentEarlyList,
                 masterJadwalMengaji,
+                walasPhoneData,
                 lastUpdated: Date.now()
             };
 
@@ -1088,6 +1183,11 @@
             return `${day} ${month} ${year}`;
         }
 
+        function getMonthNameIndo(monthNum) {
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            return months[monthNum - 1] || '';
+        }
+
         function initDateDisplays() {
             const todayStr = `${getDayNameID()}, ${getFormattedDateID()}`;
             document.getElementById('header-date-display').innerText = todayStr;
@@ -1104,6 +1204,10 @@
             document.getElementById('month-select-mengaji').value = currentMonthStr;
             document.getElementById('month-select-presensi').value = currentMonthStr;
             document.getElementById('month-select-siswa').value = currentMonthStr;
+
+            // Default Multi-Month Range: Dari Juli (Bulan 07) s.d. Bulan Sekarang
+            document.getElementById('month-start-siswa').value = `${yyyy}-07`;
+            document.getElementById('month-end-siswa').value = currentMonthStr;
         }
 
         function initClassSelectors() {
@@ -2027,15 +2131,86 @@
             });
         };
 
+        // HELPER LOGIC UNTUK PERHITUNGAN RENTANG BULAN (MULTI-BULAN)
+        function getMonthRangeArray(startM, endM) {
+            if (!startM || !endM) return [];
+            const [startY, startMNum] = startM.split('-').map(Number);
+            const [endY, endMNum] = endM.split('-').map(Number);
+            
+            const months = [];
+            let curY = startY;
+            let curM = startMNum;
+            
+            while (curY < endY || (curY === endY && curM <= endMNum)) {
+                const mm = String(curM).padStart(2, '0');
+                months.push(`${curY}-${mm}`);
+                curM++;
+                if (curM > 12) {
+                    curM = 1;
+                    curY++;
+                }
+            }
+            return months;
+        }
+
+        window.toggleRekapSiswaModeControls = function() {
+            const mode = document.getElementById('rekap-siswa-mode-select').value;
+            const singleCtrl = document.getElementById('container-single-month-ctrl');
+            const rangeCtrl = document.getElementById('container-range-month-ctrl');
+
+            if (mode === 'single') {
+                singleCtrl.classList.remove('hidden');
+                singleCtrl.classList.add('flex');
+                rangeCtrl.classList.add('hidden');
+                rangeCtrl.classList.remove('flex');
+            } else {
+                singleCtrl.classList.add('hidden');
+                singleCtrl.classList.remove('flex');
+                rangeCtrl.classList.remove('hidden');
+                rangeCtrl.classList.add('flex');
+            }
+        };
+
+        window.setQuickMonthRange = function(startMNum, endMNum) {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            
+            const startMM = String(startMNum).padStart(2, '0');
+            const endMM = String(endMNum).padStart(2, '0');
+
+            document.getElementById('rekap-siswa-mode-select').value = 'range';
+            toggleRekapSiswaModeControls();
+
+            document.getElementById('month-start-siswa').value = `${yyyy}-${startMM}`;
+            document.getElementById('month-end-siswa').value = `${yyyy}-${endMM}`;
+
+            renderRekapSiswa();
+        };
+
         window.renderRekapSiswa = function() {
             const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
+            const mode = document.getElementById('rekap-siswa-mode-select').value;
+            if (!selectedClass) return;
+
+            if (mode === 'single') {
+                renderRekapSiswaSingleMonth(selectedClass);
+            } else {
+                renderRekapSiswaMultiMonth(selectedClass);
+            }
+        };
+
+        // RENDER 1 BULAN SAJA (HARIAN LENGKAP)
+        function renderRekapSiswaSingleMonth(selectedClass) {
             const monthStr = document.getElementById('month-select-siswa').value;
-            if (!monthStr || !selectedClass) return;
+            if (!monthStr) return;
 
             const parts = monthStr.split('-');
             const year = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10);
             const daysInMonth = new Date(year, month, 0).getDate();
+
+            const monthTitleStr = `${getMonthNameIndo(month).toUpperCase()} ${year}`;
+            document.getElementById('display-rekap-siswa-title').innerText = `REKAPITULASI PRESENSI SISWA KELAS ${selectedClass} — BULAN ${monthTitleStr}`;
 
             const workdays = [];
             for (let d = 1; d <= daysInMonth; d++) {
@@ -2044,14 +2219,24 @@
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
             }
 
-            const headerGroup = document.getElementById('siswa-date-header-group');
-            if (headerGroup) headerGroup.colSpan = workdays.length;
+            const headerElem = document.getElementById('siswa-matrix-header');
+            let daysTh = workdays.map(d => `<th class="p-1 border border-amber-700 text-center">${d}</th>`).join('');
 
-            const headerRow = document.getElementById('siswa-matrix-days-row');
-            headerRow.innerHTML = '';
-            workdays.forEach(d => {
-                headerRow.innerHTML += `<th class="p-1 border border-amber-700 text-center">${d}</th>`;
-            });
+            headerElem.innerHTML = `
+                <tr>
+                    <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
+                    <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
+                    <th colspan="${workdays.length}" class="p-1 border border-amber-700 align-middle">TANGGAL (HARI KERJA)</th>
+                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-blue-700 align-middle">S</th>
+                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-amber-800 align-middle">I</th>
+                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-800 align-middle">A</th>
+                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-900 align-middle">T</th>
+                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-indigo-900 align-middle">P</th>
+                </tr>
+                <tr class="bg-slate-100 font-bold text-slate-700 text-[10px]">
+                    ${daysTh}
+                </tr>
+            `;
 
             const matrixBody = document.getElementById('siswa-matrix-body');
             matrixBody.innerHTML = '';
@@ -2087,46 +2272,183 @@
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
 
+                const isWarningLate = countT >= 4;
+                const rowBgClass = isWarningLate ? "bg-rose-50 hover:bg-rose-100/90" : "hover:bg-slate-50";
+                const nameStyle = isWarningLate ? "font-extrabold text-rose-900 bg-rose-100/80" : "font-bold text-slate-800";
+                const nameBadge = isWarningLate 
+                    ? `<span class="ml-1.5 px-2 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded-full inline-flex items-center gap-1 shadow-xs" title="Terlambat ${countT}x"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${countT}x Terlambat</span>` 
+                    : "";
+                const totalLateStyle = isWarningLate ? "font-black text-white bg-rose-600 shadow-sm" : "font-bold text-rose-800 bg-rose-100";
+
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50";
+                tr.className = rowBgClass;
                 tr.innerHTML = `
                     <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
-                    <td class="col-nama p-2 border border-slate-200 text-left font-bold text-slate-800 sticky-col whitespace-nowrap">${studentName}</td>
+                    <td class="col-nama p-2 border border-slate-200 text-left ${nameStyle} sticky-col whitespace-nowrap">
+                        <div class="flex items-center justify-between gap-1.5">
+                            <span>${studentName}</span>
+                            ${nameBadge}
+                        </div>
+                    </td>
                     ${dayCells}
                     <td class="p-1 border border-slate-200 font-bold text-blue-600 bg-blue-50">${countS}</td>
                     <td class="p-1 border border-slate-200 font-bold text-amber-600 bg-amber-50">${countI}</td>
                     <td class="p-1 border border-slate-200 font-bold text-rose-600 bg-rose-50">${countA}</td>
-                    <td class="p-1 border border-slate-200 font-bold text-rose-800 bg-rose-100">${countT}</td>
+                    <td class="p-1 border border-slate-200 ${totalLateStyle}">${countT}</td>
                     <td class="p-1 border border-slate-200 font-bold text-indigo-800 bg-indigo-100">${countP}</td>
                 `;
                 matrixBody.appendChild(tr);
             });
 
-            renderSiswaRekapSummary(monthStr);
-        };
+            renderSiswaRekapSummary([monthStr]);
+        }
 
-        function renderSiswaRekapSummary(monthStr) {
+        // RENDER RENTANG BULAN / MULTI-BULAN (MISAL JULI - SEPTEMBER)
+        function renderRekapSiswaMultiMonth(selectedClass) {
+            const startM = document.getElementById('month-start-siswa').value;
+            const endM = document.getElementById('month-end-siswa').value;
+            if (!startM || !endM) return;
+
+            const monthsArr = getMonthRangeArray(startM, endM);
+            if (monthsArr.length === 0) return;
+
+            const startMNum = parseInt(startM.split('-')[1], 10);
+            const startYear = startM.split('-')[0];
+            const endMNum = parseInt(endM.split('-')[1], 10);
+            const endYear = endM.split('-')[0];
+
+            const rangeTitleStr = `${getMonthNameIndo(startMNum).toUpperCase()} ${startYear} S.D. ${getMonthNameIndo(endMNum).toUpperCase()} ${endYear}`;
+            document.getElementById('display-rekap-siswa-title').innerText = `REKAPITULASI PRESENSI SISWA KELAS ${selectedClass} — PERIODE ${rangeTitleStr}`;
+
+            const headerElem = document.getElementById('siswa-matrix-header');
+            
+            let monthGroupTh = monthsArr.map(mStr => {
+                const [y, m] = mStr.split('-').map(Number);
+                const name = getMonthNameIndo(m).toUpperCase().substring(0, 3);
+                return `<th colspan="5" class="p-1 border border-amber-700 bg-amber-700 text-white text-center font-bold">${name} ${y}</th>`;
+            }).join('');
+
+            let subHeaders = monthsArr.map(() => `
+                <th class="p-1 border border-amber-700 text-center w-6 bg-blue-100 text-blue-900 font-bold">S</th>
+                <th class="p-1 border border-amber-700 text-center w-6 bg-amber-100 text-amber-900 font-bold">I</th>
+                <th class="p-1 border border-amber-700 text-center w-6 bg-rose-100 text-rose-900 font-bold">A</th>
+                <th class="p-1 border border-amber-700 text-center w-6 bg-rose-200 text-rose-950 font-bold">T</th>
+                <th class="p-1 border border-amber-700 text-center w-6 bg-indigo-100 text-indigo-900 font-bold">P</th>
+            `).join('');
+
+            headerElem.innerHTML = `
+                <tr>
+                    <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
+                    <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
+                    ${monthGroupTh}
+                    <th colspan="5" class="p-1 border border-amber-800 bg-amber-900 text-yellow-300 align-middle font-extrabold uppercase">AKUMULASI TOTAL (${monthsArr.length} BULAN)</th>
+                </tr>
+                <tr class="bg-slate-100 font-bold text-slate-700 text-[10px]">
+                    ${subHeaders}
+                    <th class="p-1 border border-amber-800 text-center w-7 bg-blue-700 text-white">S</th>
+                    <th class="p-1 border border-amber-800 text-center w-7 bg-amber-800 text-white">I</th>
+                    <th class="p-1 border border-amber-800 text-center w-7 bg-rose-800 text-white">A</th>
+                    <th class="p-1 border border-amber-800 text-center w-7 bg-rose-900 text-white">T</th>
+                    <th class="p-1 border border-amber-800 text-center w-7 bg-indigo-900 text-white">P</th>
+                </tr>
+            `;
+
+            const matrixBody = document.getElementById('siswa-matrix-body');
+            matrixBody.innerHTML = '';
+
+            const studentList = studentMasterData[selectedClass] || [];
+
+            studentList.forEach((studentName, idx) => {
+                let grandS = 0, grandI = 0, grandA = 0, grandT = 0, grandP = 0;
+                let monthCellsHtml = '';
+
+                monthsArr.forEach(mStr => {
+                    let mS = 0, mI = 0, mA = 0, mT = 0, mP = 0;
+
+                    studentAbsenceList.forEach(x => {
+                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) {
+                            if (x.status === 'S') mS++;
+                            if (x.status === 'I') mI++;
+                            if (x.status === 'A') mA++;
+                        }
+                    });
+
+                    studentLateList.forEach(x => {
+                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mT++;
+                    });
+
+                    studentEarlyList.forEach(x => {
+                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mP++;
+                    });
+
+                    grandS += mS; grandI += mI; grandA += mA; grandT += mT; grandP += mP;
+
+                    monthCellsHtml += `
+                        <td class="p-1 border border-slate-200 text-center font-bold text-blue-600">${mS || '-'}</td>
+                        <td class="p-1 border border-slate-200 text-center font-bold text-amber-600">${mI || '-'}</td>
+                        <td class="p-1 border border-slate-200 text-center font-bold text-rose-600">${mA || '-'}</td>
+                        <td class="p-1 border border-slate-200 text-center font-bold text-rose-800">${mT || '-'}</td>
+                        <td class="p-1 border border-slate-200 text-center font-bold text-indigo-800">${mP || '-'}</td>
+                    `;
+                });
+
+                const isWarningLate = grandT >= 4;
+                const rowBgClass = isWarningLate ? "bg-rose-50 hover:bg-rose-100/90" : "hover:bg-slate-50";
+                const nameStyle = isWarningLate ? "font-extrabold text-rose-900 bg-rose-100/80" : "font-bold text-slate-800";
+                const nameBadge = isWarningLate 
+                    ? `<span class="ml-1.5 px-2 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded-full inline-flex items-center gap-1 shadow-xs" title="Total Terlambat Periode Ini: ${grandT}x"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${grandT}x Terlambat</span>` 
+                    : "";
+                const totalLateStyle = isWarningLate ? "font-black text-white bg-rose-600 shadow-sm" : "font-bold text-rose-800 bg-rose-100";
+
+                const tr = document.createElement('tr');
+                tr.className = rowBgClass;
+                tr.innerHTML = `
+                    <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
+                    <td class="col-nama p-2 border border-slate-200 text-left ${nameStyle} sticky-col whitespace-nowrap">
+                        <div class="flex items-center justify-between gap-1.5">
+                            <span>${studentName}</span>
+                            ${nameBadge}
+                        </div>
+                    </td>
+                    ${monthCellsHtml}
+                    <td class="p-1 border border-slate-200 font-extrabold text-blue-700 bg-blue-100">${grandS}</td>
+                    <td class="p-1 border border-slate-200 font-extrabold text-amber-800 bg-amber-100">${grandI}</td>
+                    <td class="p-1 border border-slate-200 font-extrabold text-rose-700 bg-rose-100">${grandA}</td>
+                    <td class="p-1 border border-slate-200 ${totalLateStyle}">${grandT}</td>
+                    <td class="p-1 border border-slate-200 font-extrabold text-indigo-900 bg-indigo-100">${grandP}</td>
+                `;
+                matrixBody.appendChild(tr);
+            });
+
+            renderSiswaRekapSummary(monthsArr);
+        }
+
+        function renderSiswaRekapSummary(monthsArrInput) {
             const tbody = document.getElementById('siswa-rekap-summary-body');
             tbody.innerHTML = '';
+
+            const monthsArr = Array.isArray(monthsArrInput) ? monthsArrInput : [monthsArrInput];
 
             ALL_CLASSES.forEach((cls, idx) => {
                 const totalStudents = (studentMasterData[cls] || []).length;
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
 
-                studentAbsenceList.forEach(item => {
-                    if (item.date.startsWith(monthStr) && cleanClassName(item.class) === cls) {
-                        if (item.status === 'S') countS++;
-                        if (item.status === 'I') countI++;
-                        if (item.status === 'A') countA++;
-                    }
-                });
+                monthsArr.forEach(mStr => {
+                    studentAbsenceList.forEach(item => {
+                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) {
+                            if (item.status === 'S') countS++;
+                            if (item.status === 'I') countI++;
+                            if (item.status === 'A') countA++;
+                        }
+                    });
 
-                studentLateList.forEach(item => {
-                    if (item.date.startsWith(monthStr) && cleanClassName(item.class) === cls) countT++;
-                });
+                    studentLateList.forEach(item => {
+                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) countT++;
+                    });
 
-                studentEarlyList.forEach(item => {
-                    if (item.date.startsWith(monthStr) && cleanClassName(item.class) === cls) countP++;
+                    studentEarlyList.forEach(item => {
+                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) countP++;
+                    });
                 });
 
                 const tr = document.createElement('tr');
@@ -2142,6 +2464,353 @@
                     <td class="p-2 border border-slate-200 font-bold text-indigo-800">${countP}</td>
                 `;
                 tbody.appendChild(tr);
+            });
+        }
+
+        window.openSendWalasModal = function() {
+            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
+            if (!selectedClass) {
+                showToast('Pilih kelas terlebih dahulu!');
+                return;
+            }
+
+            const savedWalas = walasPhoneData[selectedClass] || { phone: '', name: '' };
+
+            document.getElementById('walas-modal-class-display').value = selectedClass;
+            document.getElementById('walas-modal-phone').value = savedWalas.phone || '';
+            document.getElementById('walas-modal-name').value = savedWalas.name || '';
+
+            updateWalasMsgPreview();
+
+            document.getElementById('walas-modal-phone').oninput = updateWalasMsgPreview;
+            document.getElementById('walas-modal-name').oninput = updateWalasMsgPreview;
+
+            document.getElementById('modal-send-walas').classList.remove('hidden');
+        };
+
+        function updateWalasMsgPreview() {
+            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
+            const mode = document.getElementById('rekap-siswa-mode-select').value;
+            const name = document.getElementById('walas-modal-name').value.trim() || 'Bapak/Ibu Wali Kelas';
+            
+            let periodText = '';
+            if (mode === 'single') {
+                const monthStr = document.getElementById('month-select-siswa').value || '';
+                const parts = monthStr.split('-');
+                const monthName = getMonthNameIndo(parseInt(parts[1], 10));
+                periodText = `Bulan *${monthName} ${parts[0]}*`;
+            } else {
+                const startM = document.getElementById('month-start-siswa').value || '';
+                const endM = document.getElementById('month-end-siswa').value || '';
+                const startParts = startM.split('-');
+                const endParts = endM.split('-');
+                const startName = getMonthNameIndo(parseInt(startParts[1], 10));
+                const endName = getMonthNameIndo(parseInt(endParts[1], 10));
+                periodText = `Periode *${startName} ${startParts[0]} - ${endName} ${endParts[0]}*`;
+            }
+
+            const msg = `Assalamu'alaikum Wr. Wb.\n\nYth. ${name} (${selectedClass}),\n\nBerikut kami sampaikan *Laporan Rekapitulasi Presensi Siswa Kelas ${selectedClass}* untuk ${periodText} SMAN 11 Bandung.\n\n*Catatan:* File dokumen PDF rekapitulasi presensi lengkap telah terunduh secara otomatis. Silakan periksa file pada perangkat Anda.\n\nTerima kasih atas perhatian dan kerja samanya.\n\n_Salam,_\n*Tim Guru Piket SMAN 11 Bandung*`;
+
+            document.getElementById('walas-modal-msg-preview').value = msg;
+        }
+
+        window.closeSendWalasModal = function() {
+            document.getElementById('modal-send-walas').classList.add('hidden');
+        };
+
+        function formatPhoneForWA(phone) {
+            let cleaned = phone.replace(/[^0-9]/g, '');
+            if (cleaned.startsWith('0')) {
+                cleaned = '62' + cleaned.substring(1);
+            }
+            return cleaned;
+        }
+
+        window.executeSendToWalas = function() {
+            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
+            const rawPhone = document.getElementById('walas-modal-phone').value.trim();
+            const walasName = document.getElementById('walas-modal-name').value.trim();
+
+            if (!rawPhone) {
+                showToast('Masukkan nomor WhatsApp Wali Kelas terlebih dahulu!');
+                return;
+            }
+
+            const phoneFormatted = formatPhoneForWA(rawPhone);
+
+            walasPhoneData[selectedClass] = { phone: rawPhone, name: walasName };
+            localStorage.setItem('piket_walas_phone', JSON.stringify(walasPhoneData));
+            pushToCloud();
+
+            showToast('Memproses & Mengunduh PDF...');
+
+            generateSiswaPDF(selectedClass, () => {
+                const message = document.getElementById('walas-modal-msg-preview').value;
+                const encodedMsg = encodeURIComponent(message);
+                const waUrl = `https://api.whatsapp.com/send?phone=${phoneFormatted}&text=${encodedMsg}`;
+
+                window.open(waUrl, '_blank');
+                closeSendWalasModal();
+                showToast('PDF Terunduh! WhatsApp terbuka, silakan lampirkan PDF.');
+            });
+        };
+
+        function generateSiswaPDF(selectedClass, callback) {
+            const mode = document.getElementById('rekap-siswa-mode-select').value;
+            const studentList = studentMasterData[selectedClass] || [];
+            const savedWalas = walasPhoneData[selectedClass] || { name: '' };
+            const todayDateStr = getFormattedDateID();
+
+            let periodTitle = '';
+            let tableHeadersHtml = '';
+            let tableRowsHtml = '';
+
+            if (mode === 'single') {
+                const monthStr = document.getElementById('month-select-siswa').value;
+                const parts = monthStr.split('-');
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+                const monthName = getMonthNameIndo(month);
+                const daysInMonth = new Date(year, month, 0).getDate();
+
+                periodTitle = `BULAN: ${monthName.toUpperCase()} ${year}`;
+
+                const workdays = [];
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateObj = new Date(year, month - 1, d);
+                    const dayOfWeek = dateObj.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
+                }
+
+                tableHeadersHtml = `
+                    <tr style="background: #d97706; color: #ffffff; font-weight: bold;">
+                        <th style="border: 1px solid #000; padding: 4px; font-size: 8pt;">NO</th>
+                        <th style="border: 1px solid #000; padding: 4px; font-size: 8pt; text-align: left;">NAMA SISWA</th>
+                        ${workdays.map(d => `<th style="border: 1px solid #000; padding: 2px; font-size: 7.5pt;">${d}</th>`).join('')}
+                        <th style="border: 1px solid #000; padding: 4px; background: #1e40af; font-size: 8pt;">S</th>
+                        <th style="border: 1px solid #000; padding: 4px; background: #92400e; font-size: 8pt;">I</th>
+                        <th style="border: 1px solid #000; padding: 4px; background: #9f1239; font-size: 8pt;">A</th>
+                        <th style="border: 1px solid #000; padding: 4px; background: #881337; font-size: 8pt;">T</th>
+                        <th style="border: 1px solid #000; padding: 4px; background: #312e81; font-size: 8pt;">P</th>
+                    </tr>
+                `;
+
+                studentList.forEach((studentName, idx) => {
+                    let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
+                    let dayCellsHtml = '';
+
+                    workdays.forEach(d => {
+                        const dayFormatted = String(d).padStart(2, '0');
+                        const dateKey = `${monthStr}-${dayFormatted}`;
+
+                        const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+                        const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+                        const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
+
+                        let cellContent = '-';
+                        if (absLog) {
+                            if (absLog.status === 'S') { cellContent = '<b style="color: #2563eb;">S</b>'; countS++; }
+                            if (absLog.status === 'I') { cellContent = '<b style="color: #d97706;">I</b>'; countI++; }
+                            if (absLog.status === 'A') { cellContent = '<b style="color: #dc2626;">A</b>'; countA++; }
+                        } else if (lateLog) {
+                            cellContent = '<b style="color: #9f1239; font-size: 6.5pt;">T</b>'; countT++;
+                        } else if (earlyLog) {
+                            cellContent = '<b style="color: #3730a3; font-size: 6.5pt;">P</b>'; countP++;
+                        }
+
+                        dayCellsHtml += `<td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${cellContent}</td>`;
+                    });
+
+                    const isWarningLate = countT >= 4;
+                    const rowBg = isWarningLate ? 'background: #fff1f2;' : '';
+                    const nameStyle = isWarningLate ? 'font-weight: bold; color: #9f1239; background: #ffe4e6;' : 'font-weight: bold;';
+                    const lateWarningBadge = isWarningLate ? ` <span style="background: #e11d48; color: #ffffff; font-size: 6.5pt; padding: 1px 4px; border-radius: 4px; font-weight: bold;">⚠️ ${countT}x Terlambat</span>` : '';
+                    const totalLateStyle = isWarningLate ? 'background: #e11d48; color: #ffffff; font-weight: bold;' : 'color: #881337; background: #fff1f2; font-weight: bold;';
+
+                    tableRowsHtml += `
+                        <tr style="${rowBg}">
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-size: 8pt;">${idx + 1}</td>
+                            <td style="border: 1px solid #000; padding: 3px; ${nameStyle} font-size: 8pt; white-space: nowrap;">${studentName}${lateWarningBadge}</td>
+                            ${dayCellsHtml}
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #1e40af; background: #eff6ff;">${countS}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #92400e; background: #fffbeb;">${countI}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #dc2626; background: #fef2f2;">${countA}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; ${totalLateStyle}">${countT}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #312e81; background: #eef2ff;">${countP}</td>
+                        </tr>
+                    `;
+                });
+
+            } else {
+                // MULTI-MONTH RANGE PDF
+                const startM = document.getElementById('month-start-siswa').value;
+                const endM = document.getElementById('month-end-siswa').value;
+                const monthsArr = getMonthRangeArray(startM, endM);
+
+                const startMNum = parseInt(startM.split('-')[1], 10);
+                const endMNum = parseInt(endM.split('-')[1], 10);
+                periodTitle = `PERIODE: ${getMonthNameIndo(startMNum).toUpperCase()} ${startM.split('-')[0]} S.D. ${getMonthNameIndo(endMNum).toUpperCase()} ${endM.split('-')[0]}`;
+
+                let monthHeaders = monthsArr.map(mStr => {
+                    const mNum = parseInt(mStr.split('-')[1], 10);
+                    return `<th colspan="5" style="border: 1px solid #000; padding: 4px; background: #b45309; color: #ffffff; font-size: 8pt;">${getMonthNameIndo(mNum).toUpperCase().substring(0,3)}</th>`;
+                }).join('');
+
+                let subHeaders = monthsArr.map(() => `
+                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">S</th>
+                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">I</th>
+                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">A</th>
+                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">T</th>
+                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">P</th>
+                `).join('');
+
+                tableHeadersHtml = `
+                    <tr>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 4px; background: #d97706; color: #ffffff; font-size: 8pt; vertical-align: middle;">NO</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 4px; background: #d97706; color: #ffffff; font-size: 8pt; text-align: left; vertical-align: middle;">NAMA SISWA</th>
+                        ${monthHeaders}
+                        <th colspan="5" style="border: 1px solid #000; padding: 4px; background: #78350f; color: #fef08a; font-size: 8pt; vertical-align: middle;">AKUMULASI TOTAL</th>
+                    </tr>
+                    <tr>
+                        ${subHeaders}
+                        <th style="border: 1px solid #000; padding: 2px; background: #1e40af; color: #ffffff; font-size: 7.5pt;">S</th>
+                        <th style="border: 1px solid #000; padding: 2px; background: #92400e; color: #ffffff; font-size: 7.5pt;">I</th>
+                        <th style="border: 1px solid #000; padding: 2px; background: #9f1239; color: #ffffff; font-size: 7.5pt;">A</th>
+                        <th style="border: 1px solid #000; padding: 2px; background: #881337; color: #ffffff; font-size: 7.5pt;">T</th>
+                        <th style="border: 1px solid #000; padding: 2px; background: #312e81; color: #ffffff; font-size: 7.5pt;">P</th>
+                    </tr>
+                `;
+
+                studentList.forEach((studentName, idx) => {
+                    let grandS = 0, grandI = 0, grandA = 0, grandT = 0, grandP = 0;
+                    let monthCellsHtml = '';
+
+                    monthsArr.forEach(mStr => {
+                        let mS = 0, mI = 0, mA = 0, mT = 0, mP = 0;
+
+                        studentAbsenceList.forEach(x => {
+                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) {
+                                if (x.status === 'S') mS++;
+                                if (x.status === 'I') mI++;
+                                if (x.status === 'A') mA++;
+                            }
+                        });
+
+                        studentLateList.forEach(x => {
+                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mT++;
+                        });
+
+                        studentEarlyList.forEach(x => {
+                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mP++;
+                        });
+
+                        grandS += mS; grandI += mI; grandA += mA; grandT += mT; grandP += mP;
+
+                        monthCellsHtml += `
+                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mS || '-'}</td>
+                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mI || '-'}</td>
+                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mA || '-'}</td>
+                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt; color: #9f1239; font-weight: bold;">${mT || '-'}</td>
+                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mP || '-'}</td>
+                        `;
+                    });
+
+                    const isWarningLate = grandT >= 4;
+                    const rowBg = isWarningLate ? 'background: #fff1f2;' : '';
+                    const nameStyle = isWarningLate ? 'font-weight: bold; color: #9f1239; background: #ffe4e6;' : 'font-weight: bold;';
+                    const lateWarningBadge = isWarningLate ? ` <span style="background: #e11d48; color: #ffffff; font-size: 6.5pt; padding: 1px 4px; border-radius: 4px; font-weight: bold;">⚠️ ${grandT}x Terlambat</span>` : '';
+                    const totalLateStyle = isWarningLate ? 'background: #e11d48; color: #ffffff; font-weight: bold;' : 'color: #881337; background: #fff1f2; font-weight: bold;';
+
+                    tableRowsHtml += `
+                        <tr style="${rowBg}">
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-size: 8pt;">${idx + 1}</td>
+                            <td style="border: 1px solid #000; padding: 3px; ${nameStyle} font-size: 8pt; white-space: nowrap;">${studentName}${lateWarningBadge}</td>
+                            ${monthCellsHtml}
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #1e40af; background: #dbeafe;">${grandS}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #92400e; background: #fef3c7;">${grandI}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #dc2626; background: #ffe4e6;">${grandA}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; ${totalLateStyle}">${grandT}</td>
+                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #312e81; background: #e0e7ff;">${grandP}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const pdfContainer = document.createElement('div');
+            pdfContainer.style.padding = '15px';
+            pdfContainer.style.fontFamily = 'sans-serif';
+            pdfContainer.style.background = '#ffffff';
+            pdfContainer.style.color = '#000000';
+            pdfContainer.style.width = '1000px';
+
+            pdfContainer.innerHTML = `
+                <div style="border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-align: center;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Coat_of_arms_of_West_Java.svg/180px-Coat_of_arms_of_West_Java.svg.png" style="height: 55px;">
+                    <div style="flex: 1; margin: 0 10px;">
+                        <h4 style="margin: 0; font-size: 8.5pt; text-transform: uppercase;">PEMERINTAH DAERAH PROVINSI JAWA BARAT — DINAS PENDIDIKAN</h4>
+                        <h4 style="margin: 0; font-size: 8.5pt; text-transform: uppercase;">CABANG DINAS PENDIDIKAN WILAYAH VII</h4>
+                        <h3 style="margin: 2px 0; font-size: 11pt; text-transform: uppercase; font-weight: bold;">SMA NEGERI 11 KOTA BANDUNG</h3>
+                        <p style="margin: 0; font-size: 7.5pt;">Jalan Kembar Baru No. 23 Kota Bandung 40253 | Telp: (022) 5201102 | www.sman11bdg.sch.id</p>
+                    </div>
+                    <img src="https://sman11bdg.sch.id/wp-content/uploads/2021/08/logo-11.png" style="height: 55px;">
+                </div>
+
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <h3 style="margin: 0; font-size: 10.5pt; font-weight: bold; text-transform: uppercase; text-decoration: underline;">LAPORAN REKAPITULASI PRESENSI SISWA</h3>
+                    <p style="margin: 4px 0 0 0; font-size: 8.5pt; font-weight: bold;">KELAS: ${selectedClass} &nbsp;|&nbsp; ${periodTitle}</p>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 8pt; text-align: center; margin-bottom: 15px;">
+                    <thead>${tableHeadersHtml}</thead>
+                    <tbody>
+                        ${tableRowsHtml || '<tr><td colspan="40" style="padding: 10px; border: 1px solid #000;">Belum ada siswa terdaftar di kelas ini.</td></tr>'}
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 10px; font-size: 7.5pt; display: flex; gap: 15px; border: 1px solid #cbd5e1; padding: 6px; background: #f8fafc;">
+                    <b>Keterangan Kode:</b>
+                    <span><b>S</b> = Sakit</span>
+                    <span><b>I</b> = Izin</span>
+                    <span><b>A</b> = Alpha</span>
+                    <span><b>T</b> = Terlambat</span>
+                    <span><b>P</b> = Izin Pulang</span>
+                    <span style="color: #9f1239; font-weight: bold;">⚠️ ≥ 4x = Sorotan Keterlambatan T (≥4 Kali)</span>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 8.5pt;">
+                    <div style="text-align: center; width: 220px;">
+                        <p style="margin: 0;">Mengetahui,</p>
+                        <p style="margin: 0; font-weight: bold;">Wali Kelas ${selectedClass}</p>
+                        <div style="height: 45px;"></div>
+                        <p style="margin: 0; font-weight: bold; text-decoration: underline;">${savedWalas.name || '( ........................................ )'}</p>
+                    </div>
+                    <div style="text-align: center; width: 220px;">
+                        <p style="margin: 0;">Bandung, ${todayDateStr}</p>
+                        <p style="margin: 0; font-weight: bold;">Koordinator / Tim Guru Piket</p>
+                        <div style="height: 45px;"></div>
+                        <p style="margin: 0; font-weight: bold; text-decoration: underline;">( Tim Piket SMAN 11 Bandung )</p>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(pdfContainer);
+
+            const opt = {
+                margin:       [0.3, 0.3, 0.3, 0.3],
+                filename:     `Rekap_Presensi_Siswa_${selectedClass.replace(/\s+/g, '_')}_Periode.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                document.body.removeChild(pdfContainer);
+                if (callback) callback();
+            }).catch(err => {
+                console.error("PDF Generation Error:", err);
+                document.body.removeChild(pdfContainer);
+                showToast('Gagal membuat PDF. Mencoba membuka WA langsung...');
+                if (callback) callback();
             });
         }
 
@@ -2356,7 +3025,7 @@
 
             if (type === 'mengaji') { tableId = 'table-rekap-mengaji'; filename = 'Rekap_Mengaji_Bulanan.xlsx'; }
             if (type === 'presensi') { tableId = 'table-rekap-presensi'; filename = 'Rekap_Presensi_Guru_Bulanan.xlsx'; }
-            if (type === 'siswa') { tableId = 'table-rekap-siswa'; filename = 'Rekap_Presensi_Siswa_Bulanan.xlsx'; }
+            if (type === 'siswa') { tableId = 'table-rekap-siswa'; filename = 'Rekap_Presensi_Siswa_Periode.xlsx'; }
 
             const table = document.getElementById(tableId);
             if (!table) return;
