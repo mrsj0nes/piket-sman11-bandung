@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- html2pdf for PDF Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -260,7 +258,7 @@
                     <p class="text-xs text-slate-500">Catat guru yang tidak hadir mengajar (Sakit, DL, KP, Cuti, TB).</p>
                 </div>
                 <button onclick="openAddAbsenceModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
-                    <i class="fa-solid fa-plus"></i> Catat Guru Absen
+                    <i class="fa-solid fa-plus"></i> + Catat Guru Absen
                 </button>
             </div>
 
@@ -392,6 +390,9 @@
                     <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
                         <i class="fa-solid fa-print"></i> Cetak / PDF
                     </button>
+                    <button onclick="deleteSelectedMonthData('month-select-mengaji')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5 transition" title="Hapus seluruh data bulan ini">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Data Bulan Ini
+                    </button>
                 </div>
             </div>
 
@@ -434,6 +435,9 @@
                     </button>
                     <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
                         <i class="fa-solid fa-print"></i> Cetak / PDF
+                    </button>
+                    <button onclick="deleteSelectedMonthData('month-select-presensi')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5 transition" title="Hapus seluruh data bulan ini">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Data Bulan Ini
                     </button>
                 </div>
             </div>
@@ -480,86 +484,65 @@
             </div>
         </section>
 
-        <!-- TAB: REKAP SISWA (SUPPORT SINGLE & MULTI-MONTH RANGES) -->
         <section id="tab-rekap-siswa" class="tab-content hidden space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3 no-print">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <div class="flex items-center gap-1.5">
-                            <label class="text-xs font-bold text-slate-600 uppercase">Kelas:</label>
-                            <select id="rekap-siswa-class-select" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500"></select>
-                        </div>
-
-                        <div class="flex items-center gap-1.5">
-                            <label class="text-xs font-bold text-slate-600 uppercase">Tipe Rekap:</label>
-                            <select id="rekap-siswa-mode-select" onchange="toggleRekapSiswaModeControls(); renderRekapSiswa();" class="font-bold text-amber-700 bg-amber-50 border border-amber-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
-                                <option value="range" selected>🗓️ Rentang Bulan (Multi-Bulan)</option>
-                                <option value="single">📅 1 Bulan saja (Harian)</option>
-                            </select>
-                        </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs font-semibold text-slate-500 uppercase">Kelas:</label>
+                        <select id="rekap-siswa-class-select" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500"></select>
+                    </div>
+                    
+                    <!-- Rentang Bulan / Multi-Bulan Filter -->
+                    <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-xl border border-amber-200">
+                        <label class="text-xs font-bold text-amber-800 uppercase">Periode:</label>
+                        <input type="month" id="month-start-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs bg-white border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-amber-500">
+                        <span class="text-xs font-bold text-slate-500">s.d.</span>
+                        <input type="month" id="month-end-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs bg-white border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-amber-500">
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <button onclick="openSendWalasModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center gap-1.5 transition">
-                            <i class="fa-brands fa-whatsapp text-sm text-green-300"></i> Kirim WA Walas (PDF)
-                        </button>
-                        <button onclick="exportToExcel('siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
-                            <i class="fa-solid fa-download"></i> Excel
-                        </button>
-                        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
-                            <i class="fa-solid fa-print"></i> Cetak / PDF
-                        </button>
+                    <!-- Preset Quick Month Range Buttons -->
+                    <div class="flex items-center gap-1">
+                        <button onclick="setSiswaRangePreset('jul-sep')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Sep</button>
+                        <button onclick="setSiswaRangePreset('jul-okt')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Okt</button>
+                        <button onclick="setSiswaRangePreset('sem1')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Sem 1</button>
+                        <button onclick="setSiswaRangePreset('sem2')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Sem 2</button>
                     </div>
                 </div>
 
-                <!-- FILTER BULAN & PRESETS -->
-                <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-                    <!-- SINGLE MONTH CONTROL -->
-                    <div id="container-single-month-ctrl" class="hidden items-center gap-1.5">
-                        <label class="font-semibold text-slate-500 uppercase">Pilih Bulan:</label>
-                        <input type="month" id="month-select-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
-                    </div>
-
-                    <!-- MULTI-MONTH RANGE CONTROLS -->
-                    <div id="container-range-month-ctrl" class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center gap-1.5">
-                            <span class="font-bold text-slate-600">Dari:</span>
-                            <input type="month" id="month-start-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="font-bold text-slate-600">Sampai:</span>
-                            <input type="month" id="month-end-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500">
-                        </div>
-                    </div>
-
-                    <!-- QUICK PRESETS BUTTONS -->
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase mr-1">Preset Cepat:</span>
-                        <button type="button" onclick="setQuickMonthRange(7, 9)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
-                            ⚡ Juli - Sept
-                        </button>
-                        <button type="button" onclick="setQuickMonthRange(7, 10)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
-                            ⚡ Juli - Oktober
-                        </button>
-                        <button type="button" onclick="setQuickMonthRange(7, 12)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
-                            ⚡ Sem 1 (Juli-Des)
-                        </button>
-                        <button type="button" onclick="setQuickMonthRange(1, 6)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md text-[11px] font-semibold border border-slate-300 transition">
-                            ⚡ Sem 2 (Jan-Jun)
-                        </button>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportToExcel('siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i> Excel
+                    </button>
+                    <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> Cetak / PDF
+                    </button>
+                    <button onclick="deleteSelectedMonthData('month-start-siswa')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5 transition" title="Hapus data rentang bulan ini">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Data Bulan Ini
+                    </button>
                 </div>
             </div>
 
-            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm mb-3">
-                <h3 id="display-rekap-siswa-title" class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800 tracking-wide">
-                    REKAPITULASI PRESENSI SISWA PERIODE JULI - SEPTEMBER
+            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
+                <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">
+                    REKAPITULASI PRESENSI SISWA — PERIODE <span id="display-siswa-period-label" class="text-amber-600 font-black">-</span>
                 </h3>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
                 <table id="table-rekap-siswa" class="w-full text-xs text-center border-collapse">
-                    <thead id="siswa-matrix-header" class="bg-amber-600 text-white font-bold"></thead>
+                    <thead>
+                        <tr class="bg-amber-600 text-white font-bold">
+                            <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
+                            <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
+                            <th id="siswa-date-header-group" class="p-1 border border-amber-700 align-middle">TANGGAL (HARI KERJA)</th>
+                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-blue-700 align-middle">S</th>
+                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-amber-800 align-middle">I</th>
+                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-800 align-middle">A</th>
+                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-900 align-middle">T</th>
+                            <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-indigo-900 align-middle">P</th>
+                        </tr>
+                        <tr id="siswa-matrix-days-row" class="bg-slate-100 font-bold text-slate-700 text-[10px]"></tr>
+                    </thead>
                     <tbody id="siswa-matrix-body" class="divide-y divide-slate-200"></tbody>
                 </table>
             </div>
@@ -570,12 +553,10 @@
                 </span>
                 <span class="font-medium"><strong class="text-blue-600 font-bold">S</strong> = Sakit</span>
                 <span class="font-medium"><strong class="text-amber-600 font-bold">I</strong> = Izin</span>
-                <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpha</span>
+                <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpa</span>
                 <span class="font-medium"><strong class="text-rose-800 font-bold">T</strong> = Terlambat</span>
                 <span class="font-medium"><strong class="text-indigo-800 font-bold">P</strong> = Pulang</span>
-                <span class="font-medium flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 font-bold">
-                    <span class="bg-rose-600 text-white text-[9px] px-1.5 py-0.2 rounded-full">⚠️ ≥ 4x</span> Sorotan Keterlambatan T (≥4 Kali)
-                </span>
+                <span class="font-medium bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold">⚠️ ≥ 4x = Sorotan Keterlambatan T (≥4 Kali)</span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto p-4 space-y-3">
@@ -702,6 +683,7 @@
 
     </main>
 
+
     <!-- MODAL CONFIRM DIALOG -->
     <div id="modal-confirm-dialog" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-3 text-center">
@@ -737,54 +719,7 @@
         </div>
     </div>
 
-    <!-- MODAL KIRIM WA WALAS (PDF) -->
-    <div id="modal-send-walas" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-4">
-            <div class="flex items-center justify-between border-b pb-2.5">
-                <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i> Kirim Rekap Presensi Siswa ke WA Walas
-                </h3>
-                <button onclick="closeSendWalasModal()" class="text-slate-400 hover:text-slate-600 text-base">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Kelas Target</label>
-                    <input type="text" id="walas-modal-class-display" readonly class="w-full font-extrabold text-brand-700 bg-slate-100 border border-slate-300 rounded-xl p-2.5">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Nomor WhatsApp Wali Kelas *</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-400"></i>
-                        <input type="text" id="walas-modal-phone" placeholder="Contoh: 08123456789 atau 628123456789" class="w-full pl-9 pr-3 py-2.5 font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500">
-                    </div>
-                    <p class="text-[10px] text-slate-500 mt-1">Nomor ini akan tersimpan otomatis untuk kelas ini.</p>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama Wali Kelas [Opsional]</label>
-                    <input type="text" id="walas-modal-name" placeholder="Contoh: Bapak Ahmad, S.Pd." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500">
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Preview Pesan WA</label>
-                    <textarea id="walas-modal-msg-preview" rows="4" class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-700" readonly></textarea>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeSendWalasModal()" class="w-1/3 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                <button type="button" onclick="executeSendToWalas()" class="w-2/3 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-file-pdf"></i> Unduh PDF & Buka WA
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL QUICK STUDENT (BATCH MULTIPLE STUDENTS) -->
+    <!-- MODAL QUICK STUDENT (BATCH) -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -861,7 +796,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK TEACHER (BATCH MULTIPLE TEACHERS) -->
+    <!-- MODAL QUICK TEACHER (BATCH) -->
     <div id="modal-quick-teacher" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -877,7 +812,7 @@
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Absen</label>
-                        <select id="quick-teacher-default-status" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
+                        <select id="quick-teacher-status-batch" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
                             <option value="Sakit">Sakit (S)</option>
                             <option value="Dinas Luar">Dinas Luar (DL)</option>
                             <option value="KP">Kepentingan Pribadi (KP)</option>
@@ -887,24 +822,24 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Jam Ke-</label>
-                        <input type="text" id="quick-teacher-default-jam" placeholder="Contoh: 1-4" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        <input type="text" id="quick-teacher-jam-batch" placeholder="Contoh: 1-4" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
                     </div>
                 </div>
 
                 <div class="relative">
                     <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Guru (Searchable) *</label>
                     <div class="flex gap-1.5">
-                        <input type="text" id="quick-teacher-name" oninput="onQuickTeacherInput(this.value)" autocomplete="off" placeholder="Ketik nama guru..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
+                        <input type="text" id="qs-teacher-search-name" oninput="onTeacherSearchInput(this.value)" autocomplete="off" placeholder="Ketik nama guru..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
                         <button type="button" onclick="addCurrentTeacherToBatch()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 shadow transition">
                             + Tambah
                         </button>
                     </div>
-                    <div id="quick-teacher-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
+                    <div id="qs-teacher-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                 </div>
 
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Guru Yang Diinput (<span id="qt-batch-count" class="text-rose-600">0</span> Guru)</span>
+                        <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Guru Yang Diinput (<span id="qs-teacher-count" class="text-rose-600">0</span> Guru)</span>
                         <button type="button" onclick="clearTeacherBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
                     </div>
                     
@@ -914,13 +849,13 @@
                                 <tr>
                                     <th class="p-2 text-center w-6">#</th>
                                     <th class="p-2">Nama Guru</th>
-                                    <th class="p-2 w-28">Status</th>
-                                    <th class="p-2 w-20">Jam</th>
-                                    <th class="p-2">Ket / Tugas / Inval</th>
+                                    <th class="p-2 w-24">Status</th>
+                                    <th class="p-2 w-16">Jam</th>
+                                    <th class="p-2">Ket / Inval</th>
                                     <th class="p-2 text-center w-10">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="qt-batch-table-body" class="divide-y divide-slate-100">
+                            <tbody id="qs-teacher-table-body" class="divide-y divide-slate-100">
                                 <tr>
                                     <td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td>
                                 </tr>
@@ -929,15 +864,15 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2 shrink-0 border-t border-slate-100">
-                    <button type="button" onclick="closeQuickTeacherModal()" class="w-1/2 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                    <button type="submit" class="w-1/2 py-2.5 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow transition">Simpan Semua Guru</button>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeQuickTeacherModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                    <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow transition">Simpan Semua Guru Absen</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL MASTER JADWAL MENGAJI -->
+    <!-- MODAL MASTER JADWAL -->
     <div id="modal-master-jadwal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2.5">
@@ -970,7 +905,7 @@
         </div>
     </div>
 
-    <!-- MODAL FIREBASE REALTIME CONFIG -->
+    <!-- MODAL CLOUD SYNC -->
     <div id="modal-cloud-sync" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2 border-slate-100">
@@ -1005,7 +940,6 @@
         const DEFAULT_PIN = "112233";
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'piket-sman11-bandung';
         
-        // KONFIGURASI DEFAULT FIREBASE UNTUK SMAN 11 BANDUNG
         const DEFAULT_FIREBASE_CONFIG = {
             apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWlFsCfw",
             authDomain: "piket-sman11-bandung.firebaseapp.com",
@@ -1072,11 +1006,9 @@
         let studentAbsenceList = JSON.parse(localStorage.getItem('piket_student_absences')) || [];
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
-        let walasPhoneData = JSON.parse(localStorage.getItem('piket_walas_phone')) || {};
         let isAdminUnlocked = false;
 
-        // Quick Student & Teacher Batch Mode State Variables
-        let quickStudentMode = 'batch';
+        // Batch Queues
         let batchQueue = [];
         let teacherBatchQueue = [];
 
@@ -1114,7 +1046,6 @@
                         if (data.studentAbsenceList) studentAbsenceList = data.studentAbsenceList;
                         if (data.studentLateList) studentLateList = data.studentLateList;
                         if (data.studentEarlyList) studentEarlyList = data.studentEarlyList;
-                        if (data.walasPhoneData) walasPhoneData = data.walasPhoneData;
 
                         localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                         localStorage.setItem('piket_student_master', JSON.stringify(studentMasterData));
@@ -1124,7 +1055,6 @@
                         localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
                         localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
                         localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-                        localStorage.setItem('piket_walas_phone', JSON.stringify(walasPhoneData));
 
                         renderMengaji36Grid();
                         renderTeacherAbsenceList();
@@ -1157,7 +1087,6 @@
                 studentLateList,
                 studentEarlyList,
                 masterJadwalMengaji,
-                walasPhoneData,
                 lastUpdated: Date.now()
             };
 
@@ -1197,18 +1126,17 @@
             return days[dateObj.getDay()];
         }
 
-        function getFormattedDateID(dateKey = getTodayKey()) {
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const parts = dateKey.split('-');
-            const year = parts[0];
-            const month = months[parseInt(parts[1], 10) - 1];
-            const day = parseInt(parts[2], 10);
-            return `${day} ${month} ${year}`;
-        }
-
         function getMonthNameIndo(monthNum) {
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return months[monthNum - 1] || '';
+        }
+
+        function getFormattedDateID(dateKey = getTodayKey()) {
+            const parts = dateKey.split('-');
+            const year = parts[0];
+            const month = getMonthNameIndo(parseInt(parts[1], 10));
+            const day = parseInt(parts[2], 10);
+            return `${day} ${month} ${year}`;
         }
 
         function initDateDisplays() {
@@ -1226,17 +1154,17 @@
             
             document.getElementById('month-select-mengaji').value = currentMonthStr;
             document.getElementById('month-select-presensi').value = currentMonthStr;
-            document.getElementById('month-select-siswa').value = currentMonthStr;
-
-            document.getElementById('month-start-siswa').value = `${yyyy}-07`;
-            document.getElementById('month-end-siswa').value = currentMonthStr;
+            
+            // Set Default Multi-Month Range for Siswa (e.g. July to September/Current Month)
+            const julMonthStr = `${yyyy}-07`;
+            document.getElementById('month-start-siswa').value = julMonthStr;
+            document.getElementById('month-end-siswa').value = currentMonthStr < julMonthStr ? julMonthStr : currentMonthStr;
         }
 
         function initClassSelectors() {
             const selectors = [
                 document.getElementById('rekap-siswa-class-select'),
                 document.getElementById('master-siswa-class-select'),
-                document.getElementById('quick-student-class'),
                 document.getElementById('quick-student-class-batch')
             ];
 
@@ -1301,6 +1229,7 @@
 
         function renderMengaji36Grid() {
             const container = document.getElementById('mengaji-36-grid-container');
+            if (!container) return;
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
@@ -1448,6 +1377,8 @@
             const icon = document.getElementById('cloud-status-icon');
             const text = document.getElementById('cloud-status-text');
 
+            if (!badge) return;
+
             if (active) {
                 badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
                 icon.className = "fa-solid fa-bolt text-xs text-yellow-300";
@@ -1491,8 +1422,9 @@
         function showToast(message) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
-            toastMsg.innerText = message;
+            if (!toast || !toastMsg) return;
 
+            toastMsg.innerText = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
 
@@ -1507,6 +1439,7 @@
         function renderTeacherAbsenceList() {
             const container = document.getElementById('absence-list-container');
             const emptyState = document.getElementById('absence-empty-state');
+            if (!container || !emptyState) return;
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
@@ -1555,27 +1488,21 @@
         };
 
         window.openAddAbsenceModal = function() {
-            const form = document.getElementById('form-quick-teacher');
-            if (form) form.reset();
-            const inputName = document.getElementById('quick-teacher-name');
-            if (inputName) inputName.value = '';
-            const sug = document.getElementById('quick-teacher-suggestions');
-            if (sug) sug.classList.add('hidden');
             teacherBatchQueue = [];
             renderTeacherBatchQueueTable();
-            const modal = document.getElementById('modal-quick-teacher');
-            if (modal) modal.classList.remove('hidden');
+            document.getElementById('qs-teacher-search-name').value = '';
+            document.getElementById('qs-teacher-suggestions').classList.add('hidden');
+            document.getElementById('modal-quick-teacher').classList.remove('hidden');
         };
 
         window.closeQuickTeacherModal = function() {
-            const modal = document.getElementById('modal-quick-teacher');
-            if (modal) modal.classList.add('hidden');
+            document.getElementById('modal-quick-teacher').classList.add('hidden');
         };
 
-        window.onQuickTeacherInput = function(val) {
-            const sugBox = document.getElementById('quick-teacher-suggestions');
+        window.onTeacherSearchInput = function(val) {
+            const sugBox = document.getElementById('qs-teacher-suggestions');
             sugBox.innerHTML = '';
-            
+
             if (!val || val.trim().length === 0) {
                 sugBox.classList.add('hidden');
                 return;
@@ -1587,10 +1514,10 @@
             if (matches.length === 0) {
                 const addDiv = document.createElement('div');
                 addDiv.className = "p-2.5 text-xs text-rose-600 font-bold hover:bg-rose-50 cursor-pointer";
-                addDiv.innerText = `➕ Tambahkan: "${val}"`;
+                addDiv.innerText = `➕ Tambahkan Guru: "${val}"`;
                 addDiv.onclick = () => {
                     addTeacherToBatch(val);
-                    document.getElementById('quick-teacher-name').value = '';
+                    document.getElementById('qs-teacher-search-name').value = '';
                     sugBox.classList.add('hidden');
                 };
                 sugBox.appendChild(addDiv);
@@ -1604,7 +1531,7 @@
                 div.innerHTML = `<span class="font-semibold text-slate-800">${teacherName}</span>`;
                 div.onclick = () => {
                     addTeacherToBatch(teacherName);
-                    document.getElementById('quick-teacher-name').value = '';
+                    document.getElementById('qs-teacher-search-name').value = '';
                     sugBox.classList.add('hidden');
                 };
                 sugBox.appendChild(div);
@@ -1614,26 +1541,27 @@
         };
 
         window.addCurrentTeacherToBatch = function() {
-            const val = document.getElementById('quick-teacher-name').value.trim();
+            const val = document.getElementById('qs-teacher-search-name').value.trim();
             if (val) {
                 addTeacherToBatch(val);
-                document.getElementById('quick-teacher-name').value = '';
-                document.getElementById('quick-teacher-suggestions').classList.add('hidden');
+                document.getElementById('qs-teacher-search-name').value = '';
+                document.getElementById('qs-teacher-suggestions').classList.add('hidden');
             }
         };
 
-        function addTeacherToBatch(teacherName, status = null) {
-            const defaultStatus = status || document.getElementById('quick-teacher-default-status').value;
-            const defaultJam = document.getElementById('quick-teacher-default-jam').value.trim();
-            
+        function addTeacherToBatch(teacherName) {
+            const defaultStatus = document.getElementById('quick-teacher-status-batch').value;
+            const defaultJam = document.getElementById('quick-teacher-jam-batch').value.trim();
+
             const existing = teacherBatchQueue.find(x => x.teacher.toLowerCase() === teacherName.toLowerCase());
             if (existing) {
                 existing.status = defaultStatus;
+                existing.jam = defaultJam;
             } else {
                 teacherBatchQueue.push({
                     teacher: teacherName,
                     status: defaultStatus,
-                    jam: defaultJam || '1-4',
+                    jam: defaultJam,
                     kelas: '',
                     penanggulangan: ''
                 });
@@ -1642,11 +1570,11 @@
         }
 
         function renderTeacherBatchQueueTable() {
-            const tbody = document.getElementById('qt-batch-table-body');
-            const countElem = document.getElementById('qt-batch-count');
-            if (countElem) countElem.innerText = teacherBatchQueue.length;
+            const tbody = document.getElementById('qs-teacher-table-body');
+            const countElem = document.getElementById('qs-teacher-count');
+            if (!tbody || !countElem) return;
 
-            if (!tbody) return;
+            countElem.innerText = teacherBatchQueue.length;
 
             if (teacherBatchQueue.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td></tr>`;
@@ -1661,22 +1589,22 @@
                     <td class="p-2 text-center text-slate-400 font-bold">${index + 1}</td>
                     <td class="p-2 font-bold text-slate-800">${item.teacher}</td>
                     <td class="p-2">
-                        <select onchange="updateTeacherBatchItemStatus(${index}, this.value)" class="text-[11px] font-bold p-1 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-rose-500">
-                            <option value="Sakit" ${item.status === 'Sakit' ? 'selected' : ''}>Sakit (S)</option>
-                            <option value="Dinas Luar" ${item.status === 'Dinas Luar' ? 'selected' : ''}>Dinas Luar (DL)</option>
+                        <select onchange="updateTeacherBatchStatus(${index}, this.value)" class="text-[11px] font-bold p-1 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-rose-500">
+                            <option value="Sakit" ${item.status === 'Sakit' ? 'selected' : ''}>Sakit</option>
+                            <option value="Dinas Luar" ${item.status === 'Dinas Luar' ? 'selected' : ''}>Dinas Luar</option>
                             <option value="KP" ${item.status === 'KP' ? 'selected' : ''}>KP</option>
-                            <option value="Cuti" ${item.status === 'Cuti' ? 'selected' : ''}>Cuti (C)</option>
-                            <option value="Tanpa Berita" ${item.status === 'Tanpa Berita' ? 'selected' : ''}>Tanpa Berita (TB)</option>
+                            <option value="Cuti" ${item.status === 'Cuti' ? 'selected' : ''}>Cuti</option>
+                            <option value="Tanpa Berita" ${item.status === 'Tanpa Berita' ? 'selected' : ''}>Tanpa Berita</option>
                         </select>
                     </td>
                     <td class="p-2">
-                        <input type="text" value="${item.jam || ''}" onchange="updateTeacherBatchItemJam(${index}, this.value)" placeholder="Jam..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
+                        <input type="text" value="${item.jam || ''}" onchange="updateTeacherBatchJam(${index}, this.value)" placeholder="1-4..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
                     </td>
                     <td class="p-2">
-                        <input type="text" value="${item.penanggulangan || ''}" onchange="updateTeacherBatchItemPenanggulangan(${index}, this.value)" placeholder="Ket / Tugas / Inval..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
+                        <input type="text" value="${item.penanggulangan || ''}" onchange="updateTeacherBatchInval(${index}, this.value)" placeholder="Ket / Inval..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
                     </td>
                     <td class="p-2 text-center">
-                        <button type="button" onclick="removeTeacherBatchQueueItem(${index})" class="text-rose-500 hover:text-rose-700">
+                        <button type="button" onclick="removeTeacherBatchItem(${index})" class="text-rose-500 hover:text-rose-700">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -1685,27 +1613,15 @@
             });
         }
 
-        window.removeTeacherBatchQueueItem = function(index) {
+        window.removeTeacherBatchItem = function(index) {
             teacherBatchQueue.splice(index, 1);
             renderTeacherBatchQueueTable();
         };
 
-        window.updateTeacherBatchItemStatus = function(index, newStatus) {
-            teacherBatchQueue[index].status = newStatus;
-        };
-
-        window.updateTeacherBatchItemJam = function(index, val) {
-            teacherBatchQueue[index].jam = val;
-        };
-
-        window.updateTeacherBatchItemPenanggulangan = function(index, val) {
-            teacherBatchQueue[index].penanggulangan = val;
-        };
-
-        window.clearTeacherBatchQueue = function() {
-            teacherBatchQueue = [];
-            renderTeacherBatchQueueTable();
-        };
+        window.updateTeacherBatchStatus = function(index, val) { teacherBatchQueue[index].status = val; };
+        window.updateTeacherBatchJam = function(index, val) { teacherBatchQueue[index].jam = val; };
+        window.updateTeacherBatchInval = function(index, val) { teacherBatchQueue[index].penanggulangan = val; };
+        window.clearTeacherBatchQueue = function() { teacherBatchQueue = []; renderTeacherBatchQueueTable(); };
 
         window.saveQuickTeacherForm = function(event) {
             event.preventDefault();
@@ -1722,21 +1638,21 @@
                 absenceLogs[todayKey].push({
                     teacher: item.teacher,
                     status: item.status,
-                    jam: item.jam || '1-4',
-                    kelas: item.kelas || '',
-                    penanggulangan: item.penanggulangan || ''
+                    jam: item.jam,
+                    kelas: item.kelas || '-',
+                    penanggulangan: item.penanggulangan
                 });
             });
 
             localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
             renderTeacherAbsenceList();
 
-            const totalSaved = teacherBatchQueue.length;
+            const savedCount = teacherBatchQueue.length;
             teacherBatchQueue = [];
             renderTeacherBatchQueueTable();
 
             closeQuickTeacherModal();
-            showToast(`${totalSaved} Presensi guru berhasil disimpan!`);
+            showToast(`${savedCount} Catatan ketidakhadiran guru berhasil disimpan!`);
             pushToCloud();
         };
 
@@ -1744,6 +1660,7 @@
             const tbody = document.getElementById('siswa-detail-table-body');
             const emptyState = document.getElementById('siswa-detail-empty');
             const badge = document.getElementById('count-student-absent-badge');
+            if (!tbody || !emptyState) return;
             tbody.innerHTML = '';
 
             const todayKey = getTodayKey();
@@ -1798,6 +1715,7 @@
             const container = document.getElementById('late-list-container');
             const emptyState = document.getElementById('late-empty-state');
             const badge = document.getElementById('count-late-badge');
+            if (!container || !emptyState) return;
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
@@ -1848,6 +1766,7 @@
             const container = document.getElementById('early-list-container');
             const emptyState = document.getElementById('early-empty-state');
             const badge = document.getElementById('count-early-badge');
+            if (!container || !emptyState) return;
             container.innerHTML = '';
 
             const todayKey = getTodayKey();
@@ -1897,11 +1816,8 @@
         window.openQuickStudentModal = function(defaultStatus = 'S') {
             document.getElementById('form-quick-student').reset();
             document.getElementById('quick-student-status-batch').value = defaultStatus === 'TERLAMBAT' || defaultStatus === 'PULANG' ? defaultStatus : 'S';
-            
-            quickStudentMode = 'batch';
             batchQueue = [];
             renderBatchQueueTable();
-            
             document.getElementById('qs-batch-suggestions').classList.add('hidden');
             document.getElementById('modal-quick-student').classList.remove('hidden');
         };
@@ -1989,6 +1905,8 @@
         function renderBatchQueueTable() {
             const tbody = document.getElementById('qs-batch-table-body');
             const countElem = document.getElementById('qs-batch-count');
+            if (!tbody || !countElem) return;
+
             countElem.innerText = batchQueue.length;
 
             if (batchQueue.length === 0) {
@@ -2083,53 +2001,6 @@
 
             closeQuickStudentModal();
             showToast(`${totalSaved} Presensi siswa berhasil disimpan!`);
-            pushToCloud();
-        };
-
-        window.openMasterJadwalModal = function() {
-            document.getElementById('modal-master-jadwal').classList.remove('hidden');
-            renderMasterJadwalDayForm();
-        };
-
-        window.closeMasterJadwalModal = function() {
-            document.getElementById('modal-master-jadwal').classList.add('hidden');
-        };
-
-        window.renderMasterJadwalDayForm = function() {
-            const day = document.getElementById('select-master-day').value;
-            const container = document.getElementById('master-jadwal-day-form-container');
-            container.innerHTML = '';
-
-            const daySchedule = masterJadwalMengaji[day] || {};
-
-            ALL_CLASSES.forEach(cls => {
-                const currentTeacher = daySchedule[cls] || '';
-                const div = document.createElement('div');
-                div.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2";
-                div.innerHTML = `
-                    <span class="font-bold text-xs text-slate-700 w-16">${cls}</span>
-                    <select id="master-schedule-select-${cls}" class="flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium">
-                        <option value="">-- Kosong --</option>
-                        ${teacherList.map(t => `<option value="${t}" ${t === currentTeacher ? 'selected' : ''}>${t}</option>`).join('')}
-                    </select>
-                `;
-                container.appendChild(div);
-            });
-        };
-
-        window.saveMasterJadwalDayForm = function() {
-            const day = document.getElementById('select-master-day').value;
-            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
-
-            ALL_CLASSES.forEach(cls => {
-                const sel = document.getElementById(`master-schedule-select-${cls}`);
-                if (sel) masterJadwalMengaji[day][cls] = sel.value;
-            });
-
-            localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
-            closeMasterJadwalModal();
-            showToast(`Master jadwal mengaji hari ${day} berhasil disimpan!`);
-            resetToMasterSchedule();
             pushToCloud();
         };
 
@@ -2273,110 +2144,88 @@
             });
         };
 
-        function getMonthRangeArray(startM, endM) {
-            if (!startM || !endM) return [];
-            const [startY, startMNum] = startM.split('-').map(Number);
-            const [endY, endMNum] = endM.split('-').map(Number);
-            
-            const months = [];
-            let curY = startY;
-            let curM = startMNum;
-            
-            while (curY < endY || (curY === endY && curM <= endMNum)) {
-                const mm = String(curM).padStart(2, '0');
-                months.push(`${curY}-${mm}`);
-                curM++;
-                if (curM > 12) {
-                    curM = 1;
-                    curY++;
-                }
-            }
-            return months;
-        }
-
-        window.toggleRekapSiswaModeControls = function() {
-            const mode = document.getElementById('rekap-siswa-mode-select').value;
-            const singleCtrl = document.getElementById('container-single-month-ctrl');
-            const rangeCtrl = document.getElementById('container-range-month-ctrl');
-
-            if (mode === 'single') {
-                singleCtrl.classList.remove('hidden');
-                singleCtrl.classList.add('flex');
-                rangeCtrl.classList.add('hidden');
-                rangeCtrl.classList.remove('flex');
-            } else {
-                singleCtrl.classList.add('hidden');
-                singleCtrl.classList.remove('flex');
-                rangeCtrl.classList.remove('hidden');
-                rangeCtrl.classList.add('flex');
-            }
-        };
-
-        window.setQuickMonthRange = function(startMNum, endMNum) {
+        window.setSiswaRangePreset = function(presetType) {
             const now = new Date();
-            const yyyy = now.getFullYear();
-            
-            const startMM = String(startMNum).padStart(2, '0');
-            const endMM = String(endMNum).padStart(2, '0');
+            const year = now.getFullYear();
 
-            document.getElementById('rekap-siswa-mode-select').value = 'range';
-            toggleRekapSiswaModeControls();
-
-            document.getElementById('month-start-siswa').value = `${yyyy}-${startMM}`;
-            document.getElementById('month-end-siswa').value = `${yyyy}-${endMM}`;
-
+            if (presetType === 'jul-sep') {
+                document.getElementById('month-start-siswa').value = `${year}-07`;
+                document.getElementById('month-end-siswa').value = `${year}-09`;
+            } else if (presetType === 'jul-okt') {
+                document.getElementById('month-start-siswa').value = `${year}-07`;
+                document.getElementById('month-end-siswa').value = `${year}-10`;
+            } else if (presetType === 'sem1') {
+                document.getElementById('month-start-siswa').value = `${year}-07`;
+                document.getElementById('month-end-siswa').value = `${year}-12`;
+            } else if (presetType === 'sem2') {
+                document.getElementById('month-start-siswa').value = `${year}-01`;
+                document.getElementById('month-end-siswa').value = `${year}-06`;
+            }
             renderRekapSiswa();
         };
 
         window.renderRekapSiswa = function() {
             const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
-            const mode = document.getElementById('rekap-siswa-mode-select').value;
-            if (!selectedClass) return;
+            let startMonthStr = document.getElementById('month-start-siswa').value;
+            let endMonthStr = document.getElementById('month-end-siswa').value;
 
-            if (mode === 'single') {
-                renderRekapSiswaSingleMonth(selectedClass);
-            } else {
-                renderRekapSiswaMultiMonth(selectedClass);
-            }
-        };
-
-        function renderRekapSiswaSingleMonth(selectedClass) {
-            const monthStr = document.getElementById('month-select-siswa').value;
-            if (!monthStr) return;
-
-            const parts = monthStr.split('-');
-            const year = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10);
-            const daysInMonth = new Date(year, month, 0).getDate();
-
-            const monthTitleStr = `${getMonthNameIndo(month).toUpperCase()} ${year}`;
-            document.getElementById('display-rekap-siswa-title').innerText = `REKAPITULASI PRESENSI SISWA KELAS ${selectedClass} — BULAN ${monthTitleStr}`;
-
-            const workdays = [];
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dateObj = new Date(year, month - 1, d);
-                const dayOfWeek = dateObj.getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
+            if (!startMonthStr) return;
+            if (!endMonthStr || endMonthStr < startMonthStr) {
+                endMonthStr = startMonthStr;
+                document.getElementById('month-end-siswa').value = startMonthStr;
             }
 
-            const headerElem = document.getElementById('siswa-matrix-header');
-            let daysTh = workdays.map(d => `<th class="p-1 border border-amber-700 text-center">${d}</th>`).join('');
+            // Generate list of YYYY-MM in range
+            const startParts = startMonthStr.split('-');
+            const endParts = endMonthStr.split('-');
 
-            headerElem.innerHTML = `
-                <tr>
-                    <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
-                    <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
-                    <th colspan="${workdays.length}" class="p-1 border border-amber-700 align-middle">TANGGAL (HARI KERJA)</th>
-                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-blue-700 align-middle">S</th>
-                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-amber-800 align-middle">I</th>
-                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-800 align-middle">A</th>
-                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-rose-900 align-middle">T</th>
-                    <th rowspan="2" class="p-1 border border-amber-700 w-7 bg-indigo-900 align-middle">P</th>
-                </tr>
-                <tr class="bg-slate-100 font-bold text-slate-700 text-[10px]">
-                    ${daysTh}
-                </tr>
-            `;
+            let startY = parseInt(startParts[0], 10);
+            let startM = parseInt(startParts[1], 10);
+            const endY = parseInt(endParts[0], 10);
+            const endM = parseInt(endParts[1], 10);
+
+            const activeMonths = [];
+            while (startY < endY || (startY === endY && startM <= endM)) {
+                const mmStr = String(startM).padStart(2, '0');
+                activeMonths.push(`${startY}-${mmStr}`);
+                startM++;
+                if (startM > 12) {
+                    startM = 1;
+                    startY++;
+                }
+            }
+
+            // Update Label Header
+            const startLabel = `${getMonthNameIndo(parseInt(startParts[1], 10))} ${startParts[0]}`;
+            const endLabel = `${getMonthNameIndo(parseInt(endParts[1], 10))} ${endParts[0]}`;
+            document.getElementById('display-siswa-period-label').innerText = (startMonthStr === endMonthStr) ? startLabel : `${startLabel} s.d. ${endLabel}`;
+
+            // Build Date/Month Columns
+            const allDateKeys = [];
+            activeMonths.forEach(mStr => {
+                const p = mStr.split('-');
+                const y = parseInt(p[0], 10);
+                const m = parseInt(p[1], 10);
+                const daysInM = new Date(y, m, 0).getDate();
+
+                for (let d = 1; d <= daysInM; d++) {
+                    const dateObj = new Date(y, m - 1, d);
+                    const dow = dateObj.getDay();
+                    if (dow !== 0 && dow !== 6) {
+                        const ddStr = String(d).padStart(2, '0');
+                        allDateKeys.push({ dateKey: `${mStr}-${ddStr}`, dayNum: d, monthShort: getMonthNameIndo(m).substring(0, 3) });
+                    }
+                }
+            });
+
+            const headerGroup = document.getElementById('siswa-date-header-group');
+            if (headerGroup) headerGroup.colSpan = allDateKeys.length;
+
+            const headerRow = document.getElementById('siswa-matrix-days-row');
+            headerRow.innerHTML = '';
+            allDateKeys.forEach(item => {
+                headerRow.innerHTML += `<th class="p-1 border border-amber-700 text-center text-[9px] whitespace-nowrap">${item.dayNum}<br><span class="text-[8px] opacity-75">${item.monthShort}</span></th>`;
+            });
 
             const matrixBody = document.getElementById('siswa-matrix-body');
             matrixBody.innerHTML = '';
@@ -2387,10 +2236,8 @@
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
                 let dayCells = '';
 
-                workdays.forEach(d => {
-                    const dayFormatted = String(d).padStart(2, '0');
-                    const dateKey = `${monthStr}-${dayFormatted}`;
-
+                allDateKeys.forEach(dObj => {
+                    const dateKey = dObj.dateKey;
                     const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
                     const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
                     const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
@@ -2412,182 +2259,54 @@
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
 
-                const isWarningLate = countT >= 4;
-                const rowBgClass = isWarningLate ? "bg-rose-50 hover:bg-rose-100/90" : "hover:bg-slate-50";
-                const nameStyle = isWarningLate ? "font-extrabold text-rose-900 bg-rose-100/80" : "font-bold text-slate-800";
-                const nameBadge = isWarningLate 
-                    ? `<span class="ml-1.5 px-2 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded-full inline-flex items-center gap-1 shadow-xs" title="Terlambat ${countT}x"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${countT}x Terlambat</span>` 
-                    : "";
-                const totalLateStyle = isWarningLate ? "font-black text-white bg-rose-600 shadow-sm" : "font-bold text-rose-800 bg-rose-100";
+                // Highlight Row if Terlambat (T) >= 4x
+                const isLateWarning = countT >= 4;
+                const rowBgClass = isLateWarning ? 'bg-rose-50/90' : 'hover:bg-slate-50';
 
                 const tr = document.createElement('tr');
                 tr.className = rowBgClass;
                 tr.innerHTML = `
                     <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
-                    <td class="col-nama p-2 border border-slate-200 text-left ${nameStyle} sticky-col whitespace-nowrap">
-                        <div class="flex items-center justify-between gap-1.5">
-                            <span>${studentName}</span>
-                            ${nameBadge}
-                        </div>
+                    <td class="col-nama p-2 border border-slate-200 text-left font-bold text-slate-800 sticky-col whitespace-nowrap">
+                        ${studentName}
+                        ${isLateWarning ? `<span class="ml-1.5 px-1.5 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded shadow-xs">⚠️ ${countT}x Terlambat</span>` : ''}
                     </td>
                     ${dayCells}
                     <td class="p-1 border border-slate-200 font-bold text-blue-600 bg-blue-50">${countS}</td>
                     <td class="p-1 border border-slate-200 font-bold text-amber-600 bg-amber-50">${countI}</td>
                     <td class="p-1 border border-slate-200 font-bold text-rose-600 bg-rose-50">${countA}</td>
-                    <td class="p-1 border border-slate-200 ${totalLateStyle}">${countT}</td>
+                    <td class="p-1 border border-slate-200 font-bold ${isLateWarning ? 'bg-rose-600 text-white font-black' : 'text-rose-800 bg-rose-100'}">${countT}</td>
                     <td class="p-1 border border-slate-200 font-bold text-indigo-800 bg-indigo-100">${countP}</td>
                 `;
                 matrixBody.appendChild(tr);
             });
 
-            renderSiswaRekapSummary([monthStr]);
-        }
+            renderSiswaRekapSummaryForMonths(activeMonths);
+        };
 
-        function renderRekapSiswaMultiMonth(selectedClass) {
-            const startM = document.getElementById('month-start-siswa').value;
-            const endM = document.getElementById('month-end-siswa').value;
-            if (!startM || !endM) return;
-
-            const monthsArr = getMonthRangeArray(startM, endM);
-            if (monthsArr.length === 0) return;
-
-            const startMNum = parseInt(startM.split('-')[1], 10);
-            const startYear = startM.split('-')[0];
-            const endMNum = parseInt(endM.split('-')[1], 10);
-            const endYear = endM.split('-')[0];
-
-            const rangeTitleStr = `${getMonthNameIndo(startMNum).toUpperCase()} ${startYear} S.D. ${getMonthNameIndo(endMNum).toUpperCase()} ${endYear}`;
-            document.getElementById('display-rekap-siswa-title').innerText = `REKAPITULASI PRESENSI SISWA KELAS ${selectedClass} — PERIODE ${rangeTitleStr}`;
-
-            const headerElem = document.getElementById('siswa-matrix-header');
-            
-            let monthGroupTh = monthsArr.map(mStr => {
-                const [y, m] = mStr.split('-').map(Number);
-                const name = getMonthNameIndo(m).toUpperCase().substring(0, 3);
-                return `<th colspan="5" class="p-1 border border-amber-700 bg-amber-700 text-white text-center font-bold">${name} ${y}</th>`;
-            }).join('');
-
-            let subHeaders = monthsArr.map(() => `
-                <th class="p-1 border border-amber-700 text-center w-6 bg-blue-100 text-blue-900 font-bold">S</th>
-                <th class="p-1 border border-amber-700 text-center w-6 bg-amber-100 text-amber-900 font-bold">I</th>
-                <th class="p-1 border border-amber-700 text-center w-6 bg-rose-100 text-rose-900 font-bold">A</th>
-                <th class="p-1 border border-amber-700 text-center w-6 bg-rose-200 text-rose-950 font-bold">T</th>
-                <th class="p-1 border border-amber-700 text-center w-6 bg-indigo-100 text-indigo-900 font-bold">P</th>
-            `).join('');
-
-            headerElem.innerHTML = `
-                <tr>
-                    <th rowspan="2" class="p-2 border border-amber-700 w-8 align-middle">NO</th>
-                    <th rowspan="2" class="col-nama p-2 border border-amber-700 text-left whitespace-nowrap sticky-col-header bg-amber-600 align-middle">NAMA SISWA</th>
-                    ${monthGroupTh}
-                    <th colspan="5" class="p-1 border border-amber-800 bg-amber-900 text-yellow-300 align-middle font-extrabold uppercase">AKUMULASI TOTAL (${monthsArr.length} BULAN)</th>
-                </tr>
-                <tr class="bg-slate-100 font-bold text-slate-700 text-[10px]">
-                    ${subHeaders}
-                    <th class="p-1 border border-amber-800 text-center w-7 bg-blue-700 text-white">S</th>
-                    <th class="p-1 border border-amber-800 text-center w-7 bg-amber-800 text-white">I</th>
-                    <th class="p-1 border border-amber-800 text-center w-7 bg-rose-800 text-white">A</th>
-                    <th class="p-1 border border-amber-800 text-center w-7 bg-rose-900 text-white">T</th>
-                    <th class="p-1 border border-amber-800 text-center w-7 bg-indigo-900 text-white">P</th>
-                </tr>
-            `;
-
-            const matrixBody = document.getElementById('siswa-matrix-body');
-            matrixBody.innerHTML = '';
-
-            const studentList = studentMasterData[selectedClass] || [];
-
-            studentList.forEach((studentName, idx) => {
-                let grandS = 0, grandI = 0, grandA = 0, grandT = 0, grandP = 0;
-                let monthCellsHtml = '';
-
-                monthsArr.forEach(mStr => {
-                    let mS = 0, mI = 0, mA = 0, mT = 0, mP = 0;
-
-                    studentAbsenceList.forEach(x => {
-                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) {
-                            if (x.status === 'S') mS++;
-                            if (x.status === 'I') mI++;
-                            if (x.status === 'A') mA++;
-                        }
-                    });
-
-                    studentLateList.forEach(x => {
-                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mT++;
-                    });
-
-                    studentEarlyList.forEach(x => {
-                        if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mP++;
-                    });
-
-                    grandS += mS; grandI += mI; grandA += mA; grandT += mT; grandP += mP;
-
-                    monthCellsHtml += `
-                        <td class="p-1 border border-slate-200 text-center font-bold text-blue-600">${mS || '-'}</td>
-                        <td class="p-1 border border-slate-200 text-center font-bold text-amber-600">${mI || '-'}</td>
-                        <td class="p-1 border border-slate-200 text-center font-bold text-rose-600">${mA || '-'}</td>
-                        <td class="p-1 border border-slate-200 text-center font-bold text-rose-800">${mT || '-'}</td>
-                        <td class="p-1 border border-slate-200 text-center font-bold text-indigo-800">${mP || '-'}</td>
-                    `;
-                });
-
-                const isWarningLate = grandT >= 4;
-                const rowBgClass = isWarningLate ? "bg-rose-50 hover:bg-rose-100/90" : "hover:bg-slate-50";
-                const nameStyle = isWarningLate ? "font-extrabold text-rose-900 bg-rose-100/80" : "font-bold text-slate-800";
-                const nameBadge = isWarningLate 
-                    ? `<span class="ml-1.5 px-2 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded-full inline-flex items-center gap-1 shadow-xs" title="Total Terlambat Periode Ini: ${grandT}x"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${grandT}x Terlambat</span>` 
-                    : "";
-                const totalLateStyle = isWarningLate ? "font-black text-white bg-rose-600 shadow-sm" : "font-bold text-rose-800 bg-rose-100";
-
-                const tr = document.createElement('tr');
-                tr.className = rowBgClass;
-                tr.innerHTML = `
-                    <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
-                    <td class="col-nama p-2 border border-slate-200 text-left ${nameStyle} sticky-col whitespace-nowrap">
-                        <div class="flex items-center justify-between gap-1.5">
-                            <span>${studentName}</span>
-                            ${nameBadge}
-                        </div>
-                    </td>
-                    ${monthCellsHtml}
-                    <td class="p-1 border border-slate-200 font-extrabold text-blue-700 bg-blue-100">${grandS}</td>
-                    <td class="p-1 border border-slate-200 font-extrabold text-amber-800 bg-amber-100">${grandI}</td>
-                    <td class="p-1 border border-slate-200 font-extrabold text-rose-700 bg-rose-100">${grandA}</td>
-                    <td class="p-1 border border-slate-200 ${totalLateStyle}">${grandT}</td>
-                    <td class="p-1 border border-slate-200 font-extrabold text-indigo-900 bg-indigo-100">${grandP}</td>
-                `;
-                matrixBody.appendChild(tr);
-            });
-
-            renderSiswaRekapSummary(monthsArr);
-        }
-
-        function renderSiswaRekapSummary(monthsArrInput) {
+        function renderSiswaRekapSummaryForMonths(activeMonths) {
             const tbody = document.getElementById('siswa-rekap-summary-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
-
-            const monthsArr = Array.isArray(monthsArrInput) ? monthsArrInput : [monthsArrInput];
 
             ALL_CLASSES.forEach((cls, idx) => {
                 const totalStudents = (studentMasterData[cls] || []).length;
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
 
-                monthsArr.forEach(mStr => {
-                    studentAbsenceList.forEach(item => {
-                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) {
-                            if (item.status === 'S') countS++;
-                            if (item.status === 'I') countI++;
-                            if (item.status === 'A') countA++;
-                        }
-                    });
+                studentAbsenceList.forEach(item => {
+                    if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) {
+                        if (item.status === 'S') countS++;
+                        if (item.status === 'I') countI++;
+                        if (item.status === 'A') countA++;
+                    }
+                });
 
-                    studentLateList.forEach(item => {
-                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) countT++;
-                    });
+                studentLateList.forEach(item => {
+                    if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) countT++;
+                });
 
-                    studentEarlyList.forEach(item => {
-                        if (item.date.startsWith(mStr) && cleanClassName(item.class) === cls) countP++;
-                    });
+                studentEarlyList.forEach(item => {
+                    if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) countP++;
                 });
 
                 const tr = document.createElement('tr');
@@ -2606,354 +2325,64 @@
             });
         }
 
-        window.openSendWalasModal = function() {
-            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
-            if (!selectedClass) {
-                showToast('Pilih kelas terlebih dahulu!');
+        window.deleteSelectedMonthData = function(monthInputId) {
+            let monthInput = document.getElementById(monthInputId);
+            let monthStr = monthInput ? monthInput.value : '';
+
+            if (!monthStr) {
+                showToast('Pilih bulan yang ingin dihapus terlebih dahulu!');
                 return;
             }
 
-            const savedWalas = walasPhoneData[selectedClass] || { phone: '', name: '' };
+            const parts = monthStr.split('-');
+            const year = parts[0];
+            const monthNum = parseInt(parts[1], 10);
+            const monthName = getMonthNameIndo(monthNum);
+            const labelStr = `${monthName} ${year}`;
 
-            document.getElementById('walas-modal-class-display').value = selectedClass;
-            document.getElementById('walas-modal-phone').value = savedWalas.phone || '';
-            document.getElementById('walas-modal-name').value = savedWalas.name || '';
+            showConfirmModal(
+                `Hapus Data Bulan ${labelStr}`,
+                `Apakah Anda yakin ingin MENGHAPUS SELURUH DATA (Pemantauan Mengaji, Presensi Guru, Presensi Siswa, Terlambat & Pulang) pada bulan ${labelStr}? Data akan terhapus dari Firebase & LocalStorage dan tidak dapat dikembalikan!`,
+                () => {
+                    // Delete Mengaji logs
+                    Object.keys(mengaji36Logs).forEach(key => {
+                        if (key.startsWith(monthStr)) delete mengaji36Logs[key];
+                    });
 
-            updateWalasMsgPreview();
+                    // Delete Teacher Absence logs
+                    Object.keys(absenceLogs).forEach(key => {
+                        if (key.startsWith(monthStr)) delete absenceLogs[key];
+                    });
 
-            document.getElementById('walas-modal-phone').oninput = updateWalasMsgPreview;
-            document.getElementById('walas-modal-name').oninput = updateWalasMsgPreview;
+                    // Delete Student Absences, Lates, & Early leaves
+                    studentAbsenceList = studentAbsenceList.filter(item => !item.date || !item.date.startsWith(monthStr));
+                    studentLateList = studentLateList.filter(item => !item.date || !item.date.startsWith(monthStr));
+                    studentEarlyList = studentEarlyList.filter(item => !item.date || !item.date.startsWith(monthStr));
 
-            document.getElementById('modal-send-walas').classList.remove('hidden');
-        };
+                    // Save to LocalStorage
+                    localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+                    localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
+                    localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                    localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                    localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
 
-        function updateWalasMsgPreview() {
-            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
-            const mode = document.getElementById('rekap-siswa-mode-select').value;
-            const name = document.getElementById('walas-modal-name').value.trim() || 'Bapak/Ibu Wali Kelas';
-            
-            let periodText = '';
-            if (mode === 'single') {
-                const monthStr = document.getElementById('month-select-siswa').value || '';
-                const parts = monthStr.split('-');
-                const monthName = getMonthNameIndo(parseInt(parts[1], 10));
-                periodText = `Bulan *${monthName} ${parts[0]}*`;
-            } else {
-                const startM = document.getElementById('month-start-siswa').value || '';
-                const endM = document.getElementById('month-end-siswa').value || '';
-                const startParts = startM.split('-');
-                const endParts = endM.split('-');
-                const startName = getMonthNameIndo(parseInt(startParts[1], 10));
-                const endName = getMonthNameIndo(parseInt(endParts[1], 10));
-                periodText = `Periode *${startName} ${startParts[0]} - ${endName} ${endParts[0]}*`;
-            }
+                    // Sync to Firebase
+                    pushToCloud();
 
-            const msg = `Assalamu'alaikum Wr. Wb.\n\nYth. ${name} (${selectedClass}),\n\nBerikut kami sampaikan *Laporan Rekapitulasi Presensi Siswa Kelas ${selectedClass}* untuk ${periodText} SMAN 11 Bandung.\n\n*Catatan:* File dokumen PDF rekapitulasi presensi lengkap telah terunduh secara otomatis. Silakan periksa file pada perangkat Anda.\n\nTerima kasih atas perhatian dan kerja samanya.\n\n_Salam,_\n*Tim Guru Piket SMAN 11 Bandung*`;
+                    // Refresh Views
+                    if (typeof renderRekapMengaji === 'function') renderRekapMengaji();
+                    if (typeof renderRekapPresensi === 'function') renderRekapPresensi();
+                    if (typeof renderRekapSiswa === 'function') renderRekapSiswa();
 
-            document.getElementById('walas-modal-msg-preview').value = msg;
-        }
-
-        window.closeSendWalasModal = function() {
-            document.getElementById('modal-send-walas').classList.add('hidden');
-        };
-
-        function formatPhoneForWA(phone) {
-            let cleaned = phone.replace(/[^0-9]/g, '');
-            if (cleaned.startsWith('0')) {
-                cleaned = '62' + cleaned.substring(1);
-            }
-            return cleaned;
-        }
-
-        window.executeSendToWalas = function() {
-            const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
-            const rawPhone = document.getElementById('walas-modal-phone').value.trim();
-            const walasName = document.getElementById('walas-modal-name').value.trim();
-
-            if (!rawPhone) {
-                showToast('Masukkan nomor WhatsApp Wali Kelas terlebih dahulu!');
-                return;
-            }
-
-            const phoneFormatted = formatPhoneForWA(rawPhone);
-
-            walasPhoneData[selectedClass] = { phone: rawPhone, name: walasName };
-            localStorage.setItem('piket_walas_phone', JSON.stringify(walasPhoneData));
-            pushToCloud();
-
-            showToast('Memproses & Mengunduh PDF...');
-
-            generateSiswaPDF(selectedClass, () => {
-                const message = document.getElementById('walas-modal-msg-preview').value;
-                const encodedMsg = encodeURIComponent(message);
-                const waUrl = `https://api.whatsapp.com/send?phone=${phoneFormatted}&text=${encodedMsg}`;
-
-                window.open(waUrl, '_blank');
-                closeSendWalasModal();
-                showToast('PDF Terunduh! WhatsApp terbuka, silakan lampirkan PDF.');
-            });
-        };
-
-        function generateSiswaPDF(selectedClass, callback) {
-            const mode = document.getElementById('rekap-siswa-mode-select').value;
-            const studentList = studentMasterData[selectedClass] || [];
-            const savedWalas = walasPhoneData[selectedClass] || { name: '' };
-            const todayDateStr = getFormattedDateID();
-
-            let periodTitle = '';
-            let tableHeadersHtml = '';
-            let tableRowsHtml = '';
-
-            if (mode === 'single') {
-                const monthStr = document.getElementById('month-select-siswa').value;
-                const parts = monthStr.split('-');
-                const year = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10);
-                const monthName = getMonthNameIndo(month);
-                const daysInMonth = new Date(year, month, 0).getDate();
-
-                periodTitle = `BULAN: ${monthName.toUpperCase()} ${year}`;
-
-                const workdays = [];
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dateObj = new Date(year, month - 1, d);
-                    const dayOfWeek = dateObj.getDay();
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
+                    showToast(`Seluruh data bulan ${labelStr} berhasil dihapus!`);
                 }
-
-                tableHeadersHtml = `
-                    <tr style="background: #d97706; color: #ffffff; font-weight: bold;">
-                        <th style="border: 1px solid #000; padding: 4px; font-size: 8pt;">NO</th>
-                        <th style="border: 1px solid #000; padding: 4px; font-size: 8pt; text-align: left;">NAMA SISWA</th>
-                        ${workdays.map(d => `<th style="border: 1px solid #000; padding: 2px; font-size: 7.5pt;">${d}</th>`).join('')}
-                        <th style="border: 1px solid #000; padding: 4px; background: #1e40af; font-size: 8pt;">S</th>
-                        <th style="border: 1px solid #000; padding: 4px; background: #92400e; font-size: 8pt;">I</th>
-                        <th style="border: 1px solid #000; padding: 4px; background: #9f1239; font-size: 8pt;">A</th>
-                        <th style="border: 1px solid #000; padding: 4px; background: #881337; font-size: 8pt;">T</th>
-                        <th style="border: 1px solid #000; padding: 4px; background: #312e81; font-size: 8pt;">P</th>
-                    </tr>
-                `;
-
-                studentList.forEach((studentName, idx) => {
-                    let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
-                    let dayCellsHtml = '';
-
-                    workdays.forEach(d => {
-                        const dayFormatted = String(d).padStart(2, '0');
-                        const dateKey = `${monthStr}-${dayFormatted}`;
-
-                        const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-                        const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-                        const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-
-                        let cellContent = '-';
-                        if (absLog) {
-                            if (absLog.status === 'S') { cellContent = '<b style="color: #2563eb;">S</b>'; countS++; }
-                            if (absLog.status === 'I') { cellContent = '<b style="color: #d97706;">I</b>'; countI++; }
-                            if (absLog.status === 'A') { cellContent = '<b style="color: #dc2626;">A</b>'; countA++; }
-                        } else if (lateLog) {
-                            cellContent = '<b style="color: #9f1239; font-size: 6.5pt;">T</b>'; countT++;
-                        } else if (earlyLog) {
-                            cellContent = '<b style="color: #3730a3; font-size: 6.5pt;">P</b>'; countP++;
-                        }
-
-                        dayCellsHtml += `<td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${cellContent}</td>`;
-                    });
-
-                    const isWarningLate = countT >= 4;
-                    const rowBg = isWarningLate ? 'background: #fff1f2;' : '';
-                    const nameStyle = isWarningLate ? 'font-weight: bold; color: #9f1239; background: #ffe4e6;' : 'font-weight: bold;';
-                    const lateWarningBadge = isWarningLate ? ` <span style="background: #e11d48; color: #ffffff; font-size: 6.5pt; padding: 1px 4px; border-radius: 4px; font-weight: bold;">⚠️ ${countT}x Terlambat</span>` : '';
-                    const totalLateStyle = isWarningLate ? 'background: #e11d48; color: #ffffff; font-weight: bold;' : 'color: #881337; background: #fff1f2; font-weight: bold;';
-
-                    tableRowsHtml += `
-                        <tr style="${rowBg}">
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-size: 8pt;">${idx + 1}</td>
-                            <td style="border: 1px solid #000; padding: 3px; ${nameStyle} font-size: 8pt; white-space: nowrap;">${studentName}${lateWarningBadge}</td>
-                            ${dayCellsHtml}
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #1e40af; background: #eff6ff;">${countS}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #92400e; background: #fffbeb;">${countI}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #dc2626; background: #fef2f2;">${countA}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; ${totalLateStyle}">${countT}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #312e81; background: #eef2ff;">${countP}</td>
-                        </tr>
-                    `;
-                });
-
-            } else {
-                const startM = document.getElementById('month-start-siswa').value;
-                const endM = document.getElementById('month-end-siswa').value;
-                const monthsArr = getMonthRangeArray(startM, endM);
-
-                const startMNum = parseInt(startM.split('-')[1], 10);
-                const endMNum = parseInt(endM.split('-')[1], 10);
-                periodTitle = `PERIODE: ${getMonthNameIndo(startMNum).toUpperCase()} ${startM.split('-')[0]} S.D. ${getMonthNameIndo(endMNum).toUpperCase()} ${endM.split('-')[0]}`;
-
-                let monthHeaders = monthsArr.map(mStr => {
-                    const mNum = parseInt(mStr.split('-')[1], 10);
-                    return `<th colspan="5" style="border: 1px solid #000; padding: 4px; background: #b45309; color: #ffffff; font-size: 8pt;">${getMonthNameIndo(mNum).toUpperCase().substring(0,3)}</th>`;
-                }).join('');
-
-                let subHeaders = monthsArr.map(() => `
-                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">S</th>
-                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">I</th>
-                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">A</th>
-                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">T</th>
-                    <th style="border: 1px solid #000; padding: 2px; background: #fef3c7; font-size: 7pt;">P</th>
-                `).join('');
-
-                tableHeadersHtml = `
-                    <tr>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 4px; background: #d97706; color: #ffffff; font-size: 8pt; vertical-align: middle;">NO</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 4px; background: #d97706; color: #ffffff; font-size: 8pt; text-align: left; vertical-align: middle;">NAMA SISWA</th>
-                        ${monthHeaders}
-                        <th colspan="5" style="border: 1px solid #000; padding: 4px; background: #78350f; color: #fef08a; font-size: 8pt; vertical-align: middle;">AKUMULASI TOTAL</th>
-                    </tr>
-                    <tr>
-                        ${subHeaders}
-                        <th style="border: 1px solid #000; padding: 2px; background: #1e40af; color: #ffffff; font-size: 7.5pt;">S</th>
-                        <th style="border: 1px solid #000; padding: 2px; background: #92400e; color: #ffffff; font-size: 7.5pt;">I</th>
-                        <th style="border: 1px solid #000; padding: 2px; background: #9f1239; color: #ffffff; font-size: 7.5pt;">A</th>
-                        <th style="border: 1px solid #000; padding: 2px; background: #881337; color: #ffffff; font-size: 7.5pt;">T</th>
-                        <th style="border: 1px solid #000; padding: 2px; background: #312e81; color: #ffffff; font-size: 7.5pt;">P</th>
-                    </tr>
-                `;
-
-                studentList.forEach((studentName, idx) => {
-                    let grandS = 0, grandI = 0, grandA = 0, grandT = 0, grandP = 0;
-                    let monthCellsHtml = '';
-
-                    monthsArr.forEach(mStr => {
-                        let mS = 0, mI = 0, mA = 0, mT = 0, mP = 0;
-
-                        studentAbsenceList.forEach(x => {
-                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) {
-                                if (x.status === 'S') mS++;
-                                if (x.status === 'I') mI++;
-                                if (x.status === 'A') mA++;
-                            }
-                        });
-
-                        studentLateList.forEach(x => {
-                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mT++;
-                        });
-
-                        studentEarlyList.forEach(x => {
-                            if (x.date.startsWith(mStr) && cleanClassName(x.class) === selectedClass && x.name === studentName) mP++;
-                        });
-
-                        grandS += mS; grandI += mI; grandA += mA; grandT += mT; grandP += mP;
-
-                        monthCellsHtml += `
-                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mS || '-'}</td>
-                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mI || '-'}</td>
-                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mA || '-'}</td>
-                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt; color: #9f1239; font-weight: bold;">${mT || '-'}</td>
-                            <td style="border: 1px solid #000; padding: 2px; text-align: center; font-size: 7.5pt;">${mP || '-'}</td>
-                        `;
-                    });
-
-                    const isWarningLate = grandT >= 4;
-                    const rowBg = isWarningLate ? 'background: #fff1f2;' : '';
-                    const nameStyle = isWarningLate ? 'font-weight: bold; color: #9f1239; background: #ffe4e6;' : 'font-weight: bold;';
-                    const lateWarningBadge = isWarningLate ? ` <span style="background: #e11d48; color: #ffffff; font-size: 6.5pt; padding: 1px 4px; border-radius: 4px; font-weight: bold;">⚠️ ${grandT}x Terlambat</span>` : '';
-                    const totalLateStyle = isWarningLate ? 'background: #e11d48; color: #ffffff; font-weight: bold;' : 'color: #881337; background: #fff1f2; font-weight: bold;';
-
-                    tableRowsHtml += `
-                        <tr style="${rowBg}">
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-size: 8pt;">${idx + 1}</td>
-                            <td style="border: 1px solid #000; padding: 3px; ${nameStyle} font-size: 8pt; white-space: nowrap;">${studentName}${lateWarningBadge}</td>
-                            ${monthCellsHtml}
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #1e40af; background: #dbeafe;">${grandS}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #92400e; background: #fef3c7;">${grandI}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #dc2626; background: #ffe4e6;">${grandA}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; ${totalLateStyle}">${grandT}</td>
-                            <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold; color: #312e81; background: #e0e7ff;">${grandP}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.padding = '15px';
-            pdfContainer.style.fontFamily = 'sans-serif';
-            pdfContainer.style.background = '#ffffff';
-            pdfContainer.style.color = '#000000';
-            pdfContainer.style.width = '1000px';
-
-            pdfContainer.innerHTML = `
-                <div style="border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-align: center;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Coat_of_arms_of_West_Java.svg/180px-Coat_of_arms_of_West_Java.svg.png" style="height: 55px;">
-                    <div style="flex: 1; margin: 0 10px;">
-                        <h4 style="margin: 0; font-size: 8.5pt; text-transform: uppercase;">PEMERINTAH DAERAH PROVINSI JAWA BARAT — DINAS PENDIDIKAN</h4>
-                        <h4 style="margin: 0; font-size: 8.5pt; text-transform: uppercase;">CABANG DINAS PENDIDIKAN WILAYAH VII</h4>
-                        <h3 style="margin: 2px 0; font-size: 11pt; text-transform: uppercase; font-weight: bold;">SMA NEGERI 11 KOTA BANDUNG</h3>
-                        <p style="margin: 0; font-size: 7.5pt;">Jalan Kembar Baru No. 23 Kota Bandung 40253 | Telp: (022) 5201102 | www.sman11bdg.sch.id</p>
-                    </div>
-                    <img src="https://sman11bdg.sch.id/wp-content/uploads/2021/08/logo-11.png" style="height: 55px;">
-                </div>
-
-                <div style="text-align: center; margin-bottom: 12px;">
-                    <h3 style="margin: 0; font-size: 10.5pt; font-weight: bold; text-transform: uppercase; text-decoration: underline;">LAPORAN REKAPITULASI PRESENSI SISWA</h3>
-                    <p style="margin: 4px 0 0 0; font-size: 8.5pt; font-weight: bold;">KELAS: ${selectedClass} &nbsp;|&nbsp; ${periodTitle}</p>
-                </div>
-
-                <table style="width: 100%; border-collapse: collapse; font-size: 8pt; text-align: center; margin-bottom: 15px;">
-                    <thead>${tableHeadersHtml}</thead>
-                    <tbody>
-                        ${tableRowsHtml || '<tr><td colspan="40" style="padding: 10px; border: 1px solid #000;">Belum ada siswa terdaftar di kelas ini.</td></tr>'}
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 10px; font-size: 7.5pt; display: flex; gap: 15px; border: 1px solid #cbd5e1; padding: 6px; background: #f8fafc;">
-                    <b>Keterangan Kode:</b>
-                    <span><b>S</b> = Sakit</span>
-                    <span><b>I</b> = Izin</span>
-                    <span><b>A</b> = Alpha</span>
-                    <span><b>T</b> = Terlambat</span>
-                    <span><b>P</b> = Izin Pulang</span>
-                    <span style="color: #9f1239; font-weight: bold;">⚠️ ≥ 4x = Sorotan Keterlambatan T (≥4 Kali)</span>
-                </div>
-
-                <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 8.5pt;">
-                    <div style="text-align: center; width: 220px;">
-                        <p style="margin: 0;">Mengetahui,</p>
-                        <p style="margin: 0; font-weight: bold;">Wali Kelas ${selectedClass}</p>
-                        <div style="height: 45px;"></div>
-                        <p style="margin: 0; font-weight: bold; text-decoration: underline;">${savedWalas.name || '( ........................................ )'}</p>
-                    </div>
-                    <div style="text-align: center; width: 220px;">
-                        <p style="margin: 0;">Bandung, ${todayDateStr}</p>
-                        <p style="margin: 0; font-weight: bold;">Koordinator / Tim Guru Piket</p>
-                        <div style="height: 45px;"></div>
-                        <p style="margin: 0; font-weight: bold; text-decoration: underline;">( Tim Piket SMAN 11 Bandung )</p>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(pdfContainer);
-
-            const opt = {
-                margin:       [0.3, 0.3, 0.3, 0.3],
-                filename:     `Rekap_Presensi_Siswa_${selectedClass.replace(/\s+/g, '_')}_Periode.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
-
-            html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                document.body.removeChild(pdfContainer);
-                if (callback) callback();
-            }).catch(err => {
-                console.error("PDF Generation Error:", err);
-                document.body.removeChild(pdfContainer);
-                showToast('Gagal membuat PDF. Mencoba membuka WA langsung...');
-                if (callback) callback();
-            });
-        }
+            );
+        };
 
         window.renderMasterSiswaTab = function() {
             const select = document.getElementById('master-siswa-class-select');
+            if (!select) return;
+
             const selectedClass = cleanClassName(select.value);
             document.getElementById('display-master-class-title').innerText = selectedClass;
 
@@ -2962,6 +2391,7 @@
 
             const tbody = document.getElementById('master-siswa-list-body');
             const emptyState = document.getElementById('master-siswa-empty');
+            if (!tbody || !emptyState) return;
             tbody.innerHTML = '';
 
             if (list.length === 0) {
@@ -3051,6 +2481,7 @@
 
         window.renderMasterTeacherList = function() {
             const tbody = document.getElementById('master-teacher-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             teacherList.forEach((teacher, index) => {
@@ -3130,6 +2561,8 @@
             const icon = document.getElementById('admin-status-icon');
             const text = document.getElementById('admin-status-text');
 
+            if (!badge) return;
+
             if (isAdminUnlocked) {
                 badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
                 icon.className = "fa-solid fa-lock-open text-xs";
@@ -3155,6 +2588,54 @@
                 pendingConfirmYesCallback();
             }
             pendingConfirmYesCallback = null;
+        };
+
+        window.openMasterJadwalModal = function() {
+            document.getElementById('modal-master-jadwal').classList.remove('hidden');
+            renderMasterJadwalDayForm();
+        };
+
+        window.closeMasterJadwalModal = function() {
+            document.getElementById('modal-master-jadwal').classList.add('hidden');
+        };
+
+        window.renderMasterJadwalDayForm = function() {
+            const day = document.getElementById('select-master-day').value;
+            const container = document.getElementById('master-jadwal-day-form-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const daySchedule = masterJadwalMengaji[day] || {};
+
+            ALL_CLASSES.forEach(cls => {
+                const currentTeacher = daySchedule[cls] || '';
+                const div = document.createElement('div');
+                div.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2";
+                div.innerHTML = `
+                    <span class="font-bold text-xs text-slate-700 w-16">${cls}</span>
+                    <select id="master-schedule-select-${cls}" class="flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium">
+                        <option value="">-- Kosong --</option>
+                        ${teacherList.map(t => `<option value="${t}" ${t === currentTeacher ? 'selected' : ''}>${t}</option>`).join('')}
+                    </select>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.saveMasterJadwalDayForm = function() {
+            const day = document.getElementById('select-master-day').value;
+            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
+
+            ALL_CLASSES.forEach(cls => {
+                const sel = document.getElementById(`master-schedule-select-${cls}`);
+                if (sel) masterJadwalMengaji[day][cls] = sel.value;
+            });
+
+            localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
+            closeMasterJadwalModal();
+            showToast(`Master jadwal mengaji hari ${day} berhasil disimpan!`);
+            resetToMasterSchedule();
+            pushToCloud();
         };
 
         window.exportToExcel = function(type) {
