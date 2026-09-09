@@ -149,7 +149,7 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-xs sm:text-sm">Pencatatan Cepat HP (Quick Action)</h2>
-                    <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru dalam hitungan detik</p>
+                    <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru (hari ini atau tanggal lampau/Juli-Agustus)</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -164,13 +164,13 @@
 
         <section id="tab-input-mengaji" class="tab-content block space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3">
                     <div class="bg-brand-50 p-2.5 rounded-xl text-brand-500">
                         <i class="fa-solid fa-calendar-day text-lg"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pemantauan Hari Ini</span>
-                        <span id="mengaji-today-label" class="font-bold text-slate-800 text-xs sm:text-sm">-</span>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pemantauan Tanggal:</span>
+                        <input type="date" id="mengaji-date-picker" onchange="renderMengaji36Grid()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
@@ -185,7 +185,7 @@
                         <i class="fa-solid fa-print"></i> Cetak Lembar
                     </button>
                     <button onclick="saveMengaji36Classes()" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-3.5 py-2 rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan Hari Ini
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Tanggal Ini
                     </button>
                 </div>
             </div>
@@ -251,11 +251,17 @@
 
         <section id="tab-input-presensi" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-                        <i class="fa-solid fa-user-xmark text-amber-600"></i> Ketidakhadiran & Inval Guru Kelas Hari Ini
-                    </h3>
-                    <p class="text-xs text-slate-500">Catat guru yang tidak hadir mengajar (Sakit, DL, KP, Cuti, TB).</p>
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-50 p-2.5 rounded-xl text-brand-500">
+                        <i class="fa-solid fa-user-xmark text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Ketidakhadiran & Inval Guru Kelas</h3>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[11px] font-bold text-slate-500">Pilih Tanggal:</span>
+                            <input type="date" id="guru-input-date" onchange="renderTeacherAbsenceList()" class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-brand-500">
+                        </div>
+                    </div>
                 </div>
                 <button onclick="openAddAbsenceModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
                     <i class="fa-solid fa-plus"></i> + Catat Guru Absen
@@ -266,7 +272,7 @@
                 <div id="absence-list-container" class="space-y-3"></div>
                 <div id="absence-empty-state" class="text-center py-10 text-slate-400 hidden">
                     <i class="fa-solid fa-user-check text-3xl text-slate-200 mb-2"></i>
-                    <p class="text-xs font-medium text-slate-500">Semua Guru Hadir Mengajar Hari Ini</p>
+                    <p class="text-xs font-medium text-slate-500">Semua Guru Hadir Mengajar Pada Tanggal Ini</p>
                 </div>
             </div>
         </section>
@@ -278,8 +284,11 @@
                         <i class="fa-solid fa-graduation-cap text-lg"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Catatan Siswa Hari Ini</span>
-                        <span id="siswa-today-label" class="font-bold text-slate-800 text-xs sm:text-sm">-</span>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Catatan Siswa Tidak Hadir</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[11px] font-bold text-slate-500">Pilih Tanggal:</span>
+                            <input type="date" id="siswa-input-date" onchange="renderStudentAbsenceTable()" class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-amber-500">
+                        </div>
                     </div>
                 </div>
 
@@ -291,7 +300,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
                     <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-amber-600"></i> Daftar Nama Siswa Tidak Hadir (S/I/A) Hari Ini
+                        <i class="fa-solid fa-list-check text-amber-600"></i> Daftar Nama Siswa Tidak Hadir (S/I/A) Tanggal Ini
                     </h3>
                     <span id="count-student-absent-badge" class="bg-amber-100 text-amber-800 font-bold text-xs px-2.5 py-0.5 rounded-full">0 Siswa</span>
                 </div>
@@ -319,7 +328,7 @@
 
                 <div id="siswa-detail-empty" class="text-center py-8 text-slate-400">
                     <i class="fa-solid fa-child-reaching text-3xl mb-1 text-slate-300"></i>
-                    <p class="text-xs">Belum ada catatan nama siswa yang absen hari ini.</p>
+                    <p class="text-xs">Belum ada catatan nama siswa yang absen pada tanggal ini.</p>
                 </div>
             </div>
         </section>
@@ -331,8 +340,11 @@
                         <i class="fa-solid fa-clock text-lg"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Catatan Kesiswaan Hari Ini</span>
-                        <span id="kesiswaan-today-label" class="font-bold text-slate-800 text-xs sm:text-sm">-</span>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase">Catatan Kesiswaan</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[11px] font-bold text-slate-500">Pilih Tanggal:</span>
+                            <input type="date" id="kesiswaan-input-date" onchange="renderLateList(); renderEarlyList();" class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-rose-500">
+                        </div>
                     </div>
                 </div>
 
@@ -350,14 +362,14 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2.5">
                         <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-user-clock text-rose-600"></i> Siswa Terlambat Hari Ini
+                            <i class="fa-solid fa-user-clock text-rose-600"></i> Siswa Terlambat Tanggal Ini
                         </h3>
                         <span id="count-late-badge" class="bg-rose-100 text-rose-800 font-bold text-xs px-2.5 py-0.5 rounded-full">0 Siswa</span>
                     </div>
 
                     <div id="late-list-container" class="space-y-2.5"></div>
                     <div id="late-empty-state" class="text-center py-6 text-slate-400">
-                        <p class="text-xs">Tidak ada siswa terlambat dicatat hari ini.</p>
+                        <p class="text-xs">Tidak ada siswa terlambat dicatat pada tanggal ini.</p>
                     </div>
                 </div>
 
@@ -371,7 +383,7 @@
 
                     <div id="early-list-container" class="space-y-2.5"></div>
                     <div id="early-empty-state" class="text-center py-6 text-slate-400">
-                        <p class="text-xs">Tidak ada siswa izin pulang dicatat hari ini.</p>
+                        <p class="text-xs">Tidak ada siswa izin pulang dicatat pada tanggal ini.</p>
                     </div>
                 </div>
             </div>
@@ -502,10 +514,9 @@
 
                     <!-- Preset Quick Month Range Buttons -->
                     <div class="flex items-center gap-1">
+                        <button onclick="setSiswaRangePreset('jul-aug')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Agt</button>
                         <button onclick="setSiswaRangePreset('jul-sep')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Sep</button>
-                        <button onclick="setSiswaRangePreset('jul-okt')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Okt</button>
                         <button onclick="setSiswaRangePreset('sem1')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Sem 1</button>
-                        <button onclick="setSiswaRangePreset('sem2')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Sem 2</button>
                     </div>
                 </div>
 
@@ -719,7 +730,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK STUDENT (BATCH) -->
+    <!-- MODAL QUICK STUDENT (BATCH) WITH DATE SELECTOR -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -733,13 +744,17 @@
 
             <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
                 <div id="qs-container-batch" class="space-y-3">
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas Target *</label>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Tanggal Absen *</label>
+                            <input type="date" id="quick-student-date" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Kelas *</label>
                             <select id="quick-student-class-batch" onchange="onBatchClassChange()" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"></select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Baru</label>
+                            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status</label>
                             <select id="quick-student-status-batch" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
                                 <option value="S">Sakit (S)</option>
                                 <option value="I">Izin (I)</option>
@@ -796,7 +811,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK TEACHER (BATCH) -->
+    <!-- MODAL QUICK TEACHER (BATCH) WITH DATE SELECTOR -->
     <div id="modal-quick-teacher" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -809,9 +824,13 @@
             </div>
 
             <form id="form-quick-teacher" onsubmit="saveQuickTeacherForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
-                <div class="grid grid-cols-2 gap-2.5">
+                <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Absen</label>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Tanggal Absen *</label>
+                        <input type="date" id="quick-teacher-date" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status</label>
                         <select id="quick-teacher-status-batch" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
                             <option value="Sakit">Sakit (S)</option>
                             <option value="Dinas Luar">Dinas Luar (DL)</option>
@@ -1142,10 +1161,17 @@
         function initDateDisplays() {
             const todayStr = `${getDayNameID()}, ${getFormattedDateID()}`;
             document.getElementById('header-date-display').innerText = todayStr;
-            document.getElementById('mengaji-today-label').innerText = todayStr;
-            document.getElementById('siswa-today-label').innerText = todayStr;
-            document.getElementById('kesiswaan-today-label').innerText = todayStr;
             document.getElementById('print-form-mengaji-date').innerText = todayStr;
+
+            const todayKey = getTodayKey();
+            
+            // Set default date input fields to today
+            if (document.getElementById('mengaji-date-picker')) document.getElementById('mengaji-date-picker').value = todayKey;
+            if (document.getElementById('guru-input-date')) document.getElementById('guru-input-date').value = todayKey;
+            if (document.getElementById('siswa-input-date')) document.getElementById('siswa-input-date').value = todayKey;
+            if (document.getElementById('kesiswaan-input-date')) document.getElementById('kesiswaan-input-date').value = todayKey;
+            if (document.getElementById('quick-student-date')) document.getElementById('quick-student-date').value = todayKey;
+            if (document.getElementById('quick-teacher-date')) document.getElementById('quick-teacher-date').value = todayKey;
 
             const now = new Date();
             const yyyy = now.getFullYear();
@@ -1155,7 +1181,7 @@
             document.getElementById('month-select-mengaji').value = currentMonthStr;
             document.getElementById('month-select-presensi').value = currentMonthStr;
             
-            // Set Default Multi-Month Range for Siswa (e.g. July to September/Current Month)
+            // Set Default Multi-Month Range for Siswa (July to Current Month)
             const julMonthStr = `${yyyy}-07`;
             document.getElementById('month-start-siswa').value = julMonthStr;
             document.getElementById('month-end-siswa').value = currentMonthStr < julMonthStr ? julMonthStr : currentMonthStr;
@@ -1232,8 +1258,10 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const todayKey = getTodayKey();
-            const todayDay = getDayNameID();
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            const dateParts = todayKey.split('-');
+            const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
+            const todayDay = getDayNameID(dateObj);
             
             if (!mengaji36Logs[todayKey]) {
                 mengaji36Logs[todayKey] = {};
@@ -1294,7 +1322,7 @@
         }
 
         window.updateMengajiTeacher = function(cls, teacherName) {
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
             if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
             if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { teacher: '', present: true };
             mengaji36Logs[todayKey][cls].teacher = teacherName;
@@ -1303,7 +1331,7 @@
         };
 
         window.toggleMengajiPresence = function(cls) {
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
             if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
             if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { teacher: '', present: true };
             mengaji36Logs[todayKey][cls].present = !mengaji36Logs[todayKey][cls].present;
@@ -1313,8 +1341,11 @@
         };
 
         window.resetToMasterSchedule = function() {
-            const todayKey = getTodayKey();
-            const todayDay = getDayNameID();
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            const dateParts = todayKey.split('-');
+            const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
+            const todayDay = getDayNameID(dateObj);
+
             mengaji36Logs[todayKey] = {};
             ALL_CLASSES.forEach(cls => {
                 const presetTeacher = masterJadwalMengaji[todayDay]?.[cls] || '';
@@ -1335,7 +1366,7 @@
         window.printFormMengajiHarian = function() {
             const tbody = document.getElementById('print-form-mengaji-body');
             tbody.innerHTML = '';
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
             const todayLog = mengaji36Logs[todayKey] || {};
 
             for (let i = 0; i < 12; i++) {
@@ -1442,7 +1473,7 @@
             if (!container || !emptyState) return;
             container.innerHTML = '';
 
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('guru-input-date')?.value || getTodayKey();
             const list = absenceLogs[todayKey] || [];
 
             if (list.length === 0) {
@@ -1476,7 +1507,7 @@
 
         window.deleteTeacherAbsence = function(index) {
             showConfirmModal("Hapus Presensi Guru", "Apakah Anda yakin ingin menghapus catatan guru ini?", () => {
-                const todayKey = getTodayKey();
+                const todayKey = document.getElementById('guru-input-date')?.value || getTodayKey();
                 if (absenceLogs[todayKey]) {
                     absenceLogs[todayKey].splice(index, 1);
                     localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
@@ -1492,6 +1523,7 @@
             renderTeacherBatchQueueTable();
             document.getElementById('qs-teacher-search-name').value = '';
             document.getElementById('qs-teacher-suggestions').classList.add('hidden');
+            document.getElementById('quick-teacher-date').value = document.getElementById('guru-input-date')?.value || getTodayKey();
             document.getElementById('modal-quick-teacher').classList.remove('hidden');
         };
 
@@ -1625,17 +1657,17 @@
 
         window.saveQuickTeacherForm = function(event) {
             event.preventDefault();
-            const todayKey = getTodayKey();
+            const targetDate = document.getElementById('quick-teacher-date')?.value || getTodayKey();
 
             if (teacherBatchQueue.length === 0) {
                 showToast('Antrean daftar guru masih kosong!');
                 return;
             }
 
-            if (!absenceLogs[todayKey]) absenceLogs[todayKey] = [];
+            if (!absenceLogs[targetDate]) absenceLogs[targetDate] = [];
 
             teacherBatchQueue.forEach(item => {
-                absenceLogs[todayKey].push({
+                absenceLogs[targetDate].push({
                     teacher: item.teacher,
                     status: item.status,
                     jam: item.jam,
@@ -1645,6 +1677,9 @@
             });
 
             localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
+            if (document.getElementById('guru-input-date')) {
+                document.getElementById('guru-input-date').value = targetDate;
+            }
             renderTeacherAbsenceList();
 
             const savedCount = teacherBatchQueue.length;
@@ -1652,7 +1687,7 @@
             renderTeacherBatchQueueTable();
 
             closeQuickTeacherModal();
-            showToast(`${savedCount} Catatan ketidakhadiran guru berhasil disimpan!`);
+            showToast(`${savedCount} Catatan ketidakhadiran guru tanggal ${targetDate} berhasil disimpan!`);
             pushToCloud();
         };
 
@@ -1663,7 +1698,7 @@
             if (!tbody || !emptyState) return;
             tbody.innerHTML = '';
 
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('siswa-input-date')?.value || getTodayKey();
             const list = studentAbsenceList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1718,7 +1753,7 @@
             if (!container || !emptyState) return;
             container.innerHTML = '';
 
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('kesiswaan-input-date')?.value || getTodayKey();
             const list = studentLateList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1769,7 +1804,7 @@
             if (!container || !emptyState) return;
             container.innerHTML = '';
 
-            const todayKey = getTodayKey();
+            const todayKey = document.getElementById('kesiswaan-input-date')?.value || getTodayKey();
             const list = studentEarlyList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
@@ -1816,6 +1851,7 @@
         window.openQuickStudentModal = function(defaultStatus = 'S') {
             document.getElementById('form-quick-student').reset();
             document.getElementById('quick-student-status-batch').value = defaultStatus === 'TERLAMBAT' || defaultStatus === 'PULANG' ? defaultStatus : 'S';
+            document.getElementById('quick-student-date').value = document.getElementById('siswa-input-date')?.value || getTodayKey();
             batchQueue = [];
             renderBatchQueueTable();
             document.getElementById('qs-batch-suggestions').classList.add('hidden');
@@ -1970,7 +2006,7 @@
 
         window.saveQuickStudentForm = function(event) {
             event.preventDefault();
-            const todayKey = getTodayKey();
+            const targetDate = document.getElementById('quick-student-date')?.value || getTodayKey();
 
             if (batchQueue.length === 0) {
                 showToast('Antrean daftar siswa masih kosong!');
@@ -1979,17 +2015,20 @@
 
             batchQueue.forEach(item => {
                 if (item.status === 'TERLAMBAT') {
-                    studentLateList.push({ date: todayKey, class: item.class, name: item.name, time: item.time || '07.45', reason: item.note });
+                    studentLateList.push({ date: targetDate, class: item.class, name: item.name, time: item.time || '07.45', reason: item.note });
                 } else if (item.status === 'PULANG') {
-                    studentEarlyList.push({ date: todayKey, class: item.class, name: item.name, time: item.time || '10.30', reason: item.note });
+                    studentEarlyList.push({ date: targetDate, class: item.class, name: item.name, time: item.time || '10.30', reason: item.note });
                 } else {
-                    studentAbsenceList.push({ date: todayKey, class: item.class, name: item.name, status: item.status, note: item.note });
+                    studentAbsenceList.push({ date: targetDate, class: item.class, name: item.name, status: item.status, note: item.note });
                 }
             });
 
             localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
             localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
             localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+
+            if (document.getElementById('siswa-input-date')) document.getElementById('siswa-input-date').value = targetDate;
+            if (document.getElementById('kesiswaan-input-date')) document.getElementById('kesiswaan-input-date').value = targetDate;
 
             renderStudentAbsenceTable();
             renderLateList();
@@ -2000,7 +2039,7 @@
             renderBatchQueueTable();
 
             closeQuickStudentModal();
-            showToast(`${totalSaved} Presensi siswa berhasil disimpan!`);
+            showToast(`${totalSaved} Presensi siswa tanggal ${targetDate} berhasil disimpan!`);
             pushToCloud();
         };
 
@@ -2148,18 +2187,15 @@
             const now = new Date();
             const year = now.getFullYear();
 
-            if (presetType === 'jul-sep') {
+            if (presetType === 'jul-aug') {
+                document.getElementById('month-start-siswa').value = `${year}-07`;
+                document.getElementById('month-end-siswa').value = `${year}-08`;
+            } else if (presetType === 'jul-sep') {
                 document.getElementById('month-start-siswa').value = `${year}-07`;
                 document.getElementById('month-end-siswa').value = `${year}-09`;
-            } else if (presetType === 'jul-okt') {
-                document.getElementById('month-start-siswa').value = `${year}-07`;
-                document.getElementById('month-end-siswa').value = `${year}-10`;
             } else if (presetType === 'sem1') {
                 document.getElementById('month-start-siswa').value = `${year}-07`;
                 document.getElementById('month-end-siswa').value = `${year}-12`;
-            } else if (presetType === 'sem2') {
-                document.getElementById('month-start-siswa').value = `${year}-01`;
-                document.getElementById('month-end-siswa').value = `${year}-06`;
             }
             renderRekapSiswa();
         };
@@ -2175,7 +2211,6 @@
                 document.getElementById('month-end-siswa').value = startMonthStr;
             }
 
-            // Generate list of YYYY-MM in range
             const startParts = startMonthStr.split('-');
             const endParts = endMonthStr.split('-');
 
@@ -2195,12 +2230,10 @@
                 }
             }
 
-            // Update Label Header
             const startLabel = `${getMonthNameIndo(parseInt(startParts[1], 10))} ${startParts[0]}`;
             const endLabel = `${getMonthNameIndo(parseInt(endParts[1], 10))} ${endParts[0]}`;
             document.getElementById('display-siswa-period-label').innerText = (startMonthStr === endMonthStr) ? startLabel : `${startLabel} s.d. ${endLabel}`;
 
-            // Build Date/Month Columns
             const allDateKeys = [];
             activeMonths.forEach(mStr => {
                 const p = mStr.split('-');
@@ -2259,7 +2292,6 @@
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
 
-                // Highlight Row if Terlambat (T) >= 4x
                 const isLateWarning = countT >= 4;
                 const rowBgClass = isLateWarning ? 'bg-rose-50/90' : 'hover:bg-slate-50';
 
@@ -2344,32 +2376,26 @@
                 `Hapus Data Bulan ${labelStr}`,
                 `Apakah Anda yakin ingin MENGHAPUS SELURUH DATA (Pemantauan Mengaji, Presensi Guru, Presensi Siswa, Terlambat & Pulang) pada bulan ${labelStr}? Data akan terhapus dari Firebase & LocalStorage dan tidak dapat dikembalikan!`,
                 () => {
-                    // Delete Mengaji logs
                     Object.keys(mengaji36Logs).forEach(key => {
                         if (key.startsWith(monthStr)) delete mengaji36Logs[key];
                     });
 
-                    // Delete Teacher Absence logs
                     Object.keys(absenceLogs).forEach(key => {
                         if (key.startsWith(monthStr)) delete absenceLogs[key];
                     });
 
-                    // Delete Student Absences, Lates, & Early leaves
                     studentAbsenceList = studentAbsenceList.filter(item => !item.date || !item.date.startsWith(monthStr));
                     studentLateList = studentLateList.filter(item => !item.date || !item.date.startsWith(monthStr));
                     studentEarlyList = studentEarlyList.filter(item => !item.date || !item.date.startsWith(monthStr));
 
-                    // Save to LocalStorage
                     localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
                     localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
                     localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
                     localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
                     localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
 
-                    // Sync to Firebase
                     pushToCloud();
 
-                    // Refresh Views
                     if (typeof renderRekapMengaji === 'function') renderRekapMengaji();
                     if (typeof renderRekapPresensi === 'function') renderRekapPresensi();
                     if (typeof renderRekapSiswa === 'function') renderRekapSiswa();
