@@ -570,7 +570,7 @@
                 </span>
                 <span class="font-medium"><strong class="text-blue-600 font-bold">S</strong> = Sakit</span>
                 <span class="font-medium"><strong class="text-amber-600 font-bold">I</strong> = Izin</span>
-                <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpa</span>
+                <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpha</span>
                 <span class="font-medium"><strong class="text-rose-800 font-bold">T</strong> = Terlambat</span>
                 <span class="font-medium"><strong class="text-indigo-800 font-bold">P</strong> = Pulang</span>
                 <span class="font-medium flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 font-bold">
@@ -784,7 +784,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK STUDENT (WITH BATCH INPUT & SEARCHABLE NAMES) -->
+    <!-- MODAL QUICK STUDENT (BATCH MULTIPLE STUDENTS) -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -861,29 +861,23 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK TEACHER -->
+    <!-- MODAL QUICK TEACHER (BATCH MULTIPLE TEACHERS) -->
     <div id="modal-quick-teacher" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-5 space-y-3">
-            <div class="flex items-center justify-between border-b pb-2.5">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
                 <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-user-xmark text-rose-500"></i> Catat Ketidakhadiran Guru Kelas
+                    <i class="fa-solid fa-user-xmark text-rose-500"></i> Catat Ketidakhadiran Guru (Banyak Guru)
                 </h3>
                 <button onclick="closeQuickTeacherModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <form id="form-quick-teacher" onsubmit="saveQuickTeacherForm(event)" class="space-y-3">
-                <div class="relative">
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Pilih Nama Guru (Searchable) *</label>
-                    <input type="text" id="quick-teacher-name" oninput="onQuickTeacherInput(this.value)" autocomplete="off" placeholder="Ketik nama guru..." class="w-full text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
-                    <div id="quick-teacher-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
-                </div>
-
+            <form id="form-quick-teacher" onsubmit="saveQuickTeacherForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Status Absen *</label>
-                        <select id="quick-teacher-status" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Status Absen</label>
+                        <select id="quick-teacher-default-status" class="w-full text-xs font-semibold bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
                             <option value="Sakit">Sakit (S)</option>
                             <option value="Dinas Luar">Dinas Luar (DL)</option>
                             <option value="KP">Kepentingan Pribadi (KP)</option>
@@ -892,24 +886,52 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jam Ke- *</label>
-                        <input type="text" id="quick-teacher-jam" placeholder="Contoh: 1-4" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Default Jam Ke-</label>
+                        <input type="text" id="quick-teacher-default-jam" placeholder="Contoh: 1-4" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Kelas Yang Ditinggalkan</label>
-                    <input type="text" id="quick-teacher-kelas" placeholder="Contoh: X 1, XI 3" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                <div class="relative">
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Guru (Searchable) *</label>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="quick-teacher-name" oninput="onQuickTeacherInput(this.value)" autocomplete="off" placeholder="Ketik nama guru..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
+                        <button type="button" onclick="addCurrentTeacherToBatch()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 shadow transition">
+                            + Tambah
+                        </button>
+                    </div>
+                    <div id="quick-teacher-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Penanggulangan / Inval Guru</label>
-                    <input type="text" id="quick-teacher-inval" placeholder="Contoh: Diberi tugas hal 45 / Guru Inval: Pak Ahmad" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Guru Yang Diinput (<span id="qt-batch-count" class="text-rose-600">0</span> Guru)</span>
+                        <button type="button" onclick="clearTeacherBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
+                    </div>
+                    
+                    <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-[11px] text-left border-collapse">
+                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-2 text-center w-6">#</th>
+                                    <th class="p-2">Nama Guru</th>
+                                    <th class="p-2 w-28">Status</th>
+                                    <th class="p-2 w-20">Jam</th>
+                                    <th class="p-2">Ket / Tugas / Inval</th>
+                                    <th class="p-2 text-center w-10">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qt-batch-table-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <button type="button" onclick="closeQuickTeacherModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
-                    <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow transition">Simpan Presensi Guru</button>
+                <div class="flex items-center gap-2 pt-2 shrink-0 border-t border-slate-100">
+                    <button type="button" onclick="closeQuickTeacherModal()" class="w-1/2 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
+                    <button type="submit" class="w-1/2 py-2.5 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow transition">Simpan Semua Guru</button>
                 </div>
             </form>
         </div>
@@ -1053,9 +1075,10 @@
         let walasPhoneData = JSON.parse(localStorage.getItem('piket_walas_phone')) || {};
         let isAdminUnlocked = false;
 
-        // Quick Student Batch Mode State Variables
+        // Quick Student & Teacher Batch Mode State Variables
         let quickStudentMode = 'batch';
         let batchQueue = [];
+        let teacherBatchQueue = [];
 
         async function setupFirebase() {
             if (!firebaseConfig) {
@@ -1205,7 +1228,6 @@
             document.getElementById('month-select-presensi').value = currentMonthStr;
             document.getElementById('month-select-siswa').value = currentMonthStr;
 
-            // Default Multi-Month Range: Dari Juli (Bulan 07) s.d. Bulan Sekarang
             document.getElementById('month-start-siswa').value = `${yyyy}-07`;
             document.getElementById('month-end-siswa').value = currentMonthStr;
         }
@@ -1533,14 +1555,21 @@
         };
 
         window.openAddAbsenceModal = function() {
-            document.getElementById('form-quick-teacher').reset();
-            document.getElementById('quick-teacher-name').value = '';
-            document.getElementById('quick-teacher-suggestions').classList.add('hidden');
-            document.getElementById('modal-quick-teacher').classList.remove('hidden');
+            const form = document.getElementById('form-quick-teacher');
+            if (form) form.reset();
+            const inputName = document.getElementById('quick-teacher-name');
+            if (inputName) inputName.value = '';
+            const sug = document.getElementById('quick-teacher-suggestions');
+            if (sug) sug.classList.add('hidden');
+            teacherBatchQueue = [];
+            renderTeacherBatchQueueTable();
+            const modal = document.getElementById('modal-quick-teacher');
+            if (modal) modal.classList.remove('hidden');
         };
 
         window.closeQuickTeacherModal = function() {
-            document.getElementById('modal-quick-teacher').classList.add('hidden');
+            const modal = document.getElementById('modal-quick-teacher');
+            if (modal) modal.classList.add('hidden');
         };
 
         window.onQuickTeacherInput = function(val) {
@@ -1556,7 +1585,16 @@
             const matches = teacherList.filter(t => t.toLowerCase().includes(query));
 
             if (matches.length === 0) {
-                sugBox.classList.add('hidden');
+                const addDiv = document.createElement('div');
+                addDiv.className = "p-2.5 text-xs text-rose-600 font-bold hover:bg-rose-50 cursor-pointer";
+                addDiv.innerText = `➕ Tambahkan: "${val}"`;
+                addDiv.onclick = () => {
+                    addTeacherToBatch(val);
+                    document.getElementById('quick-teacher-name').value = '';
+                    sugBox.classList.add('hidden');
+                };
+                sugBox.appendChild(addDiv);
+                sugBox.classList.remove('hidden');
                 return;
             }
 
@@ -1565,7 +1603,8 @@
                 div.className = "p-2.5 text-xs hover:bg-slate-100 cursor-pointer border-b border-slate-100 flex items-center justify-between";
                 div.innerHTML = `<span class="font-semibold text-slate-800">${teacherName}</span>`;
                 div.onclick = () => {
-                    document.getElementById('quick-teacher-name').value = teacherName;
+                    addTeacherToBatch(teacherName);
+                    document.getElementById('quick-teacher-name').value = '';
                     sugBox.classList.add('hidden');
                 };
                 sugBox.appendChild(div);
@@ -1574,27 +1613,130 @@
             sugBox.classList.remove('hidden');
         };
 
-        window.saveQuickTeacherForm = function(event) {
-            event.preventDefault();
-            const teacher = document.getElementById('quick-teacher-name').value.trim();
-            const status = document.getElementById('quick-teacher-status').value;
-            const jam = document.getElementById('quick-teacher-jam').value.trim();
-            const kelas = document.getElementById('quick-teacher-kelas').value.trim();
-            const penanggulangan = document.getElementById('quick-teacher-inval').value.trim();
+        window.addCurrentTeacherToBatch = function() {
+            const val = document.getElementById('quick-teacher-name').value.trim();
+            if (val) {
+                addTeacherToBatch(val);
+                document.getElementById('quick-teacher-name').value = '';
+                document.getElementById('quick-teacher-suggestions').classList.add('hidden');
+            }
+        };
 
-            if (!teacher) {
-                showToast('Pilih atau ketik nama guru terlebih dahulu!');
+        function addTeacherToBatch(teacherName, status = null) {
+            const defaultStatus = status || document.getElementById('quick-teacher-default-status').value;
+            const defaultJam = document.getElementById('quick-teacher-default-jam').value.trim();
+            
+            const existing = teacherBatchQueue.find(x => x.teacher.toLowerCase() === teacherName.toLowerCase());
+            if (existing) {
+                existing.status = defaultStatus;
+            } else {
+                teacherBatchQueue.push({
+                    teacher: teacherName,
+                    status: defaultStatus,
+                    jam: defaultJam || '1-4',
+                    kelas: '',
+                    penanggulangan: ''
+                });
+            }
+            renderTeacherBatchQueueTable();
+        }
+
+        function renderTeacherBatchQueueTable() {
+            const tbody = document.getElementById('qt-batch-table-body');
+            const countElem = document.getElementById('qt-batch-count');
+            if (countElem) countElem.innerText = teacherBatchQueue.length;
+
+            if (!tbody) return;
+
+            if (teacherBatchQueue.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td></tr>`;
                 return;
             }
 
+            tbody.innerHTML = '';
+            teacherBatchQueue.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-2 text-center text-slate-400 font-bold">${index + 1}</td>
+                    <td class="p-2 font-bold text-slate-800">${item.teacher}</td>
+                    <td class="p-2">
+                        <select onchange="updateTeacherBatchItemStatus(${index}, this.value)" class="text-[11px] font-bold p-1 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-rose-500">
+                            <option value="Sakit" ${item.status === 'Sakit' ? 'selected' : ''}>Sakit (S)</option>
+                            <option value="Dinas Luar" ${item.status === 'Dinas Luar' ? 'selected' : ''}>Dinas Luar (DL)</option>
+                            <option value="KP" ${item.status === 'KP' ? 'selected' : ''}>KP</option>
+                            <option value="Cuti" ${item.status === 'Cuti' ? 'selected' : ''}>Cuti (C)</option>
+                            <option value="Tanpa Berita" ${item.status === 'Tanpa Berita' ? 'selected' : ''}>Tanpa Berita (TB)</option>
+                        </select>
+                    </td>
+                    <td class="p-2">
+                        <input type="text" value="${item.jam || ''}" onchange="updateTeacherBatchItemJam(${index}, this.value)" placeholder="Jam..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
+                    </td>
+                    <td class="p-2">
+                        <input type="text" value="${item.penanggulangan || ''}" onchange="updateTeacherBatchItemPenanggulangan(${index}, this.value)" placeholder="Ket / Tugas / Inval..." class="w-full text-[11px] p-1 bg-white border border-slate-200 rounded-lg">
+                    </td>
+                    <td class="p-2 text-center">
+                        <button type="button" onclick="removeTeacherBatchQueueItem(${index})" class="text-rose-500 hover:text-rose-700">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.removeTeacherBatchQueueItem = function(index) {
+            teacherBatchQueue.splice(index, 1);
+            renderTeacherBatchQueueTable();
+        };
+
+        window.updateTeacherBatchItemStatus = function(index, newStatus) {
+            teacherBatchQueue[index].status = newStatus;
+        };
+
+        window.updateTeacherBatchItemJam = function(index, val) {
+            teacherBatchQueue[index].jam = val;
+        };
+
+        window.updateTeacherBatchItemPenanggulangan = function(index, val) {
+            teacherBatchQueue[index].penanggulangan = val;
+        };
+
+        window.clearTeacherBatchQueue = function() {
+            teacherBatchQueue = [];
+            renderTeacherBatchQueueTable();
+        };
+
+        window.saveQuickTeacherForm = function(event) {
+            event.preventDefault();
             const todayKey = getTodayKey();
+
+            if (teacherBatchQueue.length === 0) {
+                showToast('Antrean daftar guru masih kosong!');
+                return;
+            }
+
             if (!absenceLogs[todayKey]) absenceLogs[todayKey] = [];
-            absenceLogs[todayKey].push({ teacher, status, jam, kelas, penanggulangan });
+
+            teacherBatchQueue.forEach(item => {
+                absenceLogs[todayKey].push({
+                    teacher: item.teacher,
+                    status: item.status,
+                    jam: item.jam || '1-4',
+                    kelas: item.kelas || '',
+                    penanggulangan: item.penanggulangan || ''
+                });
+            });
 
             localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
             renderTeacherAbsenceList();
+
+            const totalSaved = teacherBatchQueue.length;
+            teacherBatchQueue = [];
+            renderTeacherBatchQueueTable();
+
             closeQuickTeacherModal();
-            showToast('Ketidakhadiran guru berhasil dicatat!');
+            showToast(`${totalSaved} Presensi guru berhasil disimpan!`);
             pushToCloud();
         };
 
@@ -2131,7 +2273,6 @@
             });
         };
 
-        // HELPER LOGIC UNTUK PERHITUNGAN RENTANG BULAN (MULTI-BULAN)
         function getMonthRangeArray(startM, endM) {
             if (!startM || !endM) return [];
             const [startY, startMNum] = startM.split('-').map(Number);
@@ -2199,7 +2340,6 @@
             }
         };
 
-        // RENDER 1 BULAN SAJA (HARIAN LENGKAP)
         function renderRekapSiswaSingleMonth(selectedClass) {
             const monthStr = document.getElementById('month-select-siswa').value;
             if (!monthStr) return;
@@ -2303,7 +2443,6 @@
             renderSiswaRekapSummary([monthStr]);
         }
 
-        // RENDER RENTANG BULAN / MULTI-BULAN (MISAL JULI - SEPTEMBER)
         function renderRekapSiswaMultiMonth(selectedClass) {
             const startM = document.getElementById('month-start-siswa').value;
             const endM = document.getElementById('month-end-siswa').value;
@@ -2642,7 +2781,6 @@
                 });
 
             } else {
-                // MULTI-MONTH RANGE PDF
                 const startM = document.getElementById('month-start-siswa').value;
                 const endM = document.getElementById('month-end-siswa').value;
                 const monthsArr = getMonthRangeArray(startM, endM);
