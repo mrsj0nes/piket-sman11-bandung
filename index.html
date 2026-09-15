@@ -94,42 +94,90 @@
                 </div>
 
                 <div class="flex items-center gap-1.5 bg-brand-600 px-2.5 py-1.5 rounded-lg text-xs font-bold text-yellow-300">
-                    <i class="fa-regular fa-calendar-check text-xs"></i>
-                    <span id="header-date-display">-</span>
-                </div>
+                <i class="fa-regular fa-calendar-check text-xs"></i>
+                <span id="header-date-display">-</span>
             </div>
         </div>
     </header>
 
     <nav class="bg-white border-b border-slate-200 no-print sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-3 flex overflow-x-auto space-x-1 py-2 text-xs font-medium no-scrollbar">
-            <button onclick="switchTab('input-mengaji')" id="tab-btn-input-mengaji" class="tab-btn active px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition bg-brand-50 text-brand-500 font-semibold border border-brand-100">
-                <i class="fa-solid fa-book-quran"></i> Pemantauan Mengaji
-            </button>
-            <button onclick="switchTab('input-presensi')" id="tab-btn-input-presensi" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-user-xmark"></i> Presensi Guru
-            </button>
-            <button onclick="switchTab('input-siswa')" id="tab-btn-input-siswa" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-graduation-cap text-amber-500"></i> Presensi Siswa
-            </button>
-            <button onclick="switchTab('input-kesiswaan')" id="tab-btn-input-kesiswaan" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-clock text-rose-500"></i> Terlambat & Izin Pulang
-            </button>
-            <button onclick="switchTab('rekap-mengaji')" id="tab-btn-rekap-mengaji" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-table-cells"></i> Rekap Mengaji
-            </button>
-            <button onclick="switchTab('rekap-presensi')" id="tab-btn-rekap-presensi" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-table-list"></i> Rekap Presensi Guru
-            </button>
-            <button onclick="switchTab('rekap-siswa')" id="tab-btn-rekap-siswa" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-chart-pie"></i> Rekap Siswa (Multi-Bulan)
-            </button>
-            <button onclick="switchTab('master-siswa')" id="tab-btn-master-siswa" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-address-book text-emerald-600"></i> Master Siswa
-            </button>
-            <button onclick="switchTab('master-guru')" id="tab-btn-master-guru" class="tab-btn px-3.5 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition text-slate-600 hover:bg-slate-100">
-                <i class="fa-solid fa-lock text-[10px] text-amber-500 mr-0.5"></i> <i class="fa-solid fa-users"></i> Master Guru
-            </button>
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+            <!-- Dropdown Navigation Groups -->
+            <div class="flex items-center gap-2">
+                
+                <!-- DROPDOWN GURU -->
+                <div class="relative dropdown-container">
+                    <button id="btn-dropdown-guru" onclick="toggleDropdown('guru')" class="px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm">
+                        <i class="fa-solid fa-chalkboard-user text-brand-500 text-sm"></i>
+                        <span>MENU GURU</span>
+                        <i id="arrow-guru" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="dropdown-menu-guru" class="hidden absolute left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-1.5 space-y-0.5">
+                        <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Layanan Presensi Guru</div>
+                        <button onclick="switchTab('input-mengaji')" id="nav-item-input-mengaji" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center gap-2.5 hover:bg-slate-100 transition rounded-xl">
+                            <i class="fa-solid fa-book-quran text-emerald-600 w-4 text-center"></i> Pemantauan Mengaji
+                        </button>
+                        <button onclick="switchTab('input-presensi')" id="nav-item-input-presensi" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center gap-2.5 hover:bg-slate-100 transition rounded-xl">
+                            <i class="fa-solid fa-user-xmark text-rose-500 w-4 text-center"></i> Presensi Ketidakhadiran Guru
+                        </button>
+                        
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Rekapitulasi & Master</div>
+                        <button onclick="switchTab('rekap-presensi')" id="nav-item-rekap-presensi" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-table-list text-brand-500 w-4 text-center"></i> Rekap Presensi Guru</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </button>
+                        <button onclick="switchTab('rekap-mengaji')" id="nav-item-rekap-mengaji" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-table-cells text-purple-600 w-4 text-center"></i> Rekap Mengaji Guru</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </button>
+                        <button onclick="switchTab('master-guru')" id="nav-item-master-guru" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-users text-indigo-600 w-4 text-center"></i> Master Data Guru</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DROPDOWN KESISWAAN -->
+                <div class="relative dropdown-container">
+                    <button id="btn-dropdown-kesiswaan" onclick="toggleDropdown('kesiswaan')" class="px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm">
+                        <i class="fa-solid fa-graduation-cap text-amber-500 text-sm"></i>
+                        <span>MENU KESISWAAN</span>
+                        <i id="arrow-kesiswaan" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="dropdown-menu-kesiswaan" class="hidden absolute left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-1.5 space-y-0.5">
+                        <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Layanan Siswa</div>
+                        <button onclick="switchTab('input-siswa')" id="nav-item-input-siswa" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center gap-2.5 hover:bg-slate-100 transition rounded-xl">
+                            <i class="fa-solid fa-graduation-cap text-amber-500 w-4 text-center"></i> Presensi Siswa (S/I/A)
+                        </button>
+                        <button onclick="switchTab('input-kesiswaan')" id="nav-item-input-kesiswaan" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center gap-2.5 hover:bg-slate-100 transition rounded-xl">
+                            <i class="fa-solid fa-clock text-rose-500 w-4 text-center"></i> Terlambat & Izin Pulang
+                        </button>
+                        
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Rekapitulasi & Master</div>
+                        <button onclick="switchTab('rekap-siswa')" id="nav-item-rekap-siswa" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-pie text-amber-600 w-4 text-center"></i> Rekap Siswa (Multi-Bulan)</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </button>
+                        <button onclick="switchTab('master-siswa')" id="nav-item-master-siswa" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
+                            <span class="flex items-center gap-2.5"><i class="fa-solid fa-address-book text-emerald-600 w-4 text-center"></i> Master Data Siswa</span>
+                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Active Menu Breadcrumb / Indicator -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs">
+                <span class="text-slate-400 text-[11px]">Halaman:</span>
+                <span id="active-tab-indicator" class="text-brand-700 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji
+                </span>
+            </div>
         </div>
     </nav>
 
@@ -1130,6 +1178,7 @@
             renderMasterTeacherList();
             updateAdminStatusBadge();
             setupFirebase();
+            switchTab('input-mengaji');
         };
 
         function getTodayKey() {
@@ -1226,6 +1275,47 @@
             return clsStr.replace(/^kelas\s+/i, '').trim();
         }
 
+        window.toggleDropdown = function(menu) {
+            const guruMenu = document.getElementById('dropdown-menu-guru');
+            const kesiswaanMenu = document.getElementById('dropdown-menu-kesiswaan');
+            const arrowGuru = document.getElementById('arrow-guru');
+            const arrowKesiswaan = document.getElementById('arrow-kesiswaan');
+
+            if (menu === 'guru') {
+                const isHidden = guruMenu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isHidden) {
+                    guruMenu.classList.remove('hidden');
+                    if (arrowGuru) arrowGuru.classList.add('rotate-180');
+                }
+            } else if (menu === 'kesiswaan') {
+                const isHidden = kesiswaanMenu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isHidden) {
+                    kesiswaanMenu.classList.remove('hidden');
+                    if (arrowKesiswaan) arrowKesiswaan.classList.add('rotate-180');
+                }
+            }
+        };
+
+        window.closeAllDropdowns = function() {
+            const guruMenu = document.getElementById('dropdown-menu-guru');
+            const kesiswaanMenu = document.getElementById('dropdown-menu-kesiswaan');
+            const arrowGuru = document.getElementById('arrow-guru');
+            const arrowKesiswaan = document.getElementById('arrow-kesiswaan');
+
+            if (guruMenu) guruMenu.classList.add('hidden');
+            if (kesiswaanMenu) kesiswaanMenu.classList.add('hidden');
+            if (arrowGuru) arrowGuru.classList.remove('rotate-180');
+            if (arrowKesiswaan) arrowKesiswaan.classList.remove('rotate-180');
+        };
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-container')) {
+                closeAllDropdowns();
+            }
+        });
+
         window.switchTab = function(tabId) {
             const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'rekap-siswa', 'master-siswa', 'master-guru'];
             if (protectedTabs.includes(tabId) && !isAdminUnlocked) {
@@ -1233,18 +1323,54 @@
                 return;
             }
 
+            closeAllDropdowns();
+
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-brand-50', 'text-brand-500', 'font-semibold', 'border', 'border-brand-100');
-                btn.classList.add('text-slate-600');
+
+            const btnGuru = document.getElementById('btn-dropdown-guru');
+            const btnKesiswaan = document.getElementById('btn-dropdown-kesiswaan');
+            
+            if (btnGuru) btnGuru.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
+            if (btnKesiswaan) btnKesiswaan.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
+
+            document.querySelectorAll('.dropdown-item').forEach(btn => {
+                btn.classList.remove('bg-brand-50', 'text-brand-600', 'font-bold');
+                btn.classList.add('text-slate-700');
             });
 
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-brand-50', 'text-brand-500', 'font-semibold', 'border', 'border-brand-100');
-                activeBtn.classList.remove('text-slate-600');
+            const activeItem = document.getElementById(`nav-item-${tabId}`);
+            if (activeItem) {
+                activeItem.classList.add('bg-brand-50', 'text-brand-600', 'font-bold');
+                activeItem.classList.remove('text-slate-700');
             }
+
+            const guruTabs = ['input-mengaji', 'input-presensi', 'rekap-mengaji', 'rekap-presensi', 'master-guru'];
+            const kesiswaanTabs = ['input-siswa', 'input-kesiswaan', 'rekap-siswa', 'master-siswa'];
+
+            if (guruTabs.includes(tabId) && btnGuru) {
+                btnGuru.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm ring-2 ring-brand-500/20";
+            } else if (kesiswaanTabs.includes(tabId) && btnKesiswaan) {
+                btnKesiswaan.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-amber-500 bg-amber-50 text-amber-800 shadow-sm ring-2 ring-amber-500/20";
+            }
+
+            const tabLabels = {
+                'input-mengaji': '<i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji',
+                'input-presensi': '<i class="fa-solid fa-user-xmark text-rose-500"></i> Presensi Guru',
+                'rekap-presensi': '<i class="fa-solid fa-table-list text-brand-500"></i> Rekap Presensi Guru',
+                'rekap-mengaji': '<i class="fa-solid fa-table-cells text-purple-600"></i> Rekap Mengaji Guru',
+                'master-guru': '<i class="fa-solid fa-users text-indigo-600"></i> Master Data Guru',
+                'input-siswa': '<i class="fa-solid fa-graduation-cap text-amber-500"></i> Presensi Siswa',
+                'input-kesiswaan': '<i class="fa-solid fa-clock text-rose-500"></i> Terlambat & Izin Pulang',
+                'rekap-siswa': '<i class="fa-solid fa-chart-pie text-amber-600"></i> Rekap Siswa (Multi-Bulan)',
+                'master-siswa': '<i class="fa-solid fa-address-book text-emerald-600"></i> Master Data Siswa'
+            };
+
+            const indicator = document.getElementById('active-tab-indicator');
+            if (indicator && tabLabels[tabId]) {
+                indicator.innerHTML = tabLabels[tabId];
+            }
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
             if (tabId === 'rekap-mengaji') renderRekapMengaji();
             if (tabId === 'rekap-presensi') renderRekapPresensi();
