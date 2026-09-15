@@ -160,7 +160,6 @@
                         <div class="px-3 py-1.5 text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">Rekapitulasi & Master</div>
                         <button onclick="switchTab('rekap-siswa')" id="nav-item-rekap-siswa" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
                             <span class="flex items-center gap-2.5"><i class="fa-solid fa-chart-pie text-amber-600 w-4 text-center"></i> Rekap Siswa (Multi-Bulan)</span>
-                            <i class="fa-solid fa-lock text-[10px] text-amber-500"></i>
                         </button>
                         <button onclick="switchTab('master-siswa')" id="nav-item-master-siswa" class="dropdown-item w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-100 transition rounded-xl">
                             <span class="flex items-center gap-2.5"><i class="fa-solid fa-address-book text-emerald-600 w-4 text-center"></i> Master Data Siswa</span>
@@ -1317,7 +1316,7 @@
         });
 
         window.switchTab = function(tabId) {
-            const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'rekap-siswa', 'master-siswa', 'master-guru'];
+            const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'master-siswa', 'master-guru'];
             if (protectedTabs.includes(tabId) && !isAdminUnlocked) {
                 openPinModal(() => switchTab(tabId));
                 return;
