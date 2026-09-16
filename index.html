@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS for Excel Export -->
+    <!-- SheetJS for Excel Import & Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
@@ -77,7 +77,7 @@
                     <i class="fa-solid fa-clipboard-user text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base sm:text-lg leading-tight">SISTEM GURU PIKET & REKAP BULANAN</h1>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">SISTEM GURU PIKET & JADWAL KBM</h1>
                     <p class="text-[11px] text-brand-100">SMA Negeri 11 Kota Bandung — Cadisdik Wilayah VII</p>
                 </div>
             </div>
@@ -94,8 +94,9 @@
                 </div>
 
                 <div class="flex items-center gap-1.5 bg-brand-600 px-2.5 py-1.5 rounded-lg text-xs font-bold text-yellow-300">
-                <i class="fa-regular fa-calendar-check text-xs"></i>
-                <span id="header-date-display">-</span>
+                    <i class="fa-regular fa-calendar-check text-xs"></i>
+                    <span id="header-date-display">-</span>
+                </div>
             </div>
         </div>
     </header>
@@ -103,8 +104,14 @@
     <nav class="bg-white border-b border-slate-200 no-print sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
             <!-- Dropdown Navigation Groups -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 
+                <!-- HOME / JADWAL KBM BUTTON -->
+                <button onclick="switchTab('home')" id="nav-item-home" class="px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm">
+                    <i class="fa-solid fa-house text-yellow-500"></i>
+                    <span>JADWAL KBM</span>
+                </button>
+
                 <!-- DROPDOWN GURU -->
                 <div class="relative dropdown-container">
                     <button id="btn-dropdown-guru" onclick="toggleDropdown('guru')" class="px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm">
@@ -174,7 +181,7 @@
             <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs">
                 <span class="text-slate-400 text-[11px]">Halaman:</span>
                 <span id="active-tab-indicator" class="text-brand-700 font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji
+                    <i class="fa-solid fa-house text-yellow-500"></i> Jadwal KBM
                 </span>
             </div>
         </div>
@@ -187,6 +194,110 @@
             <i id="toast-icon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
             <span id="toast-msg">Data berhasil disimpan!</span>
         </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: BERANDA & JADWAL KBM (HOME PAGE) -->
+        <!-- ========================================== -->
+        <section id="tab-home" class="tab-content block space-y-4">
+            
+            <!-- Hero Banner & Live Hour Card -->
+            <div class="bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-900 text-white p-5 sm:p-6 rounded-2xl shadow-md relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
+                    <i class="fa-solid fa-calendar-days text-9xl"></i>
+                </div>
+
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-xs font-semibold mb-2">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <span id="home-today-date">Selasa, 15 September 2026</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-bold">Jadwal Pelajaran KBM SMAN 11 Bandung</h2>
+                        <p class="text-xs sm:text-sm text-brand-100 mt-1 max-w-2xl">
+                            Pantau jadwal mengajar guru Senin-Jumat, alokasi jam pelajaran (1-10), dan ruang kelas secara real-time.
+                        </p>
+                    </div>
+
+                    <!-- Live Active Hour Card -->
+                    <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20 text-center min-w-[210px]">
+                        <span class="text-[11px] uppercase tracking-wider text-brand-100 block font-medium">Status Jam Sekarang</span>
+                        <div id="current-lesson-hour" class="text-base sm:text-lg font-bold text-yellow-300 mt-0.5">
+                            Jam Ke-3 (08.45 - 09.30)
+                        </div>
+                        <span id="current-day-badge" class="inline-block mt-1 text-[10px] bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
+                            Hari Efektif KBM
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Filter & Control Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Day Selector Buttons -->
+                <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
+                    <span class="text-xs font-bold text-slate-500 uppercase mr-1">Hari:</span>
+                    <button onclick="filterScheduleDay('Senin')" id="btn-day-Senin" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-brand-600 text-white border-brand-600 shadow-xs">Senin</button>
+                    <button onclick="filterScheduleDay('Selasa')" id="btn-day-Selasa" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">Selasa</button>
+                    <button onclick="filterScheduleDay('Rabu')" id="btn-day-Rabu" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">Rabu</button>
+                    <button onclick="filterScheduleDay('Kamis')" id="btn-day-Kamis" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">Kamis</button>
+                    <button onclick="filterScheduleDay('Jumat')" id="btn-day-Jumat" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">Jumat</button>
+                </div>
+
+                <!-- Filters & Excel Import Action -->
+                <div class="flex flex-wrap items-center gap-2">
+                    
+                    <!-- Search Input -->
+                    <div class="relative flex-1 sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+                        <input type="text" id="search-schedule-input" onkeyup="renderScheduleGrid()" placeholder="Cari Guru / Mapel / Kelas..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+                    </div>
+
+                    <!-- Class Grade Filter -->
+                    <select id="filter-schedule-grade" onchange="renderScheduleGrid()" class="text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 font-medium">
+                        <option value="SEMUA">Semua Jenjang Kelas</option>
+                        <option value="X">Kelas X (X 1 s/d X 12)</option>
+                        <option value="XI">Kelas XI (XI 1 s/d XI 12)</option>
+                        <option value="XII">Kelas XII (XII 1 s/d XII 12)</option>
+                    </select>
+
+                    <!-- Excel Schedule Upload Button -->
+                    <button onclick="openExcelImportModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Import Excel Jadwal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Schedule Table Matrix Container -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check text-brand-600"></i>
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-800" id="schedule-title-heading">Jadwal Pelajaran Hari Senin</h3>
+                    </div>
+                    <span id="schedule-count-badge" class="text-xs bg-brand-100 text-brand-800 font-bold px-2.5 py-0.5 rounded-full">36 Kelas Terdaftar</span>
+                </div>
+
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-xs text-left text-slate-700 border-collapse">
+                        <thead class="text-[11px] uppercase bg-slate-100 text-slate-600 sticky top-0 z-20 shadow-xs border-b">
+                            <tr>
+                                <th class="p-3 w-16 text-center border-b">Jam Ke-</th>
+                                <th class="p-3 w-28 text-center border-b">Waktu KBM</th>
+                                <th class="p-3 w-24 text-center border-b">Rombel Kelas</th>
+                                <th class="p-3 border-b">Mata Pelajaran</th>
+                                <th class="p-3 border-b">Guru Pengajar / Kode</th>
+                                <th class="p-3 w-28 text-center border-b">Status KBM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-tbody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
         <!-- QUICK ACTION BAR -->
         <div class="bg-gradient-to-r from-brand-600 to-brand-700 text-white p-3.5 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-2.5 no-print">
@@ -209,7 +320,7 @@
             </div>
         </div>
 
-        <section id="tab-input-mengaji" class="tab-content block space-y-4">
+        <section id="tab-input-mengaji" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="bg-brand-50 p-2.5 rounded-xl text-brand-500">
@@ -741,7 +852,6 @@
 
     </main>
 
-
     <!-- MODAL CONFIRM DIALOG -->
     <div id="modal-confirm-dialog" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-3 text-center">
@@ -938,7 +1048,7 @@
         </div>
     </div>
 
-    <!-- MODAL MASTER JADWAL -->
+    <!-- MODAL MASTER JADWAL MENGAJI -->
     <div id="modal-master-jadwal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden p-5 space-y-3">
             <div class="flex items-center justify-between border-b pb-2.5">
@@ -994,6 +1104,35 @@
             <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                 <button type="button" onclick="resetFirebaseConfig()" class="text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-xl text-xs font-semibold border border-rose-200 transition">Reset Config</button>
                 <button type="button" onclick="saveCustomFirebaseConfig()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow transition">Simpan & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EXCEL JADWAL KBM IMPORT -->
+    <div id="excel-import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4 relative">
+            <button onclick="closeExcelImportModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 border-b pb-3">
+                <div class="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
+                    <i class="fa-solid fa-file-excel text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Import File Excel Jadwal KBM</h3>
+                    <p class="text-xs text-slate-500">Unggah file (.xlsx / .xls) jadwal pelajaran SMAN 11 Bandung</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-700">Pilih File Excel Jadwal:</label>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-slate-300 rounded-xl p-1 cursor-pointer">
+                <p class="text-[11px] text-slate-400">Contoh File: <code>Jadwal KBM TP 2026-2027 Semester Ganjil.xlsx</code></p>
+            </div>
+
+            <div class="flex justify-end gap-2 border-t pt-4">
+                <button onclick="closeExcelImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Batal</button>
+                <button onclick="processExcelUpload()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">Proses & Simpan Jadwal</button>
             </div>
         </div>
     </div>
@@ -1072,11 +1211,50 @@
         let studentAbsenceList = JSON.parse(localStorage.getItem('piket_student_absences')) || [];
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
+        let jadwalKBM = JSON.parse(localStorage.getItem('piket_jadwal_kbm')) || {};
+        let currentDayFilter = 'Senin';
         let isAdminUnlocked = false;
 
         // Batch Queues
         let batchQueue = [];
         let teacherBatchQueue = [];
+
+        function seedDefaultJadwalKBM() {
+            if (Object.keys(jadwalKBM).length > 0) return;
+
+            const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+            const subjects = ['Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'Pendidikan Agama Islam', 'PJOK', 'Informatika', 'Seni Budaya', 'PPKn'];
+            const sampleTeachers = [
+                "Hj. Laela, S.Pd.", "Dhiah Kuswarini, S.Pd., M.M.Pd.", "Syam Ahmad, S.Pd.", "Drs. Saepullah", 
+                "Thaniya, S.Pd., Gr.", "Ricky Sudrajat, S.Pd.", "Emalia Susanti, S.Pd.", "Dra. Dian Apendiani, M.Pd.", 
+                "Aas Astuti, S.Pd.", "Cucu Cahyati, S.Pd.", "Desy Fitriani, S.Pd.", "Fani Rahmawati, S.Pd."
+            ];
+
+            const times = [
+                '07.15 - 08.00', '08.00 - 08.45', '08.45 - 09.30', '09.45 - 10.30',
+                '10.30 - 11.15', '11.15 - 12.00', '12.45 - 13.30', '13.30 - 14.15',
+                '14.15 - 15.00', '15.00 - 15.45'
+            ];
+
+            days.forEach(day => {
+                jadwalKBM[day] = [];
+                ALL_CLASSES.forEach((cls, clsIdx) => {
+                    for (let h = 1; h <= 10; h++) {
+                        const subj = subjects[(clsIdx + h) % subjects.length];
+                        const tchr = sampleTeachers[(clsIdx + h * 2) % sampleTeachers.length];
+                        jadwalKBM[day].push({
+                            class: cls,
+                            hour: h,
+                            time: times[h - 1] || '08.00 - 08.45',
+                            subject: subj,
+                            teacher: tchr
+                        });
+                    }
+                });
+            });
+
+            localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+        }
 
         async function setupFirebase() {
             if (!firebaseConfig) {
@@ -1112,6 +1290,7 @@
                         if (data.studentAbsenceList) studentAbsenceList = data.studentAbsenceList;
                         if (data.studentLateList) studentLateList = data.studentLateList;
                         if (data.studentEarlyList) studentEarlyList = data.studentEarlyList;
+                        if (data.jadwalKBM) jadwalKBM = data.jadwalKBM;
 
                         localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                         localStorage.setItem('piket_student_master', JSON.stringify(studentMasterData));
@@ -1121,12 +1300,14 @@
                         localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
                         localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
                         localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                        localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
 
                         renderMengaji36Grid();
                         renderTeacherAbsenceList();
                         renderStudentAbsenceTable();
                         renderLateList();
                         renderEarlyList();
+                        renderScheduleGrid();
 
                         setTimeout(() => { isRemoteUpdate = false; }, 200);
                     }
@@ -1153,6 +1334,7 @@
                 studentLateList,
                 studentEarlyList,
                 masterJadwalMengaji,
+                jadwalKBM,
                 lastUpdated: Date.now()
             };
 
@@ -1167,6 +1349,7 @@
         window.pushToCloud = pushToCloud;
 
         window.onload = function() {
+            seedDefaultJadwalKBM();
             initDateDisplays();
             initClassSelectors();
             renderMengaji36Grid();
@@ -1175,10 +1358,34 @@
             renderLateList();
             renderEarlyList();
             renderMasterTeacherList();
+            renderScheduleGrid();
             updateAdminStatusBadge();
             setupFirebase();
-            switchTab('input-mengaji');
+            switchTab('home');
         };
+
+        function updateLiveClock() {
+            const now = new Date();
+            const curHourEl = document.getElementById('current-lesson-hour');
+            if (curHourEl) {
+                const totalMinutes = now.getHours() * 60 + now.getMinutes();
+                if (totalMinutes < 435) curHourEl.innerText = "Sebelum KBM (07.15)";
+                else if (totalMinutes < 480) curHourEl.innerText = "Jam Ke-1 (07.15 - 08.00)";
+                else if (totalMinutes < 525) curHourEl.innerText = "Jam Ke-2 (08.00 - 08.45)";
+                else if (totalMinutes < 570) curHourEl.innerText = "Jam Ke-3 (08.45 - 09.30)";
+                else if (totalMinutes < 585) curHourEl.innerText = "Istirahat Ke-1 (09.30 - 09.45)";
+                else if (totalMinutes < 630) curHourEl.innerText = "Jam Ke-4 (09.45 - 10.30)";
+                else if (totalMinutes < 675) curHourEl.innerText = "Jam Ke-5 (10.30 - 11.15)";
+                else if (totalMinutes < 720) curHourEl.innerText = "Jam Ke-6 (11.15 - 12.00)";
+                else if (totalMinutes < 765) curHourEl.innerText = "Istirahat Ke-2 (12.00 - 12.45)";
+                else if (totalMinutes < 810) curHourEl.innerText = "Jam Ke-7 (12.45 - 13.30)";
+                else if (totalMinutes < 855) curHourEl.innerText = "Jam Ke-8 (13.30 - 14.15)";
+                else if (totalMinutes < 900) curHourEl.innerText = "Jam Ke-9 (14.15 - 15.00)";
+                else if (totalMinutes < 945) curHourEl.innerText = "Jam Ke-10 (15.00 - 15.45)";
+                else curHourEl.innerText = "KBM Selesai";
+            }
+        }
+        setInterval(updateLiveClock, 1000);
 
         function getTodayKey() {
             const today = new Date();
@@ -1209,11 +1416,11 @@
         function initDateDisplays() {
             const todayStr = `${getDayNameID()}, ${getFormattedDateID()}`;
             document.getElementById('header-date-display').innerText = todayStr;
+            if (document.getElementById('home-today-date')) document.getElementById('home-today-date').innerText = todayStr;
             document.getElementById('print-form-mengaji-date').innerText = todayStr;
 
             const todayKey = getTodayKey();
             
-            // Set default date input fields to today
             if (document.getElementById('mengaji-date-picker')) document.getElementById('mengaji-date-picker').value = todayKey;
             if (document.getElementById('guru-input-date')) document.getElementById('guru-input-date').value = todayKey;
             if (document.getElementById('siswa-input-date')) document.getElementById('siswa-input-date').value = todayKey;
@@ -1229,7 +1436,6 @@
             document.getElementById('month-select-mengaji').value = currentMonthStr;
             document.getElementById('month-select-presensi').value = currentMonthStr;
             
-            // Set Default Multi-Month Range for Siswa (July to Current Month)
             const julMonthStr = `${yyyy}-07`;
             document.getElementById('month-start-siswa').value = julMonthStr;
             document.getElementById('month-end-siswa').value = currentMonthStr < julMonthStr ? julMonthStr : currentMonthStr;
@@ -1326,9 +1532,11 @@
 
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
 
+            const btnHome = document.getElementById('nav-item-home');
             const btnGuru = document.getElementById('btn-dropdown-guru');
             const btnKesiswaan = document.getElementById('btn-dropdown-kesiswaan');
             
+            if (btnHome) btnHome.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
             if (btnGuru) btnGuru.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
             if (btnKesiswaan) btnKesiswaan.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
 
@@ -1336,6 +1544,10 @@
                 btn.classList.remove('bg-brand-50', 'text-brand-600', 'font-bold');
                 btn.classList.add('text-slate-700');
             });
+
+            if (tabId === 'home' && btnHome) {
+                btnHome.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm ring-2 ring-brand-500/20";
+            }
 
             const activeItem = document.getElementById(`nav-item-${tabId}`);
             if (activeItem) {
@@ -1353,6 +1565,7 @@
             }
 
             const tabLabels = {
+                'home': '<i class="fa-solid fa-house text-yellow-500"></i> Jadwal KBM',
                 'input-mengaji': '<i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji',
                 'input-presensi': '<i class="fa-solid fa-user-xmark text-rose-500"></i> Presensi Guru',
                 'rekap-presensi': '<i class="fa-solid fa-table-list text-brand-500"></i> Rekap Presensi Guru',
@@ -1371,11 +1584,132 @@
 
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
+            if (tabId === 'home') renderScheduleGrid();
             if (tabId === 'rekap-mengaji') renderRekapMengaji();
             if (tabId === 'rekap-presensi') renderRekapPresensi();
             if (tabId === 'rekap-siswa') renderRekapSiswa();
             if (tabId === 'master-siswa') renderMasterSiswaTab();
             if (tabId === 'master-guru') renderMasterTeacherList();
+        };
+
+        window.filterScheduleDay = function(day) {
+            currentDayFilter = day;
+            document.querySelectorAll('.day-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white', 'border-brand-600', 'shadow-xs');
+                btn.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
+            });
+            const activeBtn = document.getElementById(`btn-day-${day}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-brand-600', 'text-white', 'border-brand-600', 'shadow-xs');
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+            renderScheduleGrid();
+        };
+
+        window.renderScheduleGrid = function() {
+            const tbody = document.getElementById('schedule-tbody');
+            const searchVal = (document.getElementById('search-schedule-input')?.value || '').toLowerCase();
+            const gradeVal = document.getElementById('filter-schedule-grade')?.value || 'SEMUA';
+            const heading = document.getElementById('schedule-title-heading');
+            const countBadge = document.getElementById('schedule-count-badge');
+
+            if (heading) heading.innerText = `Jadwal Pelajaran Hari ${currentDayFilter}`;
+
+            const dayData = jadwalKBM[currentDayFilter] || [];
+            
+            const filtered = dayData.filter(item => {
+                const matchesGrade = gradeVal === 'SEMUA' || item.class.startsWith(gradeVal);
+                const matchesSearch = item.class.toLowerCase().includes(searchVal) ||
+                                      item.subject.toLowerCase().includes(searchVal) ||
+                                      item.teacher.toLowerCase().includes(searchVal);
+                return matchesGrade && matchesSearch;
+            });
+
+            if (countBadge) countBadge.innerText = `${filtered.length} Slot Pelajaran`;
+
+            if (!tbody) return;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 italic">Tidak ada data jadwal pelajaran yang cocok. Silakan import Excel atau ubah kata kunci pencarian.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((item) => `
+                <tr class="hover:bg-brand-50/50 transition border-b border-slate-100">
+                    <td class="p-3 text-center font-bold text-brand-700 bg-slate-50/50">${item.hour}</td>
+                    <td class="p-3 text-center text-slate-500 font-mono text-[11px]">${item.time}</td>
+                    <td class="p-3 text-center font-bold text-slate-800 bg-yellow-50/40 rounded-lg">${item.class}</td>
+                    <td class="p-3 font-semibold text-slate-700">${item.subject}</td>
+                    <td class="p-3 text-slate-800 font-medium">${item.teacher}</td>
+                    <td class="p-3 text-center">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <i class="fa-solid fa-circle text-[7px] mr-1"></i>KBM Normal
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.openExcelImportModal = function() {
+            document.getElementById('excel-import-modal')?.classList.remove('hidden');
+        };
+
+        window.closeExcelImportModal = function() {
+            document.getElementById('excel-import-modal')?.classList.add('hidden');
+        };
+
+        window.processExcelUpload = function() {
+            const fileInput = document.getElementById('excel-file-input');
+            if (!fileInput || !fileInput.files[0]) {
+                showToast('Harap pilih file Excel (.xlsx) terlebih dahulu!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+                    let parsedCount = 0;
+
+                    days.forEach(day => {
+                        const sheet = workbook.Sheets[day] || workbook.Sheets[day.toUpperCase()];
+                        if (sheet) {
+                            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                            if (json && json.length > 1) {
+                                jadwalKBM[day] = [];
+                                for (let r = 1; r < json.length; r++) {
+                                    const row = json[r];
+                                    if (row && row.length >= 4) {
+                                        jadwalKBM[day].push({
+                                            hour: parseInt(row[0]) || 1,
+                                            time: String(row[1] || '08.00 - 08.45'),
+                                            class: String(row[2] || 'X 1').trim(),
+                                            subject: String(row[3] || 'Mata Pelajaran').trim(),
+                                            teacher: String(row[4] || 'Guru Pengajar').trim()
+                                        });
+                                        parsedCount++;
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+                    pushToCloud();
+                    closeExcelImportModal();
+                    showToast(`Berhasil mengimport ${parsedCount} slot jadwal KBM!`);
+                    renderScheduleGrid();
+                } catch(err) {
+                    console.error(err);
+                    showToast('Gagal memproses file Excel. Format tidak sesuai.');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
         };
 
         function renderMengaji36Grid() {
