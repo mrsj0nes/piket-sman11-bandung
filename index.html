@@ -1141,7 +1141,7 @@
         const appId = typeof _app_id !== 'undefined' ? _app_id : 'piket-sman11-bandung';
         
         const DEFAULT_FIREBASE_CONFIG = {
-            apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWIFsCfw",
+            apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWlFsCfw",
             authDomain: "piket-sman11-bandung.firebaseapp.com",
             projectId: "piket-sman11-bandung",
             storageBucket: "piket-sman11-bandung.firebasestorage.app",
@@ -1207,7 +1207,9 @@
 
         // --- STREAMING_CHUNK:Firebase Setup... ---
         async function setupFirebase() {
-            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('AIzaSyBwa38sTXQKuo7d7uQQY')) {
+            // BUG FIX: Blokir di bawah ini hanya akan aktif jika Anda menggunakan apiKey berbunyi "KODE_ASLI_ANDA_XXXXX" 
+            // yang ada di dalam file panduan_firebase.md. Kunci "AIzaSy..." asli Anda sekarang akan diizinkan.
+            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('KODE_ASLI_ANDA')) {
                 updateCloudStatusBadge(false, "Offline Mode (Local)");
                 return;
             }
