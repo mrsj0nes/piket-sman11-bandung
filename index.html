@@ -200,6 +200,27 @@
                 </div>
             </div>
 
+            <!-- QUICK ACTION BAR DIPINDAHKAN KE SINI -->
+            <div class="bg-gradient-to-r from-brand-600 to-brand-700 text-white p-3.5 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-2.5 no-print">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-yellow-400 text-brand-700 font-extrabold rounded-lg flex items-center justify-center text-sm shadow-sm">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-xs sm:text-sm">Pencatatan Cepat HP (Quick Action)</h2>
+                        <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru (hari ini atau tanggal lampau/Juli-Agustus)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="openQuickStudentModal()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-user-plus"></i> + Catat Siswa (S/I/A/T/P)
+                    </button>
+                    <button onclick="openAddAbsenceModal()" class="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-user-xmark"></i> + Catat Guru Absen
+                    </button>
+                </div>
+            </div>
+
             <!-- Schedule Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
@@ -270,27 +291,6 @@
                 <div id="schedule-class-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
         </section>
-
-        <!-- QUICK ACTION BAR -->
-        <div class="bg-gradient-to-r from-brand-600 to-brand-700 text-white p-3.5 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-2.5 no-print">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-yellow-400 text-brand-700 font-extrabold rounded-lg flex items-center justify-center text-sm shadow-sm">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div>
-                    <h2 class="font-bold text-xs sm:text-sm">Pencatatan Cepat HP (Quick Action)</h2>
-                    <p class="text-[10px] text-brand-100">Catat presensi siswa atau guru (hari ini atau tanggal lampau/Juli-Agustus)</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <button onclick="openQuickStudentModal()" class="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-plus"></i> + Catat Siswa (S/I/A/T/P)
-                </button>
-                <button onclick="openAddAbsenceModal()" class="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-solid fa-user-xmark"></i> + Catat Guru Absen
-                </button>
-            </div>
-        </div>
 
         <section id="tab-input-mengaji" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
