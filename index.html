@@ -1088,6 +1088,50 @@
         </div>
     </div>
 
+    <!-- MODAL EDIT CELL DATA -->
+    <div id="modal-edit-cell" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-4 relative">
+            <button onclick="closeEditCellModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 border-b pb-3">
+                <div id="edit-cell-icon-bg" class="p-2.5 rounded-xl flex items-center justify-center">
+                    <i id="edit-cell-icon" class="text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm">Edit Data Kehadiran</h3>
+                    <p id="edit-cell-subtitle" class="text-xs text-slate-500 font-semibold"></p>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Tanggal & Info:</label>
+                    <div id="edit-cell-info-text" class="text-xs font-semibold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200"></div>
+                </div>
+                
+                <div id="edit-cell-status-container">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Ubah Status:</label>
+                    <select id="edit-cell-status-select" class="w-full text-xs font-bold bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2"></select>
+                </div>
+
+                <div id="edit-cell-extra-input-container" class="hidden">
+                    <label id="edit-cell-extra-label" class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Keterangan/Jam:</label>
+                    <input type="text" id="edit-cell-extra-input" class="w-full text-xs bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100 gap-2">
+                <button type="button" onclick="deleteCellData()" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+                <button type="button" onclick="saveCellData()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white px-3 py-2 rounded-xl text-xs font-bold shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1144,6 +1188,9 @@
         let currentScheduleViewMode = 'table';
         let batchQueue = [];
         let teacherBatchQueue = [];
+
+        // Global variables for edit cell modal
+        let currentEditCellContext = null;
 
         function seedDefaultJadwalKBM() {
             if (jadwalKBM["Senin"].length === 0) {
@@ -1613,8 +1660,13 @@
                     `;
                 });
 
+                let headerBgClass = "bg-brand-600";
+                if (cls.startsWith('X ')) headerBgClass = "bg-emerald-600";
+                else if (cls.startsWith('XI ')) headerBgClass = "bg-amber-500";
+                else if (cls.startsWith('XII ')) headerBgClass = "bg-rose-600";
+
                 card.innerHTML = `
-                    <div class="bg-brand-600 text-white px-3.5 py-2.5 font-bold text-xs flex justify-between items-center">
+                    <div class="${headerBgClass} text-white px-3.5 py-2.5 font-bold text-xs flex justify-between items-center">
                         <span>${cls}</span>
                         <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">${classSchedule.length} Jam</span>
                     </div>
@@ -2447,7 +2499,8 @@
                             }
                         }
                     }
-                    dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
+                    
+                    dayCells += `<td onclick="openEditCellModal('mengaji', '${teacher}', '${dateKey}', null)" class="p-1 border border-slate-200 cursor-pointer hover:bg-purple-100 transition">${cellContent}</td>`;
                 });
                 
                 const tr = document.createElement('tr');
@@ -2507,7 +2560,8 @@
                         else if (log.status === 'Cuti') { cellContent = '<span class="text-emerald-600 font-bold">C</span>'; countC++; }
                         else if (log.status === 'Tanpa Berita') { cellContent = '<span class="text-rose-600 font-bold">TB</span>'; countTB++; }
                     }
-                    dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
+                    
+                    dayCells += `<td onclick="openEditCellModal('presensi_guru', '${teacher}', '${dateKey}', null)" class="p-1 border border-slate-200 cursor-pointer hover:bg-brand-100 transition">${cellContent}</td>`;
                 });
                 
                 const tr = document.createElement('tr');
@@ -2612,18 +2666,22 @@
                     const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
                     
                     let cellContent = '-';
+                    let currentStatus = null;
                     if (absLog) {
-                        if (absLog.status === 'S') { cellContent = '<span class="text-blue-600 font-bold">S</span>'; countS++; }
-                        if (absLog.status === 'I') { cellContent = '<span class="text-amber-600 font-bold">I</span>'; countI++; }
-                        if (absLog.status === 'A') { cellContent = '<span class="text-rose-600 font-bold">A</span>'; countA++; }
+                        if (absLog.status === 'S') { cellContent = '<span class="text-blue-600 font-bold">S</span>'; countS++; currentStatus = 'S';}
+                        if (absLog.status === 'I') { cellContent = '<span class="text-amber-600 font-bold">I</span>'; countI++; currentStatus = 'I';}
+                        if (absLog.status === 'A') { cellContent = '<span class="text-rose-600 font-bold">A</span>'; countA++; currentStatus = 'A';}
                     } else if (lateLog) {
                         cellContent = `<span class="text-rose-600 font-bold text-[9px]">T ${lateLog.time || ''}</span>`;
                         countT++;
+                        currentStatus = 'TERLAMBAT';
                     } else if (earlyLog) {
                         cellContent = `<span class="text-indigo-600 font-bold text-[9px]">P ${earlyLog.time || ''}</span>`;
                         countP++;
+                        currentStatus = 'PULANG';
                     }
-                    dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
+                    
+                    dayCells += `<td onclick="openEditCellModal('siswa', '${studentName}', '${dateKey}', '${selectedClass}')" class="p-1 border border-slate-200 cursor-pointer hover:bg-amber-100 transition">${cellContent}</td>`;
                 });
                 
                 const isLateWarning = countT >= 4;
@@ -2729,6 +2787,233 @@
                     showToast(`Seluruh data bulan ${labelStr} berhasil dihapus!`);
                 }
             );
+        };
+
+        // --- STREAMING_CHUNK:Edit Cell Modal Logic... ---
+        window.openEditCellModal = function(type, name, dateKey, className) {
+            currentEditCellContext = { type, name, dateKey, className };
+            const modal = document.getElementById('modal-edit-cell');
+            const bgIcon = document.getElementById('edit-cell-icon-bg');
+            const icon = document.getElementById('edit-cell-icon');
+            const subtitle = document.getElementById('edit-cell-subtitle');
+            const infoText = document.getElementById('edit-cell-info-text');
+            const statusSelect = document.getElementById('edit-cell-status-select');
+            const extraContainer = document.getElementById('edit-cell-extra-input-container');
+            const extraLabel = document.getElementById('edit-cell-extra-label');
+            const extraInput = document.getElementById('edit-cell-extra-input');
+            const dateFormatted = getFormattedDateID(dateKey);
+
+            extraContainer.classList.add('hidden');
+            statusSelect.innerHTML = '';
+            
+            if (type === 'mengaji') {
+                bgIcon.className = "p-2.5 rounded-xl flex items-center justify-center bg-purple-100 text-purple-600";
+                icon.className = "fa-solid fa-book-quran text-xl";
+                subtitle.innerText = "Pemantauan Mengaji Guru";
+                infoText.innerHTML = `Guru: <span class="text-purple-700">${name}</span><br>Tanggal: ${dateFormatted}`;
+                
+                statusSelect.className = "w-full text-xs font-bold bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-purple-500";
+                statusSelect.innerHTML = `
+                    <option value="Hadir">Hadir (✓)</option>
+                    <option value="Absen">Absen (X)</option>
+                `;
+
+                // Find current state
+                let currentState = "Hadir";
+                const dayLog = mengaji36Logs[dateKey];
+                if (dayLog) {
+                     Object.keys(dayLog).forEach(cls => {
+                         if (dayLog[cls].teacher === name && !dayLog[cls].present) {
+                             currentState = "Absen";
+                         }
+                     });
+                }
+                statusSelect.value = currentState;
+
+            } else if (type === 'presensi_guru') {
+                bgIcon.className = "p-2.5 rounded-xl flex items-center justify-center bg-brand-100 text-brand-600";
+                icon.className = "fa-solid fa-user-xmark text-xl";
+                subtitle.innerText = "Ketidakhadiran Guru";
+                infoText.innerHTML = `Guru: <span class="text-brand-700">${name}</span><br>Tanggal: ${dateFormatted}`;
+                
+                statusSelect.className = "w-full text-xs font-bold bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-brand-500";
+                statusSelect.innerHTML = `
+                    <option value="Hadir">-- Hadir (Hapus Data) --</option>
+                    <option value="Sakit">Sakit (S)</option>
+                    <option value="Dinas Luar">Dinas Luar (DL)</option>
+                    <option value="KP">Kepentingan Pribadi (KP)</option>
+                    <option value="Cuti">Cuti (C)</option>
+                    <option value="Tanpa Berita">Tanpa Berita (TB)</option>
+                `;
+
+                const log = (absenceLogs[dateKey] || []).find(x => x.teacher === name);
+                statusSelect.value = log ? log.status : "Hadir";
+                
+                extraContainer.classList.remove('hidden');
+                extraLabel.innerText = "Jam & Penanggulangan:";
+                extraInput.value = log ? `${log.jam || ''} | ${log.penanggulangan || ''}` : '';
+                extraInput.placeholder = "Format: Jam | Keterangan";
+
+            } else if (type === 'siswa') {
+                bgIcon.className = "p-2.5 rounded-xl flex items-center justify-center bg-amber-100 text-amber-600";
+                icon.className = "fa-solid fa-graduation-cap text-xl";
+                subtitle.innerText = "Presensi Siswa";
+                infoText.innerHTML = `Siswa: <span class="text-amber-700">${name}</span><br>Kelas: ${className}<br>Tanggal: ${dateFormatted}`;
+                
+                statusSelect.className = "w-full text-xs font-bold bg-white border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500";
+                statusSelect.innerHTML = `
+                    <option value="Hadir">-- Hadir (Hapus Data) --</option>
+                    <option value="S">Sakit (S)</option>
+                    <option value="I">Izin (I)</option>
+                    <option value="A">Alpha (A)</option>
+                    <option value="TERLAMBAT">Terlambat (T)</option>
+                    <option value="PULANG">Izin Pulang (P)</option>
+                `;
+
+                let currentStatus = "Hadir";
+                let extraData = "";
+                
+                const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === className && x.name === name);
+                const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === className && x.name === name);
+                const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === className && x.name === name);
+                
+                if (absLog) { currentStatus = absLog.status; extraData = absLog.note || ""; }
+                else if (lateLog) { currentStatus = "TERLAMBAT"; extraData = lateLog.time || ""; }
+                else if (earlyLog) { currentStatus = "PULANG"; extraData = earlyLog.time || ""; }
+                
+                statusSelect.value = currentStatus;
+                
+                extraContainer.classList.remove('hidden');
+                extraLabel.innerText = "Keterangan / Jam (T/P):";
+                extraInput.value = extraData;
+            }
+
+            modal.classList.remove('hidden');
+        };
+
+        window.closeEditCellModal = function() {
+            document.getElementById('modal-edit-cell').classList.add('hidden');
+            currentEditCellContext = null;
+        };
+
+        window.deleteCellData = function() {
+            if (!currentEditCellContext) return;
+            const { type, name, dateKey, className } = currentEditCellContext;
+            
+            showConfirmModal("Hapus Data Absensi", "Apakah Anda yakin ingin menghapus catatan pada tanggal ini?", () => {
+                if (type === 'mengaji') {
+                     const dayLog = mengaji36Logs[dateKey];
+                     if (dayLog) {
+                         Object.keys(dayLog).forEach(cls => {
+                             if (dayLog[cls].teacher === name) {
+                                 dayLog[cls].present = true; // Set to default (Hadir)
+                             }
+                         });
+                     }
+                     localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+                     renderRekapMengaji();
+                } else if (type === 'presensi_guru') {
+                    if (absenceLogs[dateKey]) {
+                        absenceLogs[dateKey] = absenceLogs[dateKey].filter(x => x.teacher !== name);
+                        localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
+                    }
+                    renderRekapPresensi();
+                } else if (type === 'siswa') {
+                    studentAbsenceList = studentAbsenceList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                    studentLateList = studentLateList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                    studentEarlyList = studentEarlyList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                    
+                    localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                    localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                    localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                    renderRekapSiswa();
+                }
+                
+                pushToCloud();
+                closeEditCellModal();
+                showToast("Data berhasil dihapus!");
+            });
+        };
+
+        window.saveCellData = function() {
+            if (!currentEditCellContext) return;
+            const { type, name, dateKey, className } = currentEditCellContext;
+            const newStatus = document.getElementById('edit-cell-status-select').value;
+            const extraVal = document.getElementById('edit-cell-extra-input').value.trim();
+            
+            if (newStatus === 'Hadir' && type !== 'mengaji') {
+                // Same as delete
+                deleteCellData();
+                return;
+            }
+
+            if (type === 'mengaji') {
+                const dayLog = mengaji36Logs[dateKey] || {};
+                let foundScheduled = false;
+                Object.keys(dayLog).forEach(cls => {
+                    if (dayLog[cls].teacher === name) {
+                        dayLog[cls].present = (newStatus === 'Hadir');
+                        foundScheduled = true;
+                    }
+                });
+                // If not found in scheduled classes, we can't really set presence. We assume it's set properly via scheduling.
+                if(!foundScheduled && newStatus === 'Absen'){
+                     showToast('Peringatan: Guru ini tidak dijadwalkan mengaji pada tanggal ini. Harap atur jadwal terlebih dahulu.');
+                     return;
+                }
+                mengaji36Logs[dateKey] = dayLog;
+                localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+                renderRekapMengaji();
+
+            } else if (type === 'presensi_guru') {
+                if (!absenceLogs[dateKey]) absenceLogs[dateKey] = [];
+                // Remove existing
+                absenceLogs[dateKey] = absenceLogs[dateKey].filter(x => x.teacher !== name);
+                
+                // Parse extra
+                let jam = '';
+                let penanggulangan = '';
+                if (extraVal.includes('|')) {
+                    const parts = extraVal.split('|');
+                    jam = parts[0].trim();
+                    penanggulangan = parts[1].trim();
+                } else {
+                    penanggulangan = extraVal;
+                }
+                
+                absenceLogs[dateKey].push({
+                    teacher: name,
+                    status: newStatus,
+                    jam: jam,
+                    kelas: '-',
+                    penanggulangan: penanggulangan
+                });
+                localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
+                renderRekapPresensi();
+
+            } else if (type === 'siswa') {
+                // Remove existing first
+                studentAbsenceList = studentAbsenceList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                studentLateList = studentLateList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                studentEarlyList = studentEarlyList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
+                
+                if (newStatus === 'TERLAMBAT') {
+                    studentLateList.push({ date: dateKey, class: className, name: name, time: extraVal || '07.45', reason: '' });
+                } else if (newStatus === 'PULANG') {
+                    studentEarlyList.push({ date: dateKey, class: className, name: name, time: extraVal || '10.30', reason: '' });
+                } else {
+                    studentAbsenceList.push({ date: dateKey, class: className, name: name, status: newStatus, note: extraVal });
+                }
+                
+                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
+                renderRekapSiswa();
+            }
+
+            pushToCloud();
+            closeEditCellModal();
+            showToast("Perubahan data berhasil disimpan!");
         };
 
         window.renderMasterSiswaTab = function() {
