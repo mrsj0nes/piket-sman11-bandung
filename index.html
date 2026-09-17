@@ -40,32 +40,12 @@
             body.print-mengaji-only main { display: none !important; }
             body.print-mengaji-only #section-print-form-mengaji { display: block !important; }
         }
-        .sticky-col {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            z-index: 10;
-        }
-        .sticky-col-header {
-            position: sticky;
-            left: 0;
-            z-index: 20;
-        }
-        .col-nama {
-            width: 1% !important;
-            white-space: nowrap !important;
-        }
-        .autocomplete-suggestions {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .sticky-col { position: sticky; left: 0; background-color: white; z-index: 10; }
+        .sticky-col-header { position: sticky; left: 0; z-index: 20; }
+        .col-nama { width: 1% !important; white-space: nowrap !important; }
+        .autocomplete-suggestions { max-height: 200px; overflow-y: auto; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800 flex flex-col">
@@ -103,10 +83,7 @@
 
     <nav class="bg-white border-b border-slate-200 no-print sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
-            <!-- Dropdown Navigation Groups -->
             <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                
-                <!-- HOME / JADWAL KBM BUTTON -->
                 <button onclick="switchTab('home')" id="nav-item-home" class="px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm">
                     <i class="fa-solid fa-house text-yellow-500"></i>
                     <span>JADWAL KBM</span>
@@ -177,7 +154,6 @@
 
             </div>
 
-            <!-- Active Menu Breadcrumb / Indicator -->
             <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs">
                 <span class="text-slate-400 text-[11px]">Halaman:</span>
                 <span id="active-tab-indicator" class="text-brand-700 font-bold flex items-center gap-1.5">
@@ -188,19 +164,13 @@
     </nav>
 
     <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-4">
-
-        <!-- Notification Toast -->
         <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 no-print">
             <i id="toast-icon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
             <span id="toast-msg">Data berhasil disimpan!</span>
         </div>
 
-        <!-- ========================================== -->
-        <!-- TAB 1: BERANDA & JADWAL KBM (HOME PAGE) -->
-        <!-- ========================================== -->
+        <!-- TAB 1: BERANDA & JADWAL KBM -->
         <section id="tab-home" class="tab-content block space-y-4">
-            
-            <!-- Hero Banner & Live Hour Card -->
             <div class="bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-900 text-white p-5 sm:p-6 rounded-2xl shadow-md relative overflow-hidden">
                 <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
                     <i class="fa-solid fa-calendar-days text-9xl"></i>
@@ -218,7 +188,6 @@
                         </p>
                     </div>
 
-                    <!-- Live Active Hour Card -->
                     <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20 text-center min-w-[210px]">
                         <span class="text-[11px] uppercase tracking-wider text-brand-100 block font-medium">Status Jam Sekarang</span>
                         <div id="current-lesson-hour" class="text-base sm:text-lg font-bold text-yellow-300 mt-0.5">
@@ -231,10 +200,8 @@
                 </div>
             </div>
 
-            <!-- Schedule Filter & Control Bar -->
+            <!-- Schedule Control Bar -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                
-                <!-- Day Selector Buttons -->
                 <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
                     <span class="text-xs font-bold text-slate-500 uppercase mr-1">Hari:</span>
                     <button onclick="filterScheduleDay('Senin')" id="btn-day-Senin" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-brand-600 text-white border-brand-600 shadow-xs">Senin</button>
@@ -244,24 +211,19 @@
                     <button onclick="filterScheduleDay('Jumat')" id="btn-day-Jumat" class="day-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200">Jumat</button>
                 </div>
 
-                <!-- Filters, View Switcher & Excel Import Action -->
                 <div class="flex flex-wrap items-center gap-2">
-                    
-                    <!-- Search Input -->
                     <div class="relative flex-1 sm:w-56">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
                         <input type="text" id="search-schedule-input" onkeyup="renderScheduleGrid()" placeholder="Cari Guru / Mapel / Kelas..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
                     </div>
 
-                    <!-- Class Grade Filter -->
                     <select id="filter-schedule-grade" onchange="renderScheduleGrid()" class="text-xs py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 font-medium">
                         <option value="SEMUA">Semua Jenjang Kelas</option>
-                        <option value="X">Kelas X (X 1 s/d X 12)</option>
-                        <option value="XI">Kelas XI (XI 1 s/d XI 12)</option>
-                        <option value="XII">Kelas XII (XII 1 s/d XII 12)</option>
+                        <option value="X ">Kelas X (X 1 s/d X 12)</option>
+                        <option value="XI ">Kelas XI (XI 1 s/d XI 12)</option>
+                        <option value="XII ">Kelas XII (XII 1 s/d XII 12)</option>
                     </select>
 
-                    <!-- View Switcher Toggle -->
                     <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
                         <button onclick="setScheduleViewMode('table')" id="btn-view-table" class="px-2.5 py-1 rounded-lg text-xs font-bold transition bg-white text-brand-700 shadow-xs flex items-center gap-1">
                             <i class="fa-solid fa-table-list"></i> Tabel
@@ -271,7 +233,6 @@
                         </button>
                     </div>
 
-                    <!-- Excel Schedule Upload Button -->
                     <button onclick="openExcelImportModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
                         <i class="fa-solid fa-file-excel"></i>
                         <span>Import Excel Jadwal</span>
@@ -279,7 +240,6 @@
                 </div>
             </div>
 
-            <!-- Schedule Container View (Table Mode) -->
             <div id="schedule-table-view-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
@@ -301,18 +261,13 @@
                                 <th class="p-3 w-28 text-center border-b">Status KBM</th>
                             </tr>
                         </thead>
-                        <tbody id="schedule-tbody" class="divide-y divide-slate-100">
-                            <!-- Populated dynamically -->
-                        </tbody>
+                        <tbody id="schedule-tbody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Schedule Cards Grid View (36 Class Cards Mode) -->
             <div id="schedule-cards-view-container" class="hidden space-y-4">
-                <div id="schedule-class-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Populated dynamically -->
-                </div>
+                <div id="schedule-class-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
         </section>
 
@@ -368,7 +323,7 @@
             <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-start gap-2.5 no-print">
                 <i class="fa-solid fa-bolt text-yellow-500 text-base mt-0.5"></i>
                 <div>
-                    <p class="font-bold">⚡ Firebase Realtime Active (Terhubung Serentak)</p>
+                    <p class="font-bold">Firebase Realtime Active (Terhubung Serentak)</p>
                     <p class="mt-0.5 text-[11px]">Setiap kali Anda menekan status <strong>Hadir/Absen</strong>, gadget lain yang membuka aplikasi ini akan **berubah seketika (&lt; 0.2 detik)** tanpa delay!</p>
                 </div>
             </div>
@@ -379,9 +334,7 @@
         <section id="section-print-form-mengaji" class="hidden">
             <div class="kop-surat mb-3 print:mb-2">
                 <div class="flex items-center justify-between gap-2 border-b-4 border-double border-slate-900 pb-2 text-center">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Coat_of_arms_of_West_Java.svg/180px-Coat_of_arms_of_West_Java.svg.png" 
-                         onerror="this.src='https://placehold.co/80x100/173b5c/ffffff?text=JABAR'" 
-                         alt="Logo Jawa Barat" class="w-14 h-18 sm:w-16 sm:h-20 object-contain shrink-0">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Coat_of_arms_of_West_Java.svg/180px-Coat_of_arms_of_West_Java.svg.png" onerror="this.src='https://placehold.co/80x100/173b5c/ffffff?text=JABAR'" alt="Logo Jawa Barat" class="w-14 h-18 sm:w-16 sm:h-20 object-contain shrink-0">
                     <div class="flex-1 px-2">
                         <h4 class="font-bold text-slate-800 text-[10px] sm:text-xs uppercase tracking-wide leading-tight">Pemerintah Daerah Provinsi Jawa Barat</h4>
                         <h3 class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wider leading-tight">Dinas Pendidikan</h3>
@@ -392,9 +345,7 @@
                         <p class="text-[8px] text-slate-500 leading-tight">Website: www.sman11bdg.sch.id &bull; Email: info@sman11bdg.sch.id</p>
                         <p class="text-[8px] font-mono text-slate-500">NPSN: 20219243 &bull; NSS: 30.1.02.60.14.10</p>
                     </div>
-                    <img src="https://sman11bdg.sch.id/wp-content/uploads/2021/08/logo-11.png" 
-                         onerror="this.src='https://placehold.co/80x100/1f4e79/ffffff?text=SMA+11'" 
-                         alt="Logo SMAN 11 Bandung" class="w-14 h-18 sm:w-16 sm:h-20 object-contain shrink-0">
+                    <img src="https://sman11bdg.sch.id/wp-content/uploads/2021/08/logo-11.png" onerror="this.src='https://placehold.co/80x100/1f4e79/ffffff?text=SMA+11'" alt="Logo SMAN 11 Bandung" class="w-14 h-18 sm:w-16 sm:h-20 object-contain shrink-0">
                 </div>
             </div>
 
@@ -409,15 +360,13 @@
                         <th class="border border-black p-1 w-6">#</th>
                         <th class="border border-black p-1 w-12">KELAS</th>
                         <th class="border border-black p-1">Nama Guru</th>
-                        <th class="border border-black p-1 w-8">✔/✗</th>
-
+                        <th class="border border-black p-1 w-8">H / X</th>
                         <th class="border border-black p-1 w-12">KELAS</th>
                         <th class="border border-black p-1">Nama Guru</th>
-                        <th class="border border-black p-1 w-8">✔/✗</th>
-
+                        <th class="border border-black p-1 w-8">H / X</th>
                         <th class="border border-black p-1 w-12">KELAS</th>
                         <th class="border border-black p-1">Nama Guru</th>
-                        <th class="border border-black p-1 w-8">✔/✗</th>
+                        <th class="border border-black p-1 w-8">H / X</th>
                     </tr>
                 </thead>
                 <tbody id="print-form-mengaji-body"></tbody>
@@ -482,7 +431,7 @@
 
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="search-input-siswa-table" onkeyup="filterTable('siswa-detail-table-body', this.value)" placeholder="🔍 Cari nama siswa / kelas..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500">
+                    <input type="text" id="search-input-siswa-table" onkeyup="filterTable('siswa-detail-table-body', this.value)" placeholder="Cari nama siswa / kelas..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div class="overflow-x-auto">
@@ -590,7 +539,7 @@
             <div class="bg-white p-3 rounded-xl border border-slate-200 no-print">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                    <input type="text" onkeyup="filterTable('mengaji-matrix-body', this.value)" placeholder="🔍 Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
+                    <input type="text" onkeyup="filterTable('mengaji-matrix-body', this.value)" placeholder="Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 </div>
             </div>
 
@@ -601,7 +550,7 @@
                             <th rowspan="2" class="p-2 border border-purple-900 w-8 align-middle">NO</th>
                             <th rowspan="2" class="col-nama p-2 border border-purple-900 text-left whitespace-nowrap sticky-col-header bg-purple-800 align-middle">NAMA GURU</th>
                             <th id="mengaji-date-header-group" class="p-1 border border-purple-900 align-middle">TANGGAL (HARI KERJA)</th>
-                            <th rowspan="2" class="p-1 border border-purple-900 w-12 bg-purple-950 align-middle">TOTAL (✗)</th>
+                            <th rowspan="2" class="p-1 border border-purple-900 w-12 bg-purple-950 align-middle">TOTAL (X)</th>
                         </tr>
                         <tr id="mengaji-days-row" class="bg-slate-100 font-bold text-slate-700 text-[10px]"></tr>
                     </thead>
@@ -636,7 +585,7 @@
             <div class="bg-white p-3 rounded-xl border border-slate-200 no-print">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                    <input type="text" onkeyup="filterTable('presensi-matrix-body', this.value)" placeholder="🔍 Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
+                    <input type="text" onkeyup="filterTable('presensi-matrix-body', this.value)" placeholder="Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 </div>
             </div>
 
@@ -678,8 +627,7 @@
                         <label class="text-xs font-semibold text-slate-500 uppercase">Kelas:</label>
                         <select id="rekap-siswa-class-select" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-amber-500"></select>
                     </div>
-                    
-                    <!-- Rentang Bulan / Multi-Bulan Filter -->
+
                     <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-xl border border-amber-200">
                         <label class="text-xs font-bold text-amber-800 uppercase">Periode:</label>
                         <input type="month" id="month-start-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs bg-white border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-amber-500">
@@ -687,11 +635,10 @@
                         <input type="month" id="month-end-siswa" onchange="renderRekapSiswa()" class="font-bold text-slate-800 text-xs bg-white border border-slate-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-amber-500">
                     </div>
 
-                    <!-- Preset Quick Month Range Buttons -->
                     <div class="flex items-center gap-1">
-                        <button onclick="setSiswaRangePreset('jul-aug')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Agt</button>
-                        <button onclick="setSiswaRangePreset('jul-sep')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Jul-Sep</button>
-                        <button onclick="setSiswaRangePreset('sem1')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">⚡ Sem 1</button>
+                        <button onclick="setSiswaRangePreset('jul-aug')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Jul-Agt</button>
+                        <button onclick="setSiswaRangePreset('jul-sep')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Jul-Sep</button>
+                        <button onclick="setSiswaRangePreset('sem1')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Sem 1</button>
                     </div>
                 </div>
 
@@ -710,7 +657,7 @@
 
             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm mb-3">
                 <h3 class="text-center font-extrabold text-xs sm:text-sm uppercase text-slate-800">
-                    REKAPITULASI PRESENSI SISWA — PERIODE <span id="display-siswa-period-label" class="text-amber-600 font-black">-</span>
+                    REKAPITULASI PRESENSI SISWA PERIODE <span id="display-siswa-period-label" class="text-amber-600 font-black">-</span>
                 </h3>
             </div>
 
@@ -742,7 +689,7 @@
                 <span class="font-medium"><strong class="text-rose-600 font-bold">A</strong> = Alpa</span>
                 <span class="font-medium"><strong class="text-rose-800 font-bold">T</strong> = Terlambat</span>
                 <span class="font-medium"><strong class="text-indigo-800 font-bold">P</strong> = Pulang</span>
-                <span class="font-medium bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold">⚠️ ≥ 4x = Sorotan Keterlambatan T (≥4 Kali)</span>
+                <span class="font-medium bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold">! 4x = Sorotan Keterlambatan T (≥4 Kali)</span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto p-4 space-y-3">
@@ -755,11 +702,11 @@
                             <th class="p-2 border border-slate-800 w-10">NO</th>
                             <th class="p-2 border border-slate-800 text-left w-24">ROMBEL</th>
                             <th class="p-2 border border-slate-800 w-20">JML SISWA</th>
+                            <th class="p-2 border border-slate-800 w-24 bg-rose-900">TERLAMBAT</th>
+                            <th class="p-2 border border-slate-800 w-24 bg-indigo-900">IZIN PULANG</th>
                             <th class="p-2 border border-slate-800 w-20 bg-blue-700">TOTAL (S)</th>
                             <th class="p-2 border border-slate-800 w-20 bg-amber-700">TOTAL (I)</th>
                             <th class="p-2 border border-slate-800 w-20 bg-rose-700">TOTAL (A)</th>
-                            <th class="p-2 border border-slate-800 w-24 bg-rose-900">TERLAMBAT</th>
-                            <th class="p-2 border border-slate-800 w-24 bg-indigo-900">IZIN PULANG</th>
                         </tr>
                     </thead>
                     <tbody id="siswa-rekap-summary-body" class="divide-y divide-slate-100"></tbody>
@@ -849,7 +796,7 @@
             <div class="bg-white p-3 rounded-xl border border-slate-200">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                    <input type="text" onkeyup="filterTable('master-teacher-body', this.value)" placeholder="🔍 Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
+                    <input type="text" onkeyup="filterTable('master-teacher-body', this.value)" placeholder="Cari nama guru..." class="w-full text-xs pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 </div>
             </div>
 
@@ -866,7 +813,6 @@
                 </table>
             </div>
         </section>
-
     </main>
 
     <!-- MODAL CONFIRM DIALOG -->
@@ -904,7 +850,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK STUDENT (BATCH) WITH DATE SELECTOR -->
+    <!-- MODAL QUICK STUDENT -->
     <div id="modal-quick-student" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -915,7 +861,6 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <form id="form-quick-student" onsubmit="saveQuickStudentForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
                 <div id="qs-container-batch" class="space-y-3">
                     <div class="grid grid-cols-3 gap-2">
@@ -938,9 +883,8 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="relative">
-                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Siswa (Searchable) *</label>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari/Tambah Nama Siswa *</label>
                         <div class="flex gap-1.5">
                             <input type="text" id="qs-batch-search-name" oninput="onBatchSearchInput(this.value)" autocomplete="off" placeholder="Ketik nama siswa..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500">
                             <button type="button" onclick="addCurrentSearchToBatch()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 shadow transition">
@@ -949,13 +893,11 @@
                         </div>
                         <div id="qs-batch-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                     </div>
-
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Siswa Yang Diinput (<span id="qs-batch-count" class="text-amber-600">0</span> Siswa)</span>
                             <button type="button" onclick="clearBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
                         </div>
-                        
                         <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-xl">
                             <table class="w-full text-[11px] text-left border-collapse">
                                 <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
@@ -963,7 +905,7 @@
                                         <th class="p-2 text-center w-6">#</th>
                                         <th class="p-2">Nama Siswa</th>
                                         <th class="p-2 w-28">Status</th>
-                                        <th class="p-2">Ket / Jam</th>
+                                        <th class="p-2">Ket/Jam</th>
                                         <th class="p-2 text-center w-10">Aksi</th>
                                     </tr>
                                 </thead>
@@ -976,7 +918,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="flex items-center gap-2 pt-2 shrink-0 border-t border-slate-100">
                     <button type="button" onclick="closeQuickStudentModal()" class="w-1/2 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
                     <button type="submit" id="qs-submit-btn" class="w-1/2 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow transition">Simpan Semua Siswa</button>
@@ -985,7 +926,7 @@
         </div>
     </div>
 
-    <!-- MODAL QUICK TEACHER (BATCH) WITH DATE SELECTOR -->
+    <!-- MODAL QUICK TEACHER -->
     <div id="modal-quick-teacher" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden p-5 space-y-3 flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b pb-2.5 shrink-0">
@@ -996,7 +937,6 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <form id="form-quick-teacher" onsubmit="saveQuickTeacherForm(event)" class="overflow-y-auto flex-1 pr-1 space-y-3">
                 <div class="grid grid-cols-3 gap-2">
                     <div>
@@ -1018,9 +958,8 @@
                         <input type="text" id="quick-teacher-jam-batch" placeholder="Contoh: 1-4" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl p-2.5">
                     </div>
                 </div>
-
                 <div class="relative">
-                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Guru (Searchable) *</label>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Cari / Tambah Nama Guru *</label>
                     <div class="flex gap-1.5">
                         <input type="text" id="qs-teacher-search-name" oninput="onTeacherSearchInput(this.value)" autocomplete="off" placeholder="Ketik nama guru..." class="flex-1 text-xs font-medium bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-rose-500">
                         <button type="button" onclick="addCurrentTeacherToBatch()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 shadow transition">
@@ -1029,13 +968,11 @@
                     </div>
                     <div id="qs-teacher-suggestions" class="autocomplete-suggestions absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 hidden"></div>
                 </div>
-
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-bold text-slate-700 uppercase">Daftar Guru Yang Diinput (<span id="qs-teacher-count" class="text-rose-600">0</span> Guru)</span>
                         <button type="button" onclick="clearTeacherBatchQueue()" class="text-rose-500 text-[10px] font-bold hover:underline">Kosongkan List</button>
                     </div>
-                    
                     <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-xl">
                         <table class="w-full text-[11px] text-left border-collapse">
                             <thead class="bg-slate-100 text-slate-600 font-bold uppercase sticky top-0 border-b border-slate-200">
@@ -1056,7 +993,6 @@
                         </table>
                     </div>
                 </div>
-
                 <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
                     <button type="button" onclick="closeQuickTeacherModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
                     <button type="submit" class="w-1/2 py-2 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow transition">Simpan Semua Guru Absen</button>
@@ -1077,7 +1013,6 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-slate-600 uppercase">Pilih Hari:</label>
                 <select id="select-master-day" onchange="renderMasterJadwalDayForm()" class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1">
@@ -1088,9 +1023,7 @@
                     <option value="Jumat">Jumat</option>
                 </select>
             </div>
-
             <div id="master-jadwal-day-form-container" class="max-h-[350px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-2 p-1"></div>
-
             <div class="flex items-center justify-end gap-2 border-t pt-3">
                 <button type="button" onclick="closeMasterJadwalModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Batal</button>
                 <button type="button" onclick="saveMasterJadwalDayForm()" class="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition">Simpan Jadwal Baku</button>
@@ -1110,14 +1043,12 @@
                 </button>
             </div>
             <p class="text-xs text-slate-500 leading-relaxed">Firebase memungkinkan semua gadget saling terhubung serentak di bawah <strong>0.2 detik</strong> tanpa tundaan!</p>
-
             <div class="space-y-2 text-xs">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Firebase Config JSON Custom [Opsional]</label>
                     <textarea id="input-firebase-config" rows="5" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "..."}' class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"></textarea>
                 </div>
             </div>
-
             <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                 <button type="button" onclick="resetFirebaseConfig()" class="text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-xl text-xs font-semibold border border-rose-200 transition">Reset Config</button>
                 <button type="button" onclick="saveCustomFirebaseConfig()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow transition">Simpan & Sync</button>
@@ -1125,7 +1056,7 @@
         </div>
     </div>
 
-    <!-- MODAL EXCEL JADWAL KBM IMPORT -->
+    <!-- MODAL EXCEL IMPORT -->
     <div id="excel-import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4 relative">
             <button onclick="closeExcelImportModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
@@ -1140,7 +1071,6 @@
                     <p class="text-xs text-slate-500">Mendukung format Matriks Grid per Kelas maupun Format 2-Sheet (Jadwal + Kode Guru)</p>
                 </div>
             </div>
-
             <div class="space-y-3">
                 <label class="block text-xs font-semibold text-slate-700">Pilih File Excel Jadwal (.xlsx / .xls):</label>
                 <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-slate-300 rounded-xl p-1 cursor-pointer">
@@ -1151,7 +1081,6 @@
                     <p>• Multi-Sheet per Hari (Sheet <code>Senin</code>, <code>Selasa</code>, dll.) / Grid Kelas <code>X 1</code> s/d <code>XII 12</code></p>
                 </div>
             </div>
-
             <div class="flex justify-end gap-2 border-t pt-4">
                 <button onclick="closeExcelImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Batal</button>
                 <button onclick="processExcelUpload()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">Proses & Simpan Jadwal</button>
@@ -1165,10 +1094,10 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const DEFAULT_PIN = "112233";
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'piket-sman11-bandung';
+        const appId = typeof _app_id !== 'undefined' ? _app_id : 'piket-sman11-bandung';
         
         const DEFAULT_FIREBASE_CONFIG = {
-            apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWlFsCfw",
+            apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWIFsCfw",
             authDomain: "piket-sman11-bandung.firebaseapp.com",
             projectId: "piket-sman11-bandung",
             storageBucket: "piket-sman11-bandung.firebasestorage.app",
@@ -1177,10 +1106,9 @@
         };
 
         let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
-
         try {
-            if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(__firebase_config);
+            if (typeof _firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(_firebase_config);
             }
         } catch(e) {}
 
@@ -1192,100 +1120,48 @@
         let db = null;
         let auth = null;
         let isRemoteUpdate = false;
+        let isAdminUnlocked = false;
 
-        const ALL_CLASSES = [];
+        // Data Models
+        let ALL_CLASSES = [];
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`X ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XI ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XII ${i}`);
 
-        function getClassRank(clsStr) {
-            const cleaned = cleanClassName(clsStr);
-            const idx = ALL_CLASSES.indexOf(cleaned);
-            return idx !== -1 ? idx : 999;
-        }
-
-        const DEFAULT_TEACHERS = [
-            "Hj. Laela, S.Pd.", "Dhiah Kuswarini, S.Pd., M.M.Pd.", "Syam Ahmad, S.Pd.", "Muhamad Hatta, S.Pd.", 
-            "Drs. Saepullah", "Thaniya, S.Pd., Gr.", "H. Setia Nugraha, S.S., M.Hum.", "Ricky Sudrajat, S.Pd.", 
-            "Emalia Susanti, S.Pd.", "Dra. Dian Apendiani, M.Pd.", "Rini Sudarni, S.Pd.", "Taufik Hadian, S.Pd.,Gr.", 
-            "Aas Astuti, S.Pd.", "Dr. Aep Sumpena, M.Ag.", "Asep Solihin, S.Pd.", "Cucu Cahyati, S.Pd.", 
-            "Desy Fitriani, S.Pd.", "Dina Herlina, S.Pd.", "Eni Suhaeni, S.Pd.", "Fitri Fatimah, S.Pd.", 
-            "Gugun Gunawan, S.Pd.", "H. Mamat Rahmat, M.Pd.", "Ika Kartika, S.Pd.", "Indra Wijaya, S.Pd.", 
-            "Jajang Nurjaman, S.Pd.", "Kiki Rizki, S.Pd.", "Lilis Suryani, S.Pd.", "M. Ramdhan, S.Pd.", 
-            "Neneng Hasanah, S.Pd.", "Opan Sopandi, S.Pd.", "Pipit Pitriani, S.Pd.", "Rahmat Hidayat, S.Pd.", 
-            "Siti Maryam, S.Pd.", "Tatan Rustandi, S.Pd.", "Ujang Supriatna, S.Pd.", "Vina Anggraeni, S.Pd.", 
-            "Wawan Setiawan, S.Pd.", "Yayan Mulyana, S.Pd.", "Zakir Hussain, S.Pd.", "Aditya Pratama, S.Pd.", 
-            "Budi Santoso, S.Pd.", "Dewi Lestari, S.Pd.", "Eka Putra, S.Pd.", "Fani Rahmawati, S.Pd.", 
-            "Gita Gutawa, S.Pd.", "Hadi Wijaya, S.Pd.", "Irma Suryani, S.Pd.", "Joni Supriadi, S.Pd.", 
-            "Kurniawati, S.Pd.", "Lukman Hakim, S.Pd.", "Maya Sari, S.Pd.", "Nurdin Hidayat, S.Pd.", 
-            "Ongky Alexander, S.Pd.", "Putri Utami, S.Pd.", "Qomaruddin, S.Pd.", "Rizal Ramli, S.Pd.", 
-            "Sri Wahyuni, S.Pd.", "Taufik Hidayat, S.Pd."
-        ];
-
-        let masterJadwalMengaji = JSON.parse(localStorage.getItem('piket_master_jadwal')) || {
-            "Senin": {}, "Selasa": {}, "Rabu": {}, "Kamis": {}, "Jumat": {}
-        };
-
-        let teacherList = JSON.parse(localStorage.getItem('piket_teachers')) || DEFAULT_TEACHERS;
+        let teacherList = JSON.parse(localStorage.getItem('piket_teachers')) || ["Ahmad Fauzi, S.Pd", "Budi Santoso, M.Pd", "Citra Lestari, S.Si"];
         let studentMasterData = JSON.parse(localStorage.getItem('piket_student_master')) || {};
+        let masterJadwalMengaji = JSON.parse(localStorage.getItem('piket_master_jadwal')) || {};
         let mengaji36Logs = JSON.parse(localStorage.getItem('piket_mengaji_logs')) || {};
         let absenceLogs = JSON.parse(localStorage.getItem('piket_absence_logs')) || {};
         let studentAbsenceList = JSON.parse(localStorage.getItem('piket_student_absences')) || [];
         let studentLateList = JSON.parse(localStorage.getItem('piket_student_late')) || [];
         let studentEarlyList = JSON.parse(localStorage.getItem('piket_student_early')) || [];
-        let jadwalKBM = JSON.parse(localStorage.getItem('piket_jadwal_kbm')) || {};
+        let jadwalKBM = JSON.parse(localStorage.getItem('piket_jadwal_kbm')) || {
+            "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": []
+        };
+
         let currentDayFilter = 'Senin';
         let currentScheduleViewMode = 'table';
-        let isAdminUnlocked = false;
-
-        // Batch Queues
         let batchQueue = [];
         let teacherBatchQueue = [];
 
         function seedDefaultJadwalKBM() {
-            if (Object.keys(jadwalKBM).length > 0 && Object.values(jadwalKBM).some(arr => arr.length > 0)) return;
-
-            const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-            
-            const mapelX = ['Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'Pendidikan Agama Islam', 'PJOK', 'Informatika', 'Seni Budaya', 'PPKn'];
-            const mapelXI = ['Matematika Lanjut', 'Bahasa Indonesia', 'Bahasa Inggris Lanjut', 'Fisika', 'Kimia', 'Biologi', 'Sejarah Tingkat Lanjut', 'PAI', 'PJOK', 'Ekonomi', 'Sosiologi', 'Geografi'];
-            const mapelXII = ['Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'PAI', 'PJOK', 'Ekonomi', 'PPKn', 'Seni Budaya'];
-
-            const times = [
-                '07.15 - 08.00', '08.00 - 08.45', '08.45 - 09.30', '09.45 - 10.30',
-                '10.30 - 11.15', '11.15 - 12.00', '12.45 - 13.30', '13.30 - 14.15',
-                '14.15 - 15.00', '15.00 - 15.45'
-            ];
-
-            days.forEach((day, dayIdx) => {
-                jadwalKBM[day] = [];
-                ALL_CLASSES.forEach((cls, clsIdx) => {
-                    const maxJam = (day === 'Jumat') ? 8 : 10;
-                    let mapelList = mapelX;
-                    if (cls.startsWith('XI ')) mapelList = mapelXI;
-                    if (cls.startsWith('XII ')) mapelList = mapelXII;
-
-                    for (let h = 1; h <= maxJam; h++) {
-                        const mapelIndex = (clsIdx * 3 + dayIdx * 2 + Math.floor((h - 1) / 2)) % mapelList.length;
-                        const teacherIndex = (clsIdx * 5 + dayIdx * 3 + mapelIndex) % teacherList.length;
-
-                        jadwalKBM[day].push({
-                            class: cls,
-                            hour: h,
-                            time: times[h - 1] || '08.00 - 08.45',
-                            subject: mapelList[mapelIndex],
-                            teacher: teacherList[teacherIndex]
-                        });
-                    }
+            if (jadwalKBM["Senin"].length === 0) {
+                jadwalKBM["Senin"].push({
+                    class: "X 1",
+                    hour: 1,
+                    time: "07.15-08.00",
+                    subject: "Matematika",
+                    teacher: "Ahmad Fauzi, S.Pd"
                 });
-            });
-
-            localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+                localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+            }
         }
 
+        // --- STREAMING_CHUNK:Firebase Setup... ---
         async function setupFirebase() {
-            if (!firebaseConfig) {
-                updateCloudStatusBadge(false, "Offline Mode");
+            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith('AIzaSyBwa38sTXQKuo7d7uQQY')) {
+                updateCloudStatusBadge(false, "Offline Mode (Local)");
                 return;
             }
 
@@ -1294,14 +1170,13 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                if (typeof _initial_auth_token !== 'undefined' && _initial_auth_token) {
+                    await signInWithCustomToken(auth, _initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
                 updateCloudStatusBadge(true, "Firebase Realtime Active");
-
                 const dataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'piket_app', 'main_doc');
 
                 onSnapshot(dataDocRef, (snapshot) => {
@@ -1339,19 +1214,18 @@
                         setTimeout(() => { isRemoteUpdate = false; }, 200);
                     }
                 }, (error) => {
-                    console.error("Firestore error:", error);
-                    updateCloudStatusBadge(false, "Sync Error");
+                    console.warn("Firestore snapshot connection issue:", error);
+                    updateCloudStatusBadge(false, "Offline Mode (Local)");
                 });
 
             } catch (err) {
-                console.error("Firebase init failed:", err);
-                updateCloudStatusBadge(false, "Config Error");
+                console.info("Firebase initialization gracefully fell back to Offline Mode (Local Storage).");
+                updateCloudStatusBadge(false, "Offline Mode (Local)");
             }
         }
 
         async function pushToCloud() {
             if (isRemoteUpdate || !db || !auth || !auth.currentUser) return;
-
             const payload = {
                 teacherList,
                 studentMasterData,
@@ -1364,7 +1238,6 @@
                 jadwalKBM,
                 lastUpdated: Date.now()
             };
-
             try {
                 const dataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'piket_app', 'main_doc');
                 await setDoc(dataDocRef, payload, { merge: true });
@@ -1372,7 +1245,6 @@
                 console.error("Firebase Push Error:", err);
             }
         }
-
         window.pushToCloud = pushToCloud;
 
         window.onload = function() {
@@ -1398,6 +1270,7 @@
             setInterval(updateLiveHourDisplay, 60000);
         };
 
+        // --- STREAMING_CHUNK:UI Rendering Functions... ---
         window.renderMengaji36Grid = function() {
             const container = document.getElementById('mengaji-36-grid-container');
             if (!container) return;
@@ -1417,7 +1290,6 @@
             }
 
             const todayLog = mengaji36Logs[todayKey];
-
             const grades = [
                 { title: "JENJANG KELAS X", classes: ALL_CLASSES.filter(c => c.startsWith('X ')), bg: "bg-emerald-600", border: "border-emerald-200", headerText: "12 Kelas X" },
                 { title: "JENJANG KELAS XI", classes: ALL_CLASSES.filter(c => c.startsWith('XI ')), bg: "bg-amber-500", border: "border-amber-200", headerText: "12 Kelas XI" },
@@ -1465,7 +1337,52 @@
                 container.appendChild(columnCard);
             });
         };
-        const renderMengaji36Grid = window.renderMengaji36Grid;
+
+        window.updateMengajiTeacher = function(cls, teacherName) {
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
+            if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { present: true };
+            mengaji36Logs[todayKey][cls].teacher = teacherName;
+            localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+            pushToCloud();
+        };
+
+        window.toggleMengajiPresence = function(cls) {
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
+            if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { teacher: '', present: true };
+
+            mengaji36Logs[todayKey][cls].present = !mengaji36Logs[todayKey][cls].present;
+            localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+            renderMengaji36Grid();
+            pushToCloud();
+        };
+
+        window.saveMengaji36Classes = function() {
+            localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+            pushToCloud();
+            showToast('Data pemantauan mengaji berhasil disimpan!');
+        };
+
+        window.resetToMasterSchedule = function() {
+            showConfirmModal("Muat Ulang Jadwal", "Apakah Anda yakin ingin mengembalikan jadwal mengaji hari ini ke Jadwal Baku?", () => {
+                const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+                const dateParts = todayKey.split('-');
+                const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
+                const todayDay = getDayNameID(dateObj);
+                
+                mengaji36Logs[todayKey] = {};
+                ALL_CLASSES.forEach(cls => {
+                    const presetTeacher = masterJadwalMengaji[todayDay]?.[cls] || '';
+                    mengaji36Logs[todayKey][cls] = { teacher: presetTeacher, present: true };
+                });
+                
+                localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+                renderMengaji36Grid();
+                pushToCloud();
+                showToast('Jadwal berhasil dimuat ulang dari jadwal baku!');
+            });
+        };
 
         window.updateLiveHourDisplay = function() {
             const hourElem = document.getElementById('current-lesson-hour');
@@ -1641,6 +1558,7 @@
             }).join('');
         }
 
+        // --- STREAMING_CHUNK:Cards and Utilites... ---
         function renderScheduleCards(filteredData) {
             const container = document.getElementById('schedule-class-cards-grid');
             if (!container) return;
@@ -1685,20 +1603,20 @@
 
                     rowsHtml += `
                         <div class="p-2 text-[11px] ${bgClass} border-b border-slate-100 flex items-center justify-between gap-2">
-                            <span class="w-8 shrink-0 font-extrabold text-slate-600 text-center">J-${item.hour}</span>
+                            <span class="font-bold text-brand-700 w-12 shrink-0">Jam ${item.hour}</span>
                             <div class="flex-1 min-w-0">
-                                <span class="font-bold text-slate-800 block truncate">${item.subject}</span>
-                                <span class="text-[10px] text-slate-500 truncate block">${item.teacher}</span>
+                                <div class="font-semibold text-slate-800 truncate">${item.subject}</div>
+                                <div class="text-[10px] text-slate-500 truncate">${item.teacher}</div>
                             </div>
-                            ${isActive ? '<span class="text-[9px] bg-amber-500 text-white font-black px-1.5 py-0.5 rounded">AKTIF</span>' : ''}
+                            <span class="text-[10px] text-slate-400 font-mono shrink-0">${item.time}</span>
                         </div>
                     `;
                 });
 
                 card.innerHTML = `
-                    <div class="bg-brand-600 text-white p-3 flex items-center justify-between font-bold">
-                        <span class="text-sm">${cls}</span>
-                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">${classSchedule.length} Jam</span>
+                    <div class="bg-brand-600 text-white px-3.5 py-2.5 font-bold text-xs flex justify-between items-center">
+                        <span>${cls}</span>
+                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">${classSchedule.length} Jam</span>
                     </div>
                     <div class="divide-y divide-slate-100 flex-1">
                         ${rowsHtml}
@@ -1708,301 +1626,7 @@
             });
         }
 
-        window.switchTab = function(tabId) {
-            const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'master-siswa', 'master-guru'];
-            if (protectedTabs.includes(tabId) && !isAdminUnlocked) {
-                openPinModal(() => switchTab(tabId));
-                return;
-            }
-
-            closeAllDropdowns();
-
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-
-            const btnGuru = document.getElementById('btn-dropdown-guru');
-            const btnKesiswaan = document.getElementById('btn-dropdown-kesiswaan');
-            const navHome = document.getElementById('nav-item-home');
-
-            if (navHome) navHome.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
-            if (btnGuru) btnGuru.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
-            if (btnKesiswaan) btnKesiswaan.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm";
-
-            document.querySelectorAll('.dropdown-item').forEach(btn => {
-                btn.classList.remove('bg-brand-50', 'text-brand-600', 'font-bold');
-                btn.classList.add('text-slate-700');
-            });
-
-            const activeItem = document.getElementById(`nav-item-${tabId}`);
-            if (activeItem) {
-                activeItem.classList.add('bg-brand-50', 'text-brand-600', 'font-bold');
-                activeItem.classList.remove('text-slate-700');
-            }
-
-            const guruTabs = ['input-mengaji', 'input-presensi', 'rekap-mengaji', 'rekap-presensi', 'master-guru'];
-            const kesiswaanTabs = ['input-siswa', 'input-kesiswaan', 'rekap-siswa', 'master-siswa'];
-
-            if (tabId === 'home' && navHome) {
-                navHome.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm ring-2 ring-brand-500/20";
-            } else if (guruTabs.includes(tabId) && btnGuru) {
-                btnGuru.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-brand-500 bg-brand-50 text-brand-700 shadow-sm ring-2 ring-brand-500/20";
-            } else if (kesiswaanTabs.includes(tabId) && btnKesiswaan) {
-                btnKesiswaan.className = "px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-extrabold transition border border-amber-500 bg-amber-50 text-amber-800 shadow-sm ring-2 ring-amber-500/20";
-            }
-
-            const tabLabels = {
-                'home': '<i class="fa-solid fa-house text-yellow-500"></i> Jadwal KBM',
-                'input-mengaji': '<i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji',
-                'input-presensi': '<i class="fa-solid fa-user-xmark text-rose-500"></i> Presensi Guru',
-                'rekap-presensi': '<i class="fa-solid fa-table-list text-brand-500"></i> Rekap Presensi Guru',
-                'rekap-mengaji': '<i class="fa-solid fa-table-cells text-purple-600"></i> Rekap Mengaji Guru',
-                'master-guru': '<i class="fa-solid fa-users text-indigo-600"></i> Master Data Guru',
-                'input-siswa': '<i class="fa-solid fa-graduation-cap text-amber-500"></i> Presensi Siswa',
-                'input-kesiswaan': '<i class="fa-solid fa-clock text-rose-500"></i> Terlambat & Izin Pulang',
-                'rekap-siswa': '<i class="fa-solid fa-chart-pie text-amber-600"></i> Rekap Siswa (Multi-Bulan)',
-                'master-siswa': '<i class="fa-solid fa-address-book text-emerald-600"></i> Master Data Siswa'
-            };
-
-            const indicator = document.getElementById('active-tab-indicator');
-            if (indicator && tabLabels[tabId]) {
-                indicator.innerHTML = tabLabels[tabId];
-            }
-
-            const activeTabSection = document.getElementById(`tab-${tabId}`);
-            if (activeTabSection) activeTabSection.classList.remove('hidden');
-
-            if (tabId === 'home') renderScheduleGrid();
-            if (tabId === 'rekap-mengaji') renderRekapMengaji();
-            if (tabId === 'rekap-presensi') renderRekapPresensi();
-            if (tabId === 'rekap-siswa') renderRekapSiswa();
-            if (tabId === 'master-siswa') renderMasterSiswaTab();
-            if (tabId === 'master-guru') renderMasterTeacherList();
-        };
-
-        window.openExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.remove('hidden');
-        };
-
-        window.closeExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.add('hidden');
-        };
-
-        // ==========================================
-        // SMART EXCEL SCHEDULE PARSER & UPLOADER (2-SHEET ENHANCED)
-        // ==========================================
-        window.processExcelUpload = function() {
-            const fileInput = document.getElementById('excel-file-input');
-            const file = fileInput?.files?.[0];
-            if (!file) {
-                showToast('Pilih file Excel jadwal terlebih dahulu!');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    
-                    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-                    let newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
-                    let teacherCodeMap = {}; // Maps code/number -> { name: "...", subject: "..." }
-                    let totalParsedCount = 0;
-                    let parsedTeacherCount = 0;
-
-                    // STEP 1: Parse Kode Guru Table from ANY sheet (Separate Sheet or Columns AX-BA)
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (!rows || rows.length === 0) return;
-
-                        for (let r = 0; r < rows.length; r++) {
-                            const row = rows[r];
-                            if (!row || row.length === 0) continue;
-
-                            for (let c = 0; c < row.length; c++) {
-                                const val = String(row[c] || '').trim().toUpperCase();
-                                if (val === 'NO. KODE' || val === 'NO KODE' || val === 'KODE GURU' || val === 'NO.') {
-                                    // Found teacher code header at row r, col c
-                                    // Expect: Col c = Code, Col c+1 = Name, Col c+3 or c+2 = Mapel
-                                    for (let rNext = r + 1; rNext < rows.length; rNext++) {
-                                        const rRow = rows[rNext];
-                                        if (!rRow) continue;
-                                        const codeRaw = String(rRow[c] || '').trim();
-                                        const nameRaw = String(rRow[c + 1] || rRow[c + 2] || '').trim();
-                                        
-                                        // Look for mapel in subsequent columns
-                                        let mapelRaw = '';
-                                        for (let offset = 2; offset <= 5; offset++) {
-                                            const candidate = String(rRow[c + offset] || '').trim();
-                                            if (candidate && !candidate.match(/^\d+$/) && !candidate.includes('19') && candidate.length > 2) {
-                                                if (!candidate.toUpperCase().includes('NIP') && !candidate.toUpperCase().includes('NUPTK')) {
-                                                    mapelRaw = candidate;
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        if (codeRaw && nameRaw && !nameRaw.toUpperCase().includes('NAMA GURU') && codeRaw.match(/^\d+$/)) {
-                                            teacherCodeMap[codeRaw] = { name: nameRaw, subject: mapelRaw || 'Mata Pelajaran' };
-                                            parsedTeacherCount++;
-                                            if (!teacherList.includes(nameRaw)) teacherList.push(nameRaw);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // Fallback Seeding if map is empty
-                    if (Object.keys(teacherCodeMap).length === 0) {
-                        teacherCodeMap = {
-                            "1": { name: "Hj. Laela, S.Pd.", subject: "Biologi" },
-                            "2": { name: "Dhiah Kuswarini, S.Pd., M.M.Pd.", subject: "Biologi" },
-                            "3": { name: "Syam Ahmad, S.Pd.", subject: "Bimbingan dan Konseling" },
-                            "4": { name: "Muhamad Hatta, S.Pd.", subject: "Sejarah Indonesia" },
-                            "5": { name: "Drs. Saepullah", subject: "Bahasa Indonesia" },
-                            "6": { name: "Thaniya, S.Pd., Gr.", subject: "Bahasa Inggris" },
-                            "7": { name: "H. Setia Nugraha, S.S., M.Hum.", subject: "Sejarah" },
-                            "8": { name: "Ricky Sudrajat, S.Pd.", subject: "Geografi" },
-                            "9": { name: "Emalia Susanti, S.Pd.", subject: "Bahasa Indonesia" },
-                            "10": { name: "Dra. Dian Apendiani, M.Pd.", subject: "Bahasa Indonesia" },
-                            "11": { name: "Rini Sudarni, S.Pd.", subject: "Biologi" },
-                            "12": { name: "Taufik Hadian, S.Pd., Gr.", subject: "PKN" },
-                            "15": { name: "Cecep Cahyana, S.Sn., Gr.", subject: "Seni Budaya" },
-                            "16": { name: "Moralitawati Fatimah, S.Pd., Gr.", subject: "Sosiologi" },
-                            "19": { name: "Fiki Purnawan, M.Pd., Gr.", subject: "Matematika" },
-                            "25": { name: "Anggi Rizkiyani, M.Pd., Gr.", subject: "Matematika" },
-                            "26": { name: "Asep Saepulloh, S.H.I., Gr.", subject: "Pendidikan Agama Islam" },
-                            "27": { name: "Asep Solihin, S.Pd.", subject: "PJOK" },
-                            "30": { name: "Desy Fitriani, S.Pd.", subject: "Kimia" },
-                            "32": { name: "Eni Suhaeni, S.Pd.", subject: "Fisika" },
-                            "39": { name: "Ika Kartika, S.Pd.", subject: "Ekonomi" },
-                            "42": { name: "Kiki Rizki, S.Pd.", subject: "Informatika" },
-                            "46": { name: "Opan Sopandi, S.Pd.", subject: "Prakarya" },
-                            "47": { name: "Pipit Pitriani, S.Pd.", subject: "Bahasa Sunda" },
-                            "50": { name: "Siti Maryam, S.Pd.", subject: "Sejarah" }
-                        };
-                    }
-
-                    // STEP 2: Parse Schedule Grid Sheets
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (!rows || rows.length === 0) return;
-
-                        let currentDay = days.find(d => sheetName.toLowerCase().includes(d.toLowerCase())) || 'Senin';
-                        let colToClassMap = {};
-
-                        for (let r = 0; r < rows.length; r++) {
-                            const row = rows[r];
-                            if (!row || row.length === 0) continue;
-
-                            // Detect Day Headers in cells (e.g. "SENIN", "HARI SELASA")
-                            const rowFirstText = String(row[0] || row[1] || row[2] || '').trim().toUpperCase();
-                            const matchedDay = days.find(d => rowFirstText === d.toUpperCase() || rowFirstText === `HARI ${d.toUpperCase()}`);
-                            if (matchedDay) {
-                                currentDay = matchedDay;
-                            }
-
-                            // Detect Merged Class Headers (e.g. Row 11: "KELAS XII", Row 12: sub-numbers 1, 2, 3... 12)
-                            let currentGradePrefix = '';
-                            for (let c = 0; c < row.length; c++) {
-                                const cellVal = String(row[c] || '').trim();
-                                if (cellVal.toUpperCase().includes('KELAS X') || cellVal.toUpperCase() === 'KELAS 10') {
-                                    currentGradePrefix = cellVal.toUpperCase().includes('XI') ? (cellVal.toUpperCase().includes('XII') ? 'XII ' : 'XI ') : 'X ';
-                                } else if (cellVal.toUpperCase().includes('KELAS XI')) {
-                                    currentGradePrefix = 'XI ';
-                                } else if (cellVal.toUpperCase().includes('KELAS XII')) {
-                                    currentGradePrefix = 'XII ';
-                                }
-
-                                // Match class column numbers or explicit codes (e.g. "X 1", "XI 5", or number "1".."12" under grade header)
-                                const cleanCls = cleanClassName(cellVal);
-                                if (ALL_CLASSES.includes(cleanCls)) {
-                                    colToClassMap[c] = cleanCls;
-                                } else if (currentGradePrefix && cellVal.match(/^[1-9]$|^1[0-2]$/)) {
-                                    const constructedCls = `${currentGradePrefix}${cellVal}`.trim();
-                                    if (ALL_CLASSES.includes(constructedCls)) {
-                                        colToClassMap[c] = constructedCls;
-                                    }
-                                }
-                            }
-
-                            // Parse Schedule Cells when row represents a Lesson Hour (Jam 1..10)
-                            let hourNum = 0;
-                            const hourText = String(row[0] || row[1] || row[2] || '').trim();
-                            const hourMatch = hourText.match(/^([1-9]|10)$/);
-                            if (hourMatch) {
-                                hourNum = parseInt(hourMatch[1], 10);
-                            }
-
-                            if (hourNum >= 1 && hourNum <= 10 && Object.keys(colToClassMap).length > 0) {
-                                const times = [
-                                    '07.15 - 08.00', '08.00 - 08.45', '08.45 - 09.30', '09.45 - 10.30',
-                                    '10.30 - 11.15', '11.15 - 12.00', '12.45 - 13.30', '13.30 - 14.15',
-                                    '14.15 - 15.00', '15.00 - 15.45'
-                                ];
-
-                                Object.keys(colToClassMap).forEach(colIdx => {
-                                    const className = colToClassMap[colIdx];
-                                    const cellVal = String(row[colIdx] || '').trim();
-                                    if (!cellVal || cellVal === '-' || cellVal.toLowerCase().includes('pembiasaan')) return;
-
-                                    let teacherName = '-';
-                                    let subjectName = 'KBM';
-
-                                    // Direct Code Lookup (e.g., Code "1" -> Hj. Laela, S.Pd. - Biologi)
-                                    if (teacherCodeMap[cellVal]) {
-                                        teacherName = teacherCodeMap[cellVal].name;
-                                        subjectName = teacherCodeMap[cellVal].subject;
-                                    } else {
-                                        // Check if contains teacher code separated by slash or spaces
-                                        const codeExtract = cellVal.match(/\b\d+\b/);
-                                        if (codeExtract && teacherCodeMap[codeExtract[0]]) {
-                                            teacherName = teacherCodeMap[codeExtract[0]].name;
-                                            subjectName = teacherCodeMap[codeExtract[0]].subject;
-                                        } else if (teacherList.includes(cellVal)) {
-                                            teacherName = cellVal;
-                                        }
-                                    }
-
-                                    const exists = newJadwalKBM[currentDay].some(x => x.class === className && x.hour === hourNum);
-                                    if (!exists) {
-                                        newJadwalKBM[currentDay].push({
-                                            class: className,
-                                            hour: hourNum,
-                                            time: times[hourNum - 1] || '08.00 - 08.45',
-                                            subject: subjectName,
-                                            teacher: teacherName
-                                        });
-                                        totalParsedCount++;
-                                    }
-                                });
-                            }
-                        }
-                    });
-
-                    if (totalParsedCount > 0) {
-                        jadwalKBM = newJadwalKBM;
-                        localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
-                        localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                        renderScheduleGrid();
-                        renderMasterTeacherList();
-                        closeExcelImportModal();
-                        
-                        showToast(`Berhasil mengimpor ${totalParsedCount} slot Jadwal KBM! Kode guru (seperti Kode 1 = Hj. Laela, S.Pd.) terpetakan sempurna.`);
-                        pushToCloud();
-                    } else {
-                        showToast('Gagal memproses file Excel. Silakan pastikan file Excel berisi tabel Jadwal & Kode Guru.');
-                    }
-                } catch (err) {
-                    console.error("Error processing excel:", err);
-                    showToast('Terjadi kesalahan saat memproses file Excel!');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        };
-
+        // --- Helper & Utility Functions ---
         function getTodayKey() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -2029,20 +1653,39 @@
             return `${day} ${month} ${year}`;
         }
 
+        function cleanClassName(clsStr) {
+            if (!clsStr) return "";
+            return clsStr.replace(/^kelas\s+/i, "").trim();
+        }
+        
+        function getClassRank(clsStr) {
+            const cls = cleanClassName(clsStr);
+            if (!cls) return 999;
+            let val = 0;
+            if (cls.startsWith('X ')) val = 100;
+            else if (cls.startsWith('XI ')) val = 200;
+            else if (cls.startsWith('XII ')) val = 300;
+            
+            const numMatch = cls.match(/\d+$/);
+            if (numMatch) {
+                val += parseInt(numMatch[0], 10);
+            }
+            return val;
+        }
+
         function initDateDisplays() {
             const todayStr = `${getDayNameID()}, ${getFormattedDateID()}`;
             if (document.getElementById('header-date-display')) document.getElementById('header-date-display').innerText = todayStr;
             if (document.getElementById('print-form-mengaji-date')) document.getElementById('print-form-mengaji-date').innerText = todayStr;
-
-            const todayKey = getTodayKey();
             
+            const todayKey = getTodayKey();
             if (document.getElementById('mengaji-date-picker')) document.getElementById('mengaji-date-picker').value = todayKey;
             if (document.getElementById('guru-input-date')) document.getElementById('guru-input-date').value = todayKey;
             if (document.getElementById('siswa-input-date')) document.getElementById('siswa-input-date').value = todayKey;
             if (document.getElementById('kesiswaan-input-date')) document.getElementById('kesiswaan-input-date').value = todayKey;
             if (document.getElementById('quick-student-date')) document.getElementById('quick-student-date').value = todayKey;
             if (document.getElementById('quick-teacher-date')) document.getElementById('quick-teacher-date').value = todayKey;
-
+            
             const now = new Date();
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -2062,128 +1705,90 @@
                 document.getElementById('master-siswa-class-select'),
                 document.getElementById('quick-student-class-batch')
             ];
-
             selectors.forEach(select => {
                 if (!select) return;
                 select.innerHTML = '';
+                const groupX = document.createElement('optgroup'); groupX.label = "--- JENJANG KELAS X ---";
+                const groupXI = document.createElement('optgroup'); groupXI.label = "--- JENJANG KELAS XI ---";
+                const groupXII = document.createElement('optgroup'); groupXII.label = "--- JENJANG KELAS XII ---";
                 
-                const groupX = document.createElement('optgroup');
-                groupX.label = "--- JENJANG KELAS X ---";
-                const groupXI = document.createElement('optgroup');
-                groupXI.label = "--- JENJANG KELAS XI ---";
-                const groupXII = document.createElement('optgroup');
-                groupXII.label = "--- JENJANG KELAS XII ---";
-
                 ALL_CLASSES.forEach(cls => {
                     const opt = document.createElement('option');
                     opt.value = cls;
                     opt.innerText = cls;
-
                     if (cls.startsWith('X ')) groupX.appendChild(opt);
                     else if (cls.startsWith('XI ')) groupXI.appendChild(opt);
                     else if (cls.startsWith('XII ')) groupXII.appendChild(opt);
                 });
-
+                
                 select.appendChild(groupX);
                 select.appendChild(groupXI);
                 select.appendChild(groupXII);
             });
         }
 
-        function cleanClassName(clsStr) {
-            if (!clsStr) return '';
-            return clsStr.replace(/^kelas\s+/i, '').trim();
-        }
+        window.switchTab = function(tabId) {
+            const protectedTabs = ['rekap-mengaji', 'rekap-presensi', 'master-siswa', 'master-guru'];
+            if (protectedTabs.includes(tabId) && !isAdminUnlocked) {
+                openPinModal(() => switchTab(tabId));
+                return;
+            }
+            
+            closeAllDropdowns();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            const activeTabSection = document.getElementById(`tab-${tabId}`);
+            if (activeTabSection) activeTabSection.classList.remove('hidden');
+            
+            if (tabId === 'home') renderScheduleGrid();
+            if (tabId === 'rekap-mengaji') renderRekapMengaji();
+            if (tabId === 'rekap-presensi') renderRekapPresensi();
+            if (tabId === 'rekap-siswa') renderRekapSiswa();
+            if (tabId === 'master-siswa') renderMasterSiswaTab();
+            if (tabId === 'master-guru') renderMasterTeacherList();
+        };
 
         window.toggleDropdown = function(menu) {
             const guruMenu = document.getElementById('dropdown-menu-guru');
             const kesiswaanMenu = document.getElementById('dropdown-menu-kesiswaan');
-            const arrowGuru = document.getElementById('arrow-guru');
-            const arrowKesiswaan = document.getElementById('arrow-kesiswaan');
-
+            
             if (menu === 'guru') {
                 const isHidden = guruMenu.classList.contains('hidden');
                 closeAllDropdowns();
-                if (isHidden) {
-                    guruMenu.classList.remove('hidden');
-                    if (arrowGuru) arrowGuru.classList.add('rotate-180');
-                }
+                if (isHidden) guruMenu.classList.remove('hidden');
             } else if (menu === 'kesiswaan') {
                 const isHidden = kesiswaanMenu.classList.contains('hidden');
                 closeAllDropdowns();
-                if (isHidden) {
-                    kesiswaanMenu.classList.remove('hidden');
-                    if (arrowKesiswaan) arrowKesiswaan.classList.add('rotate-180');
-                }
+                if (isHidden) kesiswaanMenu.classList.remove('hidden');
             }
         };
 
         window.closeAllDropdowns = function() {
             const guruMenu = document.getElementById('dropdown-menu-guru');
             const kesiswaanMenu = document.getElementById('dropdown-menu-kesiswaan');
-            const arrowGuru = document.getElementById('arrow-guru');
-            const arrowKesiswaan = document.getElementById('arrow-kesiswaan');
-
             if (guruMenu) guruMenu.classList.add('hidden');
             if (kesiswaanMenu) kesiswaanMenu.classList.add('hidden');
-            if (arrowGuru) arrowGuru.classList.remove('rotate-180');
-            if (arrowKesiswaan) arrowKesiswaan.classList.remove('rotate-180');
         };
 
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.dropdown-container')) {
-                closeAllDropdowns();
-            }
-        });
-
-        window.printFormMengajiHarian = function() {
-            const tbody = document.getElementById('print-form-mengaji-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
-            const todayLog = mengaji36Logs[todayKey] || {};
-
-            for (let i = 0; i < 12; i++) {
-                const clsX = ALL_CLASSES[i];
-                const clsXI = ALL_CLASSES[i + 12];
-                const clsXII = ALL_CLASSES[i + 24];
-
-                const logX = todayLog[clsX] || { teacher: '', present: true };
-                const logXI = todayLog[clsXI] || { teacher: '', present: true };
-                const logXII = todayLog[clsXII] || { teacher: '', present: true };
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="border border-black p-1">${i + 1}</td>
-                    <td class="border border-black p-1 font-bold">${clsX}</td>
-                    <td class="border border-black p-1 text-left">${logX.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logX.present ? '✔' : '✗'}</td>
-
-                    <td class="border border-black p-1 font-bold">${clsXI}</td>
-                    <td class="border border-black p-1 text-left">${logXI.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logXI.present ? '✔' : '✗'}</td>
-
-                    <td class="border border-black p-1 font-bold">${clsXII}</td>
-                    <td class="border border-black p-1 text-left">${logXII.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logXII.present ? '✔' : '✗'}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-
-            document.body.classList.add('print-mengaji-only');
-            window.print();
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            if (!toast || !toastMsg) return;
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
-                document.body.classList.remove('print-mengaji-only');
-            }, 500);
-        };
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+        window.showToast = showToast;
 
         function updateCloudStatusBadge(active, textStr) {
             const badge = document.getElementById('cloud-status-badge');
             const icon = document.getElementById('cloud-status-icon');
             const text = document.getElementById('cloud-status-text');
-
             if (!badge) return;
-
             if (active) {
                 badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
                 icon.className = "fa-solid fa-bolt text-xs text-yellow-300";
@@ -2224,39 +1829,22 @@
             setTimeout(() => location.reload(), 1000);
         };
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-msg');
-            if (!toast || !toastMsg) return;
-
-            toastMsg.innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        window.showToast = showToast;
-
+        // --- STREAMING_CHUNK:Event Handlers... ---
         function renderTeacherAbsenceList() {
             const container = document.getElementById('absence-list-container');
             const emptyState = document.getElementById('absence-empty-state');
             if (!container || !emptyState) return;
             container.innerHTML = '';
-
+            
             const todayKey = document.getElementById('guru-input-date')?.value || getTodayKey();
             const list = absenceLogs[todayKey] || [];
-
+            
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
-
+            
             list.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = "p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-wrap items-center justify-between gap-2";
@@ -2278,6 +1866,7 @@
                 container.appendChild(card);
             });
         }
+        window.renderTeacherAbsenceList = renderTeacherAbsenceList;
 
         window.deleteTeacherAbsence = function(index) {
             showConfirmModal("Hapus Presensi Guru", "Apakah Anda yakin ingin menghapus catatan guru ini?", () => {
@@ -2308,19 +1897,16 @@
         window.onTeacherSearchInput = function(val) {
             const sugBox = document.getElementById('qs-teacher-suggestions');
             sugBox.innerHTML = '';
-
             if (!val || val.trim().length === 0) {
                 sugBox.classList.add('hidden');
                 return;
             }
-
             const query = val.toLowerCase();
             const matches = teacherList.filter(t => t.toLowerCase().includes(query));
-
             if (matches.length === 0) {
                 const addDiv = document.createElement('div');
                 addDiv.className = "p-2.5 text-xs text-rose-600 font-bold hover:bg-rose-50 cursor-pointer";
-                addDiv.innerText = `➕ Tambahkan Guru: "${val}"`;
+                addDiv.innerText = `+ Tambahkan Guru: "${val}"`;
                 addDiv.onclick = () => {
                     addTeacherToBatch(val);
                     document.getElementById('qs-teacher-search-name').value = '';
@@ -2330,7 +1916,6 @@
                 sugBox.classList.remove('hidden');
                 return;
             }
-
             matches.slice(0, 8).forEach(teacherName => {
                 const div = document.createElement('div');
                 div.className = "p-2.5 text-xs hover:bg-slate-100 cursor-pointer border-b border-slate-100 flex items-center justify-between";
@@ -2342,7 +1927,6 @@
                 };
                 sugBox.appendChild(div);
             });
-
             sugBox.classList.remove('hidden');
         };
 
@@ -2358,8 +1942,8 @@
         function addTeacherToBatch(teacherName) {
             const defaultStatus = document.getElementById('quick-teacher-status-batch').value;
             const defaultJam = document.getElementById('quick-teacher-jam-batch').value.trim();
-
             const existing = teacherBatchQueue.find(x => x.teacher.toLowerCase() === teacherName.toLowerCase());
+            
             if (existing) {
                 existing.status = defaultStatus;
                 existing.jam = defaultJam;
@@ -2368,8 +1952,8 @@
                     teacher: teacherName,
                     status: defaultStatus,
                     jam: defaultJam,
-                    kelas: '',
-                    penanggulangan: ''
+                    kelas: "",
+                    penanggulangan: ""
                 });
             }
             renderTeacherBatchQueueTable();
@@ -2379,15 +1963,14 @@
             const tbody = document.getElementById('qs-teacher-table-body');
             const countElem = document.getElementById('qs-teacher-count');
             if (!tbody || !countElem) return;
-
+            
             countElem.innerText = teacherBatchQueue.length;
-
             if (teacherBatchQueue.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada guru dalam antrean. Ketik nama di atas.</td></tr>';
                 return;
             }
-
             tbody.innerHTML = '';
+            
             teacherBatchQueue.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
@@ -2432,14 +2015,12 @@
         window.saveQuickTeacherForm = function(event) {
             event.preventDefault();
             const targetDate = document.getElementById('quick-teacher-date')?.value || getTodayKey();
-
             if (teacherBatchQueue.length === 0) {
                 showToast('Antrean daftar guru masih kosong!');
                 return;
             }
-
+            
             if (!absenceLogs[targetDate]) absenceLogs[targetDate] = [];
-
             teacherBatchQueue.forEach(item => {
                 absenceLogs[targetDate].push({
                     teacher: item.teacher,
@@ -2449,53 +2030,50 @@
                     penanggulangan: item.penanggulangan
                 });
             });
-
+            
             localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
-            if (document.getElementById('guru-input-date')) {
-                document.getElementById('guru-input-date').value = targetDate;
-            }
+            if (document.getElementById('guru-input-date')) document.getElementById('guru-input-date').value = targetDate;
+            
             renderTeacherAbsenceList();
-
             const savedCount = teacherBatchQueue.length;
             teacherBatchQueue = [];
             renderTeacherBatchQueueTable();
-
             closeQuickTeacherModal();
             showToast(`${savedCount} Catatan ketidakhadiran guru tanggal ${targetDate} berhasil disimpan!`);
             pushToCloud();
         };
 
+        // --- STREAMING_CHUNK:Student absence handling... ---
         function renderStudentAbsenceTable() {
             const tbody = document.getElementById('siswa-detail-table-body');
             const emptyState = document.getElementById('siswa-detail-empty');
             const badge = document.getElementById('count-student-absent-badge');
             if (!tbody || !emptyState) return;
             tbody.innerHTML = '';
-
+            
             const todayKey = document.getElementById('siswa-input-date')?.value || getTodayKey();
             const list = studentAbsenceList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
-            
+                
             badge.innerText = `${list.length} Siswa`;
-
+            
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
-
-            list.forEach((item, index) => {
+            
+            list.forEach((item) => {
                 const globalIndex = studentAbsenceList.indexOf(item);
                 let badgeClass = "bg-blue-100 text-blue-800";
                 if (item.status === 'I') badgeClass = "bg-amber-100 text-amber-800";
                 if (item.status === 'A') badgeClass = "bg-rose-100 text-rose-800";
-
+                
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
-                    <td class="p-2.5 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-400">${globalIndex + 1}</td>
                     <td class="p-2.5 font-bold text-slate-800">${item.name}</td>
                     <td class="p-2.5 text-center font-semibold text-slate-600">${cleanClassName(item.class)}</td>
                     <td class="p-2.5 text-center"><span class="${badgeClass} font-extrabold text-xs px-2.5 py-0.5 rounded-full">${item.status}</span></td>
@@ -2511,27 +2089,36 @@
         }
         window.renderStudentAbsenceTable = renderStudentAbsenceTable;
 
+        window.deleteStudentAbsence = function(index) {
+            showConfirmModal("Hapus Presensi Siswa", "Apakah Anda yakin ingin menghapus catatan presensi siswa ini?", () => {
+                studentAbsenceList.splice(index, 1);
+                localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
+                renderStudentAbsenceTable();
+                showToast('Catatan siswa dihapus!');
+                pushToCloud();
+            });
+        };
+
         function renderLateList() {
             const container = document.getElementById('late-list-container');
             const emptyState = document.getElementById('late-empty-state');
             const badge = document.getElementById('count-late-badge');
             if (!container || !emptyState) return;
             container.innerHTML = '';
-
+            
             const todayKey = document.getElementById('kesiswaan-input-date')?.value || getTodayKey();
             const list = studentLateList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
-            
+                
             badge.innerText = `${list.length} Siswa`;
-
+            
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
-
+            
             list.forEach((item) => {
                 const globalIndex = studentLateList.indexOf(item);
                 const card = document.createElement('div');
@@ -2553,27 +2140,36 @@
         }
         window.renderLateList = renderLateList;
 
+        window.deleteLateStudent = function(index) {
+            showConfirmModal("Hapus Siswa Terlambat", "Hapus catatan terlambat siswa ini?", () => {
+                studentLateList.splice(index, 1);
+                localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
+                renderLateList();
+                showToast('Catatan terlambat dihapus!');
+                pushToCloud();
+            });
+        };
+
         function renderEarlyList() {
             const container = document.getElementById('early-list-container');
             const emptyState = document.getElementById('early-empty-state');
             const badge = document.getElementById('count-early-badge');
             if (!container || !emptyState) return;
             container.innerHTML = '';
-
+            
             const todayKey = document.getElementById('kesiswaan-input-date')?.value || getTodayKey();
             const list = studentEarlyList
                 .filter(item => item.date === todayKey)
                 .sort((a, b) => getClassRank(a.class) - getClassRank(b.class) || a.name.localeCompare(b.name));
-            
+                
             badge.innerText = `${list.length} Siswa`;
-
+            
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
-
+            
             list.forEach((item) => {
                 const globalIndex = studentEarlyList.indexOf(item);
                 const card = document.createElement('div');
@@ -2628,20 +2224,19 @@
             const cls = cleanClassName(document.getElementById('quick-student-class-batch').value);
             const sugBox = document.getElementById('qs-batch-suggestions');
             sugBox.innerHTML = '';
-
             if (!val || val.trim().length === 0) {
                 sugBox.classList.add('hidden');
                 return;
             }
-
+            
             const masterList = studentMasterData[cls] || [];
             const query = val.toLowerCase();
             const matches = masterList.filter(s => s.toLowerCase().includes(query));
-
+            
             if (matches.length === 0) {
                 const addDiv = document.createElement('div');
                 addDiv.className = "p-2.5 text-xs text-amber-600 font-bold hover:bg-amber-50 cursor-pointer";
-                addDiv.innerText = `➕ Tambahkan: "${val}"`;
+                addDiv.innerText = `+ Tambahkan: "${val}"`;
                 addDiv.onclick = () => {
                     addStudentToBatch(val);
                     document.getElementById('qs-batch-search-name').value = '';
@@ -2651,7 +2246,7 @@
                 sugBox.classList.remove('hidden');
                 return;
             }
-
+            
             matches.forEach(name => {
                 const div = document.createElement('div');
                 div.className = "p-2.5 text-xs hover:bg-slate-100 cursor-pointer border-b border-slate-100 flex items-center justify-between";
@@ -2663,7 +2258,6 @@
                 };
                 sugBox.appendChild(div);
             });
-
             sugBox.classList.remove('hidden');
         };
 
@@ -2679,8 +2273,8 @@
         function addStudentToBatch(studentName, status = null) {
             const cls = cleanClassName(document.getElementById('quick-student-class-batch').value);
             const defaultStatus = status || document.getElementById('quick-student-status-batch').value;
-            
             const existing = batchQueue.find(x => x.name.toLowerCase() === studentName.toLowerCase());
+            
             if (existing) {
                 existing.status = defaultStatus;
             } else {
@@ -2688,7 +2282,7 @@
                     name: studentName,
                     class: cls,
                     status: defaultStatus,
-                    note: '',
+                    note: "",
                     time: defaultStatus === 'TERLAMBAT' ? '07.45' : (defaultStatus === 'PULANG' ? '10.30' : '')
                 });
             }
@@ -2699,15 +2293,14 @@
             const tbody = document.getElementById('qs-batch-table-body');
             const countElem = document.getElementById('qs-batch-count');
             if (!tbody || !countElem) return;
-
+            
             countElem.innerText = batchQueue.length;
-
             if (batchQueue.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada siswa dalam antrean. Ketik nama di atas.</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada siswa dalam antrean. Ketik nama di atas.</td></tr>';
                 return;
             }
-
             tbody.innerHTML = '';
+            
             batchQueue.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
@@ -2764,12 +2357,11 @@
         window.saveQuickStudentForm = function(event) {
             event.preventDefault();
             const targetDate = document.getElementById('quick-student-date')?.value || getTodayKey();
-
             if (batchQueue.length === 0) {
                 showToast('Antrean daftar siswa masih kosong!');
                 return;
             }
-
+            
             batchQueue.forEach(item => {
                 if (item.status === 'TERLAMBAT') {
                     studentLateList.push({ date: targetDate, class: item.class, name: item.name, time: item.time || '07.45', reason: item.note });
@@ -2779,94 +2371,90 @@
                     studentAbsenceList.push({ date: targetDate, class: item.class, name: item.name, status: item.status, note: item.note });
                 }
             });
-
+            
             localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
             localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
             localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-
+            
             if (document.getElementById('siswa-input-date')) document.getElementById('siswa-input-date').value = targetDate;
             if (document.getElementById('kesiswaan-input-date')) document.getElementById('kesiswaan-input-date').value = targetDate;
-
+            
             renderStudentAbsenceTable();
             renderLateList();
             renderEarlyList();
-
+            
             const totalSaved = batchQueue.length;
             batchQueue = [];
             renderBatchQueueTable();
-
             closeQuickStudentModal();
             showToast(`${totalSaved} Presensi siswa tanggal ${targetDate} berhasil disimpan!`);
             pushToCloud();
         };
 
+        // --- STREAMING_CHUNK:Rekap & Master Data Logic... ---
         window.renderRekapMengaji = function() {
             const monthStr = document.getElementById('month-select-mengaji').value;
             if (!monthStr) return;
-
             const parts = monthStr.split('-');
             const year = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10);
             const daysInMonth = new Date(year, month, 0).getDate();
-
+            
             const workdays = [];
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month - 1, d);
                 const dayOfWeek = dateObj.getDay();
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
             }
-
+            
             const headerGroup = document.getElementById('mengaji-date-header-group');
             if (headerGroup) headerGroup.colSpan = workdays.length;
-
+            
             const headerRow = document.getElementById('mengaji-days-row');
             headerRow.innerHTML = '';
             workdays.forEach(d => {
                 headerRow.innerHTML += `<th class="p-1 border border-purple-900 text-center">${d}</th>`;
             });
-
+            
             const matrixBody = document.getElementById('mengaji-matrix-body');
             matrixBody.innerHTML = '';
-
+            
             teacherList.forEach((teacher, idx) => {
                 let totalAbsent = 0;
                 let dayCells = '';
-
+                
                 workdays.forEach(d => {
                     const dayFormatted = String(d).padStart(2, '0');
                     const dateKey = `${monthStr}-${dayFormatted}`;
                     const dayLog = mengaji36Logs[dateKey];
                     let cellContent = '-';
-
+                    
                     if (dayLog) {
                         let isScheduled = false;
                         let isPresent = true;
-
                         Object.keys(dayLog).forEach(cls => {
                             if (dayLog[cls].teacher === teacher) {
                                 isScheduled = true;
                                 if (!dayLog[cls].present) isPresent = false;
                             }
                         });
-
                         if (isScheduled) {
                             if (isPresent) {
-                                cellContent = '<span class="text-emerald-600 font-bold">✔</span>';
+                                cellContent = '<span class="text-emerald-600 font-bold">✓</span>';
                             } else {
-                                cellContent = '<span class="text-rose-600 font-bold">✗</span>';
+                                cellContent = '<span class="text-rose-600 font-bold">X</span>';
                                 totalAbsent++;
                             }
                         }
                     }
-
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
-
+                
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
                     <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
-                    <td class="col-nama p-2 border border-slate-200 text-left font-bold text-slate-800 sticky-col whitespace-nowrap">${teacher}</td>
+                    <td class="col-nama p-2 border border-slate-200 text-left font-bold text-slate-800 whitespace-nowrap sticky-col">${teacher}</td>
                     ${dayCells}
                     <td class="p-1 border border-slate-200 font-extrabold ${totalAbsent > 0 ? 'text-rose-600 bg-rose-50' : 'text-slate-400'}">${totalAbsent}</td>
                 `;
@@ -2877,42 +2465,41 @@
         window.renderRekapPresensi = function() {
             const monthStr = document.getElementById('month-select-presensi').value;
             if (!monthStr) return;
-
             const parts = monthStr.split('-');
             const year = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10);
             const daysInMonth = new Date(year, month, 0).getDate();
-
+            
             const workdays = [];
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month - 1, d);
                 const dayOfWeek = dateObj.getDay();
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) workdays.push(d);
             }
-
+            
             const headerGroup = document.getElementById('presensi-date-header-group');
             if (headerGroup) headerGroup.colSpan = workdays.length;
-
+            
             const headerRow = document.getElementById('presensi-days-row');
             headerRow.innerHTML = '';
             workdays.forEach(d => {
                 headerRow.innerHTML += `<th class="p-1 border border-brand-600 text-center">${d}</th>`;
             });
-
+            
             const matrixBody = document.getElementById('presensi-matrix-body');
             matrixBody.innerHTML = '';
-
+            
             teacherList.forEach((teacher, idx) => {
                 let countS = 0, countDL = 0, countKP = 0, countC = 0, countTB = 0;
                 let dayCells = '';
-
+                
                 workdays.forEach(d => {
                     const dayFormatted = String(d).padStart(2, '0');
                     const dateKey = `${monthStr}-${dayFormatted}`;
                     const list = absenceLogs[dateKey] || [];
                     const log = list.find(x => x.teacher === teacher);
-
                     let cellContent = '-';
+                    
                     if (log) {
                         if (log.status === 'Sakit') { cellContent = '<span class="text-blue-600 font-bold">S</span>'; countS++; }
                         else if (log.status === 'Dinas Luar') { cellContent = '<span class="text-amber-600 font-bold">DL</span>'; countDL++; }
@@ -2920,10 +2507,9 @@
                         else if (log.status === 'Cuti') { cellContent = '<span class="text-emerald-600 font-bold">C</span>'; countC++; }
                         else if (log.status === 'Tanpa Berita') { cellContent = '<span class="text-rose-600 font-bold">TB</span>'; countTB++; }
                     }
-
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
-
+                
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
@@ -2943,7 +2529,6 @@
         window.setSiswaRangePreset = function(presetType) {
             const now = new Date();
             const year = now.getFullYear();
-
             if (presetType === 'jul-aug') {
                 document.getElementById('month-start-siswa').value = `${year}-07`;
                 document.getElementById('month-end-siswa').value = `${year}-08`;
@@ -2961,43 +2546,38 @@
             const selectedClass = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
             let startMonthStr = document.getElementById('month-start-siswa').value;
             let endMonthStr = document.getElementById('month-end-siswa').value;
-
             if (!startMonthStr) return;
+            
             if (!endMonthStr || endMonthStr < startMonthStr) {
                 endMonthStr = startMonthStr;
                 document.getElementById('month-end-siswa').value = startMonthStr;
             }
-
+            
             const startParts = startMonthStr.split('-');
             const endParts = endMonthStr.split('-');
-
             let startY = parseInt(startParts[0], 10);
             let startM = parseInt(startParts[1], 10);
             const endY = parseInt(endParts[0], 10);
             const endM = parseInt(endParts[1], 10);
-
             const activeMonths = [];
+            
             while (startY < endY || (startY === endY && startM <= endM)) {
                 const mmStr = String(startM).padStart(2, '0');
                 activeMonths.push(`${startY}-${mmStr}`);
                 startM++;
-                if (startM > 12) {
-                    startM = 1;
-                    startY++;
-                }
+                if (startM > 12) { startM = 1; startY++; }
             }
-
+            
             const startLabel = `${getMonthNameIndo(parseInt(startParts[1], 10))} ${startParts[0]}`;
             const endLabel = `${getMonthNameIndo(parseInt(endParts[1], 10))} ${endParts[0]}`;
             document.getElementById('display-siswa-period-label').innerText = (startMonthStr === endMonthStr) ? startLabel : `${startLabel} s.d. ${endLabel}`;
-
+            
             const allDateKeys = [];
             activeMonths.forEach(mStr => {
                 const p = mStr.split('-');
                 const y = parseInt(p[0], 10);
                 const m = parseInt(p[1], 10);
                 const daysInM = new Date(y, m, 0).getDate();
-
                 for (let d = 1; d <= daysInM; d++) {
                     const dateObj = new Date(y, m - 1, d);
                     const dow = dateObj.getDay();
@@ -3007,33 +2587,31 @@
                     }
                 }
             });
-
+            
             const headerGroup = document.getElementById('siswa-date-header-group');
             if (headerGroup) headerGroup.colSpan = allDateKeys.length;
-
+            
             const headerRow = document.getElementById('siswa-matrix-days-row');
             headerRow.innerHTML = '';
             allDateKeys.forEach(item => {
                 headerRow.innerHTML += `<th class="p-1 border border-amber-700 text-center text-[9px] whitespace-nowrap">${item.dayNum}<br><span class="text-[8px] opacity-75">${item.monthShort}</span></th>`;
             });
-
+            
             const matrixBody = document.getElementById('siswa-matrix-body');
             matrixBody.innerHTML = '';
-
+            
             const studentList = studentMasterData[selectedClass] || [];
-
             studentList.forEach((studentName, idx) => {
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
                 let dayCells = '';
-
+                
                 allDateKeys.forEach(dObj => {
                     const dateKey = dObj.dateKey;
                     const absLog = studentAbsenceList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
                     const lateLog = studentLateList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
                     const earlyLog = studentEarlyList.find(x => x.date === dateKey && cleanClassName(x.class) === selectedClass && x.name === studentName);
-
+                    
                     let cellContent = '-';
-
                     if (absLog) {
                         if (absLog.status === 'S') { cellContent = '<span class="text-blue-600 font-bold">S</span>'; countS++; }
                         if (absLog.status === 'I') { cellContent = '<span class="text-amber-600 font-bold">I</span>'; countI++; }
@@ -3045,20 +2623,19 @@
                         cellContent = `<span class="text-indigo-600 font-bold text-[9px]">P ${earlyLog.time || ''}</span>`;
                         countP++;
                     }
-
                     dayCells += `<td class="p-1 border border-slate-200">${cellContent}</td>`;
                 });
-
+                
                 const isLateWarning = countT >= 4;
                 const rowBgClass = isLateWarning ? 'bg-rose-50/90' : 'hover:bg-slate-50';
-
+                
                 const tr = document.createElement('tr');
                 tr.className = rowBgClass;
                 tr.innerHTML = `
                     <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
                     <td class="col-nama p-2 border border-slate-200 text-left font-bold text-slate-800 sticky-col whitespace-nowrap">
                         ${studentName}
-                        ${isLateWarning ? `<span class="ml-1.5 px-1.5 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded shadow-xs">⚠️ ${countT}x Terlambat</span>` : ''}
+                        ${isLateWarning ? `<span class="ml-1.5 px-1.5 py-0.5 bg-rose-600 text-white font-extrabold text-[9px] rounded shadow-xs"> ! ${countT}x Terlambat</span>` : ''}
                     </td>
                     ${dayCells}
                     <td class="p-1 border border-slate-200 font-bold text-blue-600 bg-blue-50">${countS}</td>
@@ -3069,7 +2646,7 @@
                 `;
                 matrixBody.appendChild(tr);
             });
-
+            
             renderSiswaRekapSummaryForMonths(activeMonths);
         };
 
@@ -3077,11 +2654,11 @@
             const tbody = document.getElementById('siswa-rekap-summary-body');
             if (!tbody) return;
             tbody.innerHTML = '';
-
+            
             ALL_CLASSES.forEach((cls, idx) => {
                 const totalStudents = (studentMasterData[cls] || []).length;
                 let countS = 0, countI = 0, countA = 0, countT = 0, countP = 0;
-
+                
                 studentAbsenceList.forEach(item => {
                     if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) {
                         if (item.status === 'S') countS++;
@@ -3089,26 +2666,26 @@
                         if (item.status === 'A') countA++;
                     }
                 });
-
+                
                 studentLateList.forEach(item => {
                     if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) countT++;
                 });
-
+                
                 studentEarlyList.forEach(item => {
                     if (item.date && activeMonths.some(m => item.date.startsWith(m)) && cleanClassName(item.class) === cls) countP++;
                 });
-
+                
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
                     <td class="p-2 border border-slate-200 font-bold text-slate-400">${idx + 1}</td>
                     <td class="p-2 border border-slate-200 text-left font-bold text-slate-800">${cls}</td>
                     <td class="p-2 border border-slate-200 font-semibold text-slate-600">${totalStudents}</td>
-                    <td class="p-2 border border-slate-200 font-bold text-blue-600">${countS}</td>
-                    <td class="p-2 border border-slate-200 font-bold text-amber-600">${countI}</td>
-                    <td class="p-2 border border-slate-200 font-bold text-rose-600">${countA}</td>
-                    <td class="p-2 border border-slate-200 font-bold text-rose-800">${countT}</td>
-                    <td class="p-2 border border-slate-200 font-bold text-indigo-800">${countP}</td>
+                    <td class="p-2 border border-slate-200 font-bold text-rose-900 bg-rose-50">${countT}</td>
+                    <td class="p-2 border border-slate-200 font-bold text-indigo-900 bg-indigo-50">${countP}</td>
+                    <td class="p-2 border border-slate-200 font-bold text-blue-700 bg-blue-50">${countS}</td>
+                    <td class="p-2 border border-slate-200 font-bold text-amber-700 bg-amber-50">${countI}</td>
+                    <td class="p-2 border border-slate-200 font-bold text-rose-700 bg-rose-50">${countA}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -3117,46 +2694,38 @@
         window.deleteSelectedMonthData = function(monthInputId) {
             let monthInput = document.getElementById(monthInputId);
             let monthStr = monthInput ? monthInput.value : '';
-
             if (!monthStr) {
                 showToast('Pilih bulan yang ingin dihapus terlebih dahulu!');
                 return;
             }
-
+            
             const parts = monthStr.split('-');
             const year = parts[0];
             const monthNum = parseInt(parts[1], 10);
             const monthName = getMonthNameIndo(monthNum);
             const labelStr = `${monthName} ${year}`;
-
+            
             showConfirmModal(
                 `Hapus Data Bulan ${labelStr}`,
-                `Apakah Anda yakin ingin MENGHAPUS SELURUH DATA (Pemantauan Mengaji, Presensi Guru, Presensi Siswa, Terlambat & Pulang) pada bulan ${labelStr}? Data akan terhapus dari Firebase & LocalStorage dan tidak dapat dikembalikan!`,
+                `Apakah Anda yakin ingin MENGHAPUS SELURUH DATA pada bulan ${labelStr}?`,
                 () => {
-                    Object.keys(mengaji36Logs).forEach(key => {
-                        if (key.startsWith(monthStr)) delete mengaji36Logs[key];
-                    });
-
-                    Object.keys(absenceLogs).forEach(key => {
-                        if (key.startsWith(monthStr)) delete absenceLogs[key];
-                    });
-
+                    Object.keys(mengaji36Logs).forEach(key => { if (key.startsWith(monthStr)) delete mengaji36Logs[key]; });
+                    Object.keys(absenceLogs).forEach(key => { if (key.startsWith(monthStr)) delete absenceLogs[key]; });
                     studentAbsenceList = studentAbsenceList.filter(item => !item.date || !item.date.startsWith(monthStr));
                     studentLateList = studentLateList.filter(item => !item.date || !item.date.startsWith(monthStr));
                     studentEarlyList = studentEarlyList.filter(item => !item.date || !item.date.startsWith(monthStr));
-
+                    
                     localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
                     localStorage.setItem('piket_absence_logs', JSON.stringify(absenceLogs));
                     localStorage.setItem('piket_student_absences', JSON.stringify(studentAbsenceList));
                     localStorage.setItem('piket_student_late', JSON.stringify(studentLateList));
                     localStorage.setItem('piket_student_early', JSON.stringify(studentEarlyList));
-
                     pushToCloud();
-
+                    
                     if (typeof renderRekapMengaji === 'function') renderRekapMengaji();
                     if (typeof renderRekapPresensi === 'function') renderRekapPresensi();
                     if (typeof renderRekapSiswa === 'function') renderRekapSiswa();
-
+                    
                     showToast(`Seluruh data bulan ${labelStr} berhasil dihapus!`);
                 }
             );
@@ -3165,25 +2734,22 @@
         window.renderMasterSiswaTab = function() {
             const select = document.getElementById('master-siswa-class-select');
             if (!select) return;
-
             const selectedClass = cleanClassName(select.value);
             document.getElementById('display-master-class-title').innerText = selectedClass;
-
             const list = studentMasterData[selectedClass] || [];
             document.getElementById('display-master-student-count').innerText = list.length;
-
+            
             const tbody = document.getElementById('master-siswa-list-body');
             const emptyState = document.getElementById('master-siswa-empty');
             if (!tbody || !emptyState) return;
             tbody.innerHTML = '';
-
+            
             if (list.length === 0) {
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
-
+            
             list.forEach((name, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
@@ -3204,11 +2770,10 @@
             const selectedClass = cleanClassName(document.getElementById('master-siswa-class-select').value);
             const input = document.getElementById('input-single-student-name');
             const name = input.value.trim();
-
             if (!name) return;
-
             if (!studentMasterData[selectedClass]) studentMasterData[selectedClass] = [];
             studentMasterData[selectedClass].push(name);
+            
             localStorage.setItem('piket_student_master', JSON.stringify(studentMasterData));
             input.value = '';
             renderMasterSiswaTab();
@@ -3220,18 +2785,17 @@
             const selectedClass = cleanClassName(document.getElementById('master-siswa-class-select').value);
             const textarea = document.getElementById('input-bulk-students-text');
             const rawText = textarea.value.trim();
-
             if (!rawText) return;
-
+            
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             if (!studentMasterData[selectedClass]) studentMasterData[selectedClass] = [];
-
+            
             lines.forEach(name => {
                 if (!studentMasterData[selectedClass].includes(name)) {
                     studentMasterData[selectedClass].push(name);
                 }
             });
-
+            
             localStorage.setItem('piket_student_master', JSON.stringify(studentMasterData));
             textarea.value = '';
             renderMasterSiswaTab();
@@ -3266,7 +2830,7 @@
             const tbody = document.getElementById('master-teacher-body');
             if (!tbody) return;
             tbody.innerHTML = '';
-
+            
             teacherList.forEach((teacher, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
@@ -3343,9 +2907,8 @@
             const badge = document.getElementById('admin-status-badge');
             const icon = document.getElementById('admin-status-icon');
             const text = document.getElementById('admin-status-text');
-
             if (!badge) return;
-
+            
             if (isAdminUnlocked) {
                 badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
                 icon.className = "fa-solid fa-lock-open text-xs";
@@ -3387,16 +2950,15 @@
             const container = document.getElementById('master-jadwal-day-form-container');
             if (!container) return;
             container.innerHTML = '';
-
+            
             const daySchedule = masterJadwalMengaji[day] || {};
-
             ALL_CLASSES.forEach(cls => {
                 const currentTeacher = daySchedule[cls] || '';
                 const div = document.createElement('div');
                 div.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2";
                 div.innerHTML = `
                     <span class="font-bold text-xs text-slate-700 w-16">${cls}</span>
-                    <select id="master-schedule-select-${cls}" class="flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium">
+                    <select id="master-schedule-select-${cls.replace(/\s+/g, '-')}" class="flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium">
                         <option value="">-- Kosong --</option>
                         ${teacherList.map(t => `<option value="${t}" ${t === currentTeacher ? 'selected' : ''}>${t}</option>`).join('')}
                     </select>
@@ -3408,12 +2970,12 @@
         window.saveMasterJadwalDayForm = function() {
             const day = document.getElementById('select-master-day').value;
             if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
-
+            
             ALL_CLASSES.forEach(cls => {
-                const sel = document.getElementById(`master-schedule-select-${cls}`);
+                const sel = document.getElementById(`master-schedule-select-${cls.replace(/\s+/g, '-')}`);
                 if (sel) masterJadwalMengaji[day][cls] = sel.value;
             });
-
+            
             localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
             closeMasterJadwalModal();
             showToast(`Master jadwal mengaji hari ${day} berhasil disimpan!`);
@@ -3424,14 +2986,13 @@
         window.exportToExcel = function(type) {
             let tableId = '';
             let filename = '';
-
             if (type === 'mengaji') { tableId = 'table-rekap-mengaji'; filename = 'Rekap_Mengaji_Bulanan.xlsx'; }
             if (type === 'presensi') { tableId = 'table-rekap-presensi'; filename = 'Rekap_Presensi_Guru_Bulanan.xlsx'; }
             if (type === 'siswa') { tableId = 'table-rekap-siswa'; filename = 'Rekap_Presensi_Siswa_Periode.xlsx'; }
-
+            
             const table = document.getElementById(tableId);
             if (!table) return;
-
+            
             const wb = XLSX.utils.table_to_book(table, { sheet: "Rekap" });
             XLSX.writeFile(wb, filename);
             showToast(`File Excel (${filename}) berhasil diunduh!`);
@@ -3440,10 +3001,9 @@
         window.filterTable = function(tbodyId, query) {
             const tbody = document.getElementById(tbodyId);
             if (!tbody) return;
-
             const q = query.toLowerCase();
             const rows = tbody.getElementsByTagName('tr');
-
+            
             for (let i = 0; i < rows.length; i++) {
                 const text = rows[i].innerText.toLowerCase();
                 if (text.includes(q)) {
@@ -3452,6 +3012,206 @@
                     rows[i].style.display = 'none';
                 }
             }
+        };
+
+        window.printFormMengajiHarian = function() {
+            const tbody = document.getElementById('print-form-mengaji-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            const todayLog = mengaji36Logs[todayKey] || {};
+            
+            for (let i = 0; i < 12; i++) {
+                const clsX = ALL_CLASSES[i];
+                const clsXI = ALL_CLASSES[i + 12];
+                const clsXII = ALL_CLASSES[i + 24];
+                
+                const logX = todayLog[clsX] || { teacher: "", present: true };
+                const logXI = todayLog[clsXI] || { teacher: "", present: true };
+                const logXII = todayLog[clsXII] || { teacher: "", present: true };
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="border border-black p-1">${i+1}</td>
+                    <td class="border border-black p-1 font-bold">${clsX}</td>
+                    <td class="border border-black p-1 text-left">${logX.teacher || '-'}</td>
+                    <td class="border border-black p-1 font-bold">${logX.present ? '✓' : 'X'}</td>
+                    <td class="border border-black p-1 font-bold">${clsXI}</td>
+                    <td class="border border-black p-1 text-left">${logXI.teacher || '-'}</td>
+                    <td class="border border-black p-1 font-bold">${logXI.present ? '✓' : 'X'}</td>
+                    <td class="border border-black p-1 font-bold">${clsXII}</td>
+                    <td class="border border-black p-1 text-left">${logXII.teacher || '-'}</td>
+                    <td class="border border-black p-1 font-bold">${logXII.present ? '✓' : 'X'}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+            
+            document.body.classList.add('print-mengaji-only');
+            window.print();
+            setTimeout(() => { document.body.classList.remove('print-mengaji-only'); }, 500);
+        };
+
+        window.openExcelImportModal = function() {
+            document.getElementById('excel-import-modal').classList.remove('hidden');
+        };
+
+        window.closeExcelImportModal = function() {
+            document.getElementById('excel-import-modal').classList.add('hidden');
+        };
+
+        window.processExcelUpload = function() {
+            const fileInput = document.getElementById('excel-file-input');
+            const file = fileInput?.files?.[0];
+            if (!file) {
+                showToast('Pilih file Excel jadwal terlebih dahulu!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+                    let newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
+                    let teacherCodeMap = {}; 
+                    let totalParsedCount = 0;
+                    
+                    workbook.SheetNames.forEach(sheetName => {
+                        const ws = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (!rows || rows.length === 0) return;
+                        
+                        for (let r = 0; r < rows.length; r++) {
+                            const row = rows[r];
+                            if (!row || row.length === 0) continue;
+                            for (let c = 0; c < row.length; c++) {
+                                const val = String(row[c] || "").trim().toUpperCase();
+                                if (val === 'NO. KODE' || val === 'NO KODE' || val === 'KODE GURU' || val === 'NO.') {
+                                    for (let rNext = r + 1; rNext < rows.length; rNext++) {
+                                        const rRow = rows[rNext];
+                                        if (!rRow) continue;
+                                        const codeRaw = String(rRow[c] || '').trim();
+                                        const nameRaw = String(rRow[c + 1] || rRow[c + 2] || '').trim();
+                                        let mapelRaw = '';
+                                        for (let offset = 2; offset <= 5; offset++) {
+                                            const candidate = String(rRow[c + offset] || '').trim();
+                                            if (candidate && !candidate.match(/^\d+$/) && !candidate.includes('19') && candidate.length > 2) {
+                                                if (!candidate.toUpperCase().includes('NIP') && !candidate.toUpperCase().includes('NUPTK')) {
+                                                    mapelRaw = candidate;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (codeRaw && nameRaw && !nameRaw.toUpperCase().includes('NAMA GURU') && codeRaw.match(/^\d+$/)) {
+                                            teacherCodeMap[codeRaw] = { name: nameRaw, subject: mapelRaw || 'Mata Pelajaran' };
+                                            if (!teacherList.includes(nameRaw)) teacherList.push(nameRaw);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const ws = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (!rows || rows.length === 0) return;
+                        
+                        let currentDay = days.find(d => sheetName.toLowerCase().includes(d.toLowerCase())) || 'Senin';
+                        let colToClassMap = {};
+                        
+                        for (let r = 0; r < rows.length; r++) {
+                            const row = rows[r];
+                            if (!row || row.length === 0) continue;
+                            
+                            const rowFirstText = String(row[0] || row[1] || row[2] || '').trim().toUpperCase();
+                            const matchedDay = days.find(d => rowFirstText === d.toUpperCase() || rowFirstText === `HARI ${d.toUpperCase()}`);
+                            if (matchedDay) currentDay = matchedDay;
+                            
+                            let currentGradePrefix = "";
+                            for (let c = 0; c < row.length; c++) {
+                                const cellVal = String(row[c] || '').trim();
+                                if (cellVal.toUpperCase().includes('KELAS X') || cellVal.toUpperCase() === 'KELAS 10') {
+                                    currentGradePrefix = cellVal.toUpperCase().includes('XI') ? (cellVal.toUpperCase().includes('XII') ? 'XII ' : 'XI ') : 'X ';
+                                } else if (cellVal.toUpperCase().includes('KELAS XI')) {
+                                    currentGradePrefix = 'XI ';
+                                } else if (cellVal.toUpperCase().includes('KELAS XII')) {
+                                    currentGradePrefix = 'XII ';
+                                }
+                                
+                                const cleanCls = cleanClassName(cellVal);
+                                if (ALL_CLASSES.includes(cleanCls)) {
+                                    colToClassMap[c] = cleanCls;
+                                } else if (currentGradePrefix && cellVal.match(/^[1-9]$|^1[0-2]$/)) {
+                                    const constructedCls = `${currentGradePrefix}${cellVal}`.trim();
+                                    if (ALL_CLASSES.includes(constructedCls)) colToClassMap[c] = constructedCls;
+                                }
+                            }
+                            
+                            let hourNum = 0;
+                            const hourText = String(row[0] || row[1] || row[2] || '').trim();
+                            const hourMatch = hourText.match(/^([1-9]|10)$/);
+                            if (hourMatch) hourNum = parseInt(hourMatch[1], 10);
+                            
+                            if (hourNum >= 1 && hourNum <= 10 && Object.keys(colToClassMap).length > 0) {
+                                const times = ['07.15-08.00', '08.00-08.45', '08.45-09.30', '09.45 - 10.30', '10.30-11.15', '11.15-12.00', '12.45-13.30', '13.30 - 14.15', '14.15-15.00', '15.00-15.45'];
+                                Object.keys(colToClassMap).forEach(colIdx => {
+                                    const className = colToClassMap[colIdx];
+                                    const cellVal = String(row[colIdx] || "").trim();
+                                    
+                                    if (!cellVal || cellVal === '-' || cellVal.toLowerCase().includes('pembiasaan')) return;
+                                    
+                                    let teacherName = '-';
+                                    let subjectName = 'KBM';
+                                    if (teacherCodeMap[cellVal]) {
+                                        teacherName = teacherCodeMap[cellVal].name;
+                                        subjectName = teacherCodeMap[cellVal].subject;
+                                    } else {
+                                        const codeExtract = cellVal.match(/\b\d+\b/);
+                                        if (codeExtract && teacherCodeMap[codeExtract[0]]) {
+                                            teacherName = teacherCodeMap[codeExtract[0]].name;
+                                            subjectName = teacherCodeMap[codeExtract[0]].subject;
+                                        } else if (teacherList.includes(cellVal)) {
+                                            teacherName = cellVal;
+                                        }
+                                    }
+                                    
+                                    const exists = newJadwalKBM[currentDay].some(x => x.class === className && x.hour === hourNum);
+                                    if (!exists) {
+                                        newJadwalKBM[currentDay].push({
+                                            class: className,
+                                            hour: hourNum,
+                                            time: times[hourNum - 1] || '08.00-08.45',
+                                            subject: subjectName,
+                                            teacher: teacherName
+                                        });
+                                        totalParsedCount++;
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    if (totalParsedCount > 0) {
+                        jadwalKBM = newJadwalKBM;
+                        localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+                        localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                        renderScheduleGrid();
+                        renderMasterTeacherList();
+                        closeExcelImportModal();
+                        showToast(`Berhasil mengimpor ${totalParsedCount} slot Jadwal KBM!`);
+                        pushToCloud();
+                    } else {
+                        showToast('Gagal memproses file Excel. Silakan pastikan format sesuai.');
+                    }
+                } catch (err) {
+                    console.error("Error processing excel:", err);
+                    showToast('Terjadi kesalahan saat memproses file Excel!');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         };
     </script>
 </body>
