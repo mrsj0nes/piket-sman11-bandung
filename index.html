@@ -178,10 +178,6 @@
 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-xs font-semibold mb-2">
-                            <i class="fa-solid fa-calendar-check"></i>
-                            <span id="home-today-date">Selasa, 15 September 2026</span>
-                        </div>
                         <h2 class="text-xl sm:text-2xl font-bold">Jadwal Pelajaran KBM SMAN 11 Bandung</h2>
                         <p class="text-xs sm:text-sm text-brand-100 mt-1 max-w-2xl">
                             Pantau jadwal mengajar guru Senin-Jumat, alokasi jam pelajaran (1-10), dan ruang kelas secara real-time.
@@ -1436,11 +1432,6 @@
         window.updateLiveHourDisplay = function() {
             const hourElem = document.getElementById('current-lesson-hour');
             const dayBadge = document.getElementById('current-day-badge');
-            const homeDate = document.getElementById('home-today-date');
-
-            if (homeDate) {
-                homeDate.innerText = `${getDayNameID()}, ${getFormattedDateID()}`;
-            }
 
             const now = new Date();
             const dayName = getDayNameID(now);
