@@ -1168,7 +1168,25 @@
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XI ${i}`);
         for (let i = 1; i <= 12; i++) ALL_CLASSES.push(`XII ${i}`);
 
-        let teacherList = JSON.parse(localStorage.getItem('piket_teachers')) || ["Ahmad Fauzi, S.Pd", "Budi Santoso, M.Pd", "Citra Lestari, S.Si"];
+        // Fungsi pembersih duplikat nama
+        function deduplicateList(list) {
+            const unique = [];
+            const seen = new Set();
+            list.forEach(item => {
+                const val = (item || '').trim(); // Hilangkan spasi tak terlihat
+                if (val && !seen.has(val)) {
+                    seen.add(val);
+                    unique.push(val);
+                }
+            });
+            return unique;
+        }
+
+        // Terapkan deduplikasi langsung saat memuat data dari memori
+        let teacherListRaw = JSON.parse(localStorage.getItem('piket_teachers')) || ["Ahmad Fauzi, S.Pd", "Budi Santoso, M.Pd", "Citra Lestari, S.Si"];
+        let teacherList = deduplicateList(teacherListRaw);
+        localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+
         let studentMasterData = JSON.parse(localStorage.getItem('piket_student_master')) || {};
         let masterJadwalMengaji = JSON.parse(localStorage.getItem('piket_master_jadwal')) || {};
         let mengaji36Logs = JSON.parse(localStorage.getItem('piket_mengaji_logs')) || {};
@@ -1229,7 +1247,8 @@
                         const data = snapshot.data();
                         isRemoteUpdate = true;
 
-                        if (data.teacherList) teacherList = data.teacherList;
+                        // Terapkan deduplikasi saat menerima pembaruan dari Firebase
+                        if (data.teacherList) teacherList = deduplicateList(data.teacherList);
                         if (data.studentMasterData) studentMasterData = data.studentMasterData;
                         if (data.masterJadwalMengaji) masterJadwalMengaji = data.masterJadwalMengaji;
                         if (data.mengaji36Logs) mengaji36Logs = data.mengaji36Logs;
@@ -3149,11 +3168,17 @@
         window.openAddTeacherModal = function() {
             const name = prompt("Masukkan Nama Lengkap Guru Baru (beserta Gelar):");
             if (name && name.trim()) {
-                teacherList.push(name.trim());
-                localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                renderMasterTeacherList();
-                showToast('Guru baru berhasil ditambahkan!');
-                pushToCloud();
+                const cleanName = name.trim();
+                // Cegah penambahan jika nama sudah ada
+                if (!teacherList.includes(cleanName)) {
+                    teacherList.push(cleanName);
+                    localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                    renderMasterTeacherList();
+                    showToast('Guru baru berhasil ditambahkan!');
+                    pushToCloud();
+                } else {
+                    showToast('Nama guru tersebut sudah terdaftar di master data!');
+                }
             }
         };
 
@@ -3495,6 +3520,10 @@
 
                     if (totalParsedCount > 0) {
                         jadwalKBM = newJadwalKBM;
+                        
+                        // Bersihkan duplikat sesaat setelah import Excel selesai
+                        teacherList = deduplicateList(teacherList);
+                        
                         localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
                         localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                         renderScheduleGrid();
