@@ -1784,6 +1784,27 @@
             
             const activeTabSection = document.getElementById(`tab-${tabId}`);
             if (activeTabSection) activeTabSection.classList.remove('hidden');
+
+            // --- Update Breadcrumb / Indikator Halaman ---
+            const tabIndicator = document.getElementById('active-tab-indicator');
+            if (tabIndicator) {
+                const tabTitles = {
+                    'home': '<i class="fa-solid fa-house text-yellow-500"></i> Jadwal KBM',
+                    'input-mengaji': '<i class="fa-solid fa-book-quran text-emerald-600"></i> Pemantauan Mengaji',
+                    'input-presensi': '<i class="fa-solid fa-user-xmark text-rose-500"></i> Ketidakhadiran Guru',
+                    'rekap-presensi': '<i class="fa-solid fa-table-list text-brand-500"></i> Rekap Presensi Guru',
+                    'rekap-mengaji': '<i class="fa-solid fa-table-cells text-purple-600"></i> Rekap Mengaji Guru',
+                    'master-guru': '<i class="fa-solid fa-users text-indigo-600"></i> Master Data Guru',
+                    'input-siswa': '<i class="fa-solid fa-graduation-cap text-amber-500"></i> Presensi Siswa',
+                    'input-kesiswaan': '<i class="fa-solid fa-clock text-rose-500"></i> Terlambat & Izin Pulang',
+                    'rekap-siswa': '<i class="fa-solid fa-chart-pie text-amber-600"></i> Rekap Siswa',
+                    'master-siswa': '<i class="fa-solid fa-address-book text-emerald-600"></i> Master Data Siswa'
+                };
+                if (tabTitles[tabId]) {
+                    tabIndicator.innerHTML = tabTitles[tabId];
+                }
+            }
+            // ---------------------------------------------
             
             if (tabId === 'home') renderScheduleGrid();
             if (tabId === 'rekap-mengaji') renderRekapMengaji();
