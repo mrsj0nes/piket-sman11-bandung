@@ -779,14 +779,22 @@
         </section>
 
         <section id="tab-master-guru" class="tab-content hidden space-y-3">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h3 class="font-bold text-slate-800 text-xs sm:text-base">Daftar Master Guru</h3>
-                    <p class="text-xs text-slate-500">Kelola daftar nama guru SMAN 11 Bandung.</p>
+                    <p class="text-[11px] text-slate-500">Kelola daftar nama guru SMAN 11 Bandung.</p>
                 </div>
-                <button onclick="openAddTeacherModal()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
-                    <i class="fa-solid fa-plus"></i> Tambah Guru Baru
-                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="sortTeachersAZ()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
+                        <i class="fa-solid fa-arrow-down-a-z"></i> Urutkan A-Z
+                    </button>
+                    <button onclick="clearAllTeachers()" class="bg-rose-500 hover:bg-rose-600 text-white font-medium text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
+                        <i class="fa-solid fa-trash-can"></i> Kosongkan
+                    </button>
+                    <button onclick="openAddTeacherModal()" class="bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
+                        <i class="fa-solid fa-plus"></i> Tambah Guru Baru
+                    </button>
+                </div>
             </div>
 
             <div class="bg-white p-3 rounded-xl border border-slate-200">
@@ -802,7 +810,7 @@
                         <tr>
                             <th class="p-2.5 text-center w-12">NO</th>
                             <th class="p-2.5">NAMA GURU</th>
-                            <th class="p-2.5 text-center w-20">AKSI</th>
+                            <th class="p-2.5 text-center w-24">AKSI</th>
                         </tr>
                     </thead>
                     <tbody id="master-teacher-body" class="divide-y divide-slate-100"></tbody>
@@ -3156,13 +3164,53 @@
                     <td class="p-2.5 text-center font-bold text-slate-400">${index + 1}</td>
                     <td class="p-2.5 font-bold text-slate-800">${teacher}</td>
                     <td class="p-2.5 text-center">
-                        <button onclick="removeTeacherMaster(${index})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded hover:bg-rose-50">
-                            <i class="fa-solid fa-trash-can"></i> Hapus
+                        <button onclick="editTeacherMaster(${index})" class="text-amber-500 hover:text-amber-700 text-xs px-2 py-1 rounded hover:bg-amber-50 mr-1" title="Edit Nama">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="removeTeacherMaster(${index})" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded hover:bg-rose-50" title="Hapus Guru">
+                            <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        };
+
+        window.sortTeachersAZ = function() {
+            showConfirmModal("Urutkan A-Z", "Urutkan daftar nama guru berdasarkan abjad (A-Z)?", () => {
+                teacherList.sort((a, b) => a.localeCompare(b));
+                localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                renderMasterTeacherList();
+                showToast('Daftar guru berhasil diurutkan!');
+                pushToCloud();
+            });
+        };
+
+        window.clearAllTeachers = function() {
+            showConfirmModal("Kosongkan Master Guru", "AWAS! Anda akan menghapus SEMUA daftar guru. Fitur ini berguna jika Anda ingin meng-import ulang Excel dari awal. Lanjutkan?", () => {
+                teacherList = [];
+                localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                renderMasterTeacherList();
+                showToast('Semua data master guru berhasil dikosongkan!');
+                pushToCloud();
+            });
+        };
+
+        window.editTeacherMaster = function(index) {
+            const oldName = teacherList[index];
+            const newName = prompt("Ubah Nama Guru (Penting: Mengubah nama di sini tidak akan otomatis mengubah nama di data rekap sebelumnya):", oldName);
+            if (newName && newName.trim() && newName.trim() !== oldName) {
+                const cleanName = newName.trim();
+                if (!teacherList.includes(cleanName)) {
+                    teacherList[index] = cleanName;
+                    localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                    renderMasterTeacherList();
+                    showToast('Nama guru berhasil diperbarui!');
+                    pushToCloud();
+                } else {
+                    showToast('Gagal! Nama guru tersebut sudah terdaftar.');
+                }
+            }
         };
 
         window.openAddTeacherModal = function() {
@@ -3401,7 +3449,83 @@
                     let newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
                     let teacherCodeMap = {}; 
                     let totalParsedCount = 0;
+                    let tempTeacherList = []; // PERBAIKAN: Array khusus agar bisa di-sort berdasarkan nomor urut di file
                     
+                    // PASS 1: BACA TABEL KODE & NAMA GURU SECARA KETAT
+                    workbook.SheetNames.forEach(sheetName => {
+                        const ws = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                        if (!rows || rows.length === 0) return;
+                        
+                        const isCodeSheet = sheetName.toUpperCase().includes('KODE') || sheetName.toUpperCase().includes('GURU');
+                        
+                        for (let r = 0; r < rows.length; r++) {
+                            const row = rows[r];
+                            if (!row || row.length === 0) continue;
+                            
+                            let codeCol = -1;
+                            for (let c = 0; c < row.length; c++) {
+                                const val = String(row[c] || "").trim().toUpperCase();
+                                if (val === 'NO. KODE' || val === 'NO KODE' || val === 'KODE GURU' || val === 'KODE' || val === 'NO.') {
+                                    codeCol = c;
+                                    break;
+                                }
+                            }
+                            
+                            if (codeCol !== -1) {
+                                // Ketemu tabel dengan header yang jelas
+                                for (let rNext = r + 1; rNext < rows.length; rNext++) {
+                                    const rRow = rows[rNext];
+                                    if (!rRow) continue;
+                                    const codeRaw = String(rRow[codeCol] || '').trim();
+                                    
+                                    if (codeRaw.match(/^\d+$/)) {
+                                        const nameRaw = String(rRow[codeCol + 1] || rRow[codeCol + 2] || '').trim();
+                                        let mapelRaw = '';
+                                        for (let offset = 2; offset <= 5; offset++) {
+                                            const candidate = String(rRow[codeCol + offset] || '').trim();
+                                            if (candidate && !candidate.match(/^\d+$/) && !candidate.includes('19') && candidate.length > 2) {
+                                                if (!candidate.toUpperCase().includes('NIP') && !candidate.toUpperCase().includes('NUPTK')) {
+                                                    mapelRaw = candidate;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (nameRaw && !nameRaw.toUpperCase().includes('NAMA GURU') && !nameRaw.match(/^\d+$/)) {
+                                            const codeNum = parseInt(codeRaw, 10);
+                                            teacherCodeMap[codeRaw] = { name: nameRaw, subject: mapelRaw || 'Mata Pelajaran' };
+                                            if (!tempTeacherList.find(t => t.code === codeNum)) {
+                                                tempTeacherList.push({code: codeNum, name: nameRaw});
+                                            }
+                                        }
+                                    }
+                                }
+                            } else if (isCodeSheet) {
+                                // Fallback deteksi baris jika nama sheet "KODE" tanpa header eksplisit
+                                let cRaw = String(row[0] || row[1] || '').trim();
+                                if (cRaw.match(/^\d+$/)) {
+                                    let cOffset = (row[0] == cRaw) ? 0 : 1;
+                                    let nRaw = String(row[cOffset + 1] || row[cOffset + 2] || '').trim();
+                                    let mRaw = String(row[cOffset + 2] || row[cOffset + 3] || '').trim();
+                                    
+                                    if (nRaw && !nRaw.toUpperCase().includes('NAMA') && !nRaw.match(/^\d+$/)) {
+                                        const codeNum = parseInt(cRaw, 10);
+                                        teacherCodeMap[cRaw] = { name: nRaw, subject: mRaw || 'Mata Pelajaran' };
+                                        if (!tempTeacherList.find(t => t.code === codeNum)) {
+                                            tempTeacherList.push({code: codeNum, name: nRaw});
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // PERBAIKAN: Menimpa master data guru agar urutannya SAMA PERSIS dengan nomor (kode) di file Excel
+                    if (tempTeacherList.length > 0) {
+                        tempTeacherList.sort((a, b) => a.code - b.code);
+                        teacherList = tempTeacherList.map(t => t.name);
+                    }
+
                     workbook.SheetNames.forEach(sheetName => {
                         const ws = workbook.Sheets[sheetName];
                         const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
