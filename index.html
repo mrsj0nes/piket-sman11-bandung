@@ -1347,10 +1347,23 @@
             const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
             const todayDay = getDayNameID(dateObj);
             
+            // FIX: Jika weekend, gunakan hari Senin agar tetap bisa di-test
+            let activeDay = todayDay;
+            if (activeDay === 'Sabtu' || activeDay === 'Minggu') activeDay = 'Senin';
+            
             if (!mengaji36Logs[todayKey]) {
                 mengaji36Logs[todayKey] = {};
                 ALL_CLASSES.forEach(cls => {
-                    const presetTeacher = masterJadwalMengaji[todayDay]?.[cls] || '';
+                    let presetTeacher = masterJadwalMengaji[activeDay]?.[cls];
+                    
+                    // FIX & FITUR BARU: Ambil otomatis dari Jadwal KBM Jam Ke-1 jika Master Mengaji kosong
+                    if (!presetTeacher) {
+                        const kbmDayData = jadwalKBM[activeDay] || [];
+                        const kbmJam1 = kbmDayData.find(x => cleanClassName(x.class) === cleanClassName(cls) && parseInt(x.hour) === 1);
+                        if (kbmJam1) presetTeacher = kbmJam1.teacher;
+                    }
+                    
+                    presetTeacher = presetTeacher || '';
                     mengaji36Logs[todayKey][cls] = { teacher: presetTeacher, present: true };
                 });
             }
@@ -1437,9 +1450,22 @@
                 const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
                 const todayDay = getDayNameID(dateObj);
                 
+                // FIX: Jika weekend, gunakan hari Senin
+                let activeDay = todayDay;
+                if (activeDay === 'Sabtu' || activeDay === 'Minggu') activeDay = 'Senin';
+                
                 mengaji36Logs[todayKey] = {};
                 ALL_CLASSES.forEach(cls => {
-                    const presetTeacher = masterJadwalMengaji[todayDay]?.[cls] || '';
+                    let presetTeacher = masterJadwalMengaji[activeDay]?.[cls];
+                    
+                    // FIX & FITUR BARU: Ambil otomatis dari Jadwal KBM Jam Ke-1
+                    if (!presetTeacher) {
+                        const kbmDayData = jadwalKBM[activeDay] || [];
+                        const kbmJam1 = kbmDayData.find(x => cleanClassName(x.class) === cleanClassName(cls) && parseInt(x.hour) === 1);
+                        if (kbmJam1) presetTeacher = kbmJam1.teacher;
+                    }
+                    
+                    presetTeacher = presetTeacher || '';
                     mengaji36Logs[todayKey][cls] = { teacher: presetTeacher, present: true };
                 });
                 
