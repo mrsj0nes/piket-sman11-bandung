@@ -861,7 +861,7 @@
                 <h3 id="modal-quick-student-title" class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-user-plus text-amber-500"></i> Catat Presensi Siswa (Banyak Siswa)
                 </h3>
-                <button onclick="closeQuickStudentModal()" class="text-slate-400 hover:text-slate-600 text-base">
+                <button type="button" onclick="closeQuickStudentModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -937,7 +937,7 @@
                 <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-user-xmark text-rose-500"></i> Catat Ketidakhadiran Guru (Banyak Guru)
                 </h3>
-                <button onclick="closeQuickTeacherModal()" class="text-slate-400 hover:text-slate-600 text-base">
+                <button type="button" onclick="closeQuickTeacherModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1013,7 +1013,7 @@
                     <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Atur Master Jadwal Baku Mengaji (Senin - Jumat)</h3>
                     <p class="text-[11px] text-slate-500">Jadwal guru pendamping mengaji akan tersimpan permanen untuk setiap hari kerja</p>
                 </div>
-                <button onclick="closeMasterJadwalModal()" class="text-slate-400 hover:text-slate-600 text-base">
+                <button type="button" onclick="closeMasterJadwalModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1042,7 +1042,7 @@
                 <h3 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-bolt text-yellow-500"></i> Pengaturan Firebase Realtime Sync
                 </h3>
-                <button onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600 text-base">
+                <button type="button" onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600 text-base">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1063,7 +1063,7 @@
     <!-- MODAL EXCEL IMPORT -->
     <div id="excel-import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-4 relative">
-            <button onclick="closeExcelImportModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+            <button type="button" onclick="closeExcelImportModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             <div class="flex items-center gap-3 border-b pb-3">
@@ -1086,8 +1086,8 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 border-t pt-4">
-                <button onclick="closeExcelImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Batal</button>
-                <button onclick="processExcelUpload()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">Proses & Simpan Jadwal</button>
+                <button type="button" onclick="closeExcelImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Batal</button>
+                <button type="button" onclick="processExcelUpload()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">Proses & Simpan Jadwal</button>
             </div>
         </div>
     </div>
@@ -1095,7 +1095,7 @@
     <!-- MODAL EDIT CELL DATA -->
     <div id="modal-edit-cell" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-5 space-y-4 relative">
-            <button onclick="closeEditCellModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+            <button type="button" onclick="closeEditCellModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             <div class="flex items-center gap-3 border-b pb-3">
@@ -1210,8 +1210,6 @@
         let currentScheduleViewMode = 'table';
         let batchQueue = [];
         let teacherBatchQueue = [];
-
-        // Global variables for edit cell modal
         let currentEditCellContext = null;
 
         function seedDefaultJadwalKBM() {
@@ -1227,10 +1225,8 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Firebase Setup... ---
         async function setupFirebase() {
             // BUG FIX: Blokir di bawah ini hanya akan aktif jika Anda menggunakan apiKey berbunyi "KODE_ASLI_ANDA_XXXXX" 
-            // yang ada di dalam file panduan_firebase.md. Kunci "AIzaSy..." asli Anda sekarang akan diizinkan.
             if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('KODE_ASLI_ANDA')) {
                 updateCloudStatusBadge(false, "Offline Mode (Local)");
                 return;
@@ -1255,7 +1251,6 @@
                         const data = snapshot.data();
                         isRemoteUpdate = true;
 
-                        // Terapkan deduplikasi saat menerima pembaruan dari Firebase
                         if (data.teacherList) teacherList = deduplicateList(data.teacherList);
                         if (data.studentMasterData) studentMasterData = data.studentMasterData;
                         if (data.masterJadwalMengaji) masterJadwalMengaji = data.masterJadwalMengaji;
@@ -1342,7 +1337,6 @@
             setInterval(updateLiveHourDisplay, 60000);
         };
 
-        // --- STREAMING_CHUNK:UI Rendering Functions... ---
         window.renderMengaji36Grid = function() {
             const container = document.getElementById('mengaji-36-grid-container');
             if (!container) return;
@@ -1625,7 +1619,6 @@
             }).join('');
         }
 
-        // --- STREAMING_CHUNK:Cards and Utilites... ---
         function renderScheduleCards(filteredData) {
             const container = document.getElementById('schedule-class-cards-grid');
             if (!container) return;
@@ -1812,7 +1805,6 @@
             const activeTabSection = document.getElementById(`tab-${tabId}`);
             if (activeTabSection) activeTabSection.classList.remove('hidden');
 
-            // --- Update Breadcrumb / Indikator Halaman ---
             const tabIndicator = document.getElementById('active-tab-indicator');
             if (tabIndicator) {
                 const tabTitles = {
@@ -1831,7 +1823,6 @@
                     tabIndicator.innerHTML = tabTitles[tabId];
                 }
             }
-            // ---------------------------------------------
             
             if (tabId === 'home') renderScheduleGrid();
             if (tabId === 'rekap-mengaji') renderRekapMengaji();
@@ -1922,7 +1913,6 @@
             setTimeout(() => location.reload(), 1000);
         };
 
-        // --- STREAMING_CHUNK:Event Handlers... ---
         function renderTeacherAbsenceList() {
             const container = document.getElementById('absence-list-container');
             const emptyState = document.getElementById('absence-empty-state');
@@ -2136,7 +2126,6 @@
             pushToCloud();
         };
 
-        // --- STREAMING_CHUNK:Student absence handling... ---
         function renderStudentAbsenceTable() {
             const tbody = document.getElementById('siswa-detail-table-body');
             const emptyState = document.getElementById('siswa-detail-empty');
@@ -2484,7 +2473,6 @@
             pushToCloud();
         };
 
-        // --- STREAMING_CHUNK:Rekap & Master Data Logic... ---
         window.renderRekapMengaji = function() {
             const monthStr = document.getElementById('month-select-mengaji').value;
             if (!monthStr) return;
@@ -2830,7 +2818,6 @@
             );
         };
 
-        // --- STREAMING_CHUNK:Edit Cell Modal Logic... ---
         window.openEditCellModal = function(type, name, dateKey, className) {
             currentEditCellContext = { type, name, dateKey, className };
             const modal = document.getElementById('modal-edit-cell');
@@ -2859,7 +2846,6 @@
                     <option value="Absen">Absen (X)</option>
                 `;
 
-                // Find current state
                 let currentState = "Hadir";
                 const dayLog = mengaji36Logs[dateKey];
                 if (dayLog) {
@@ -2947,7 +2933,7 @@
                      if (dayLog) {
                          Object.keys(dayLog).forEach(cls => {
                              if (dayLog[cls].teacher === name) {
-                                 dayLog[cls].present = true; // Set to default (Hadir)
+                                 dayLog[cls].present = true;
                              }
                          });
                      }
@@ -2983,7 +2969,6 @@
             const extraVal = document.getElementById('edit-cell-extra-input').value.trim();
             
             if (newStatus === 'Hadir' && type !== 'mengaji') {
-                // Same as delete
                 deleteCellData();
                 return;
             }
@@ -2997,7 +2982,6 @@
                         foundScheduled = true;
                     }
                 });
-                // If not found in scheduled classes, we can't really set presence. We assume it's set properly via scheduling.
                 if(!foundScheduled && newStatus === 'Absen'){
                      showToast('Peringatan: Guru ini tidak dijadwalkan mengaji pada tanggal ini. Harap atur jadwal terlebih dahulu.');
                      return;
@@ -3008,10 +2992,8 @@
 
             } else if (type === 'presensi_guru') {
                 if (!absenceLogs[dateKey]) absenceLogs[dateKey] = [];
-                // Remove existing
                 absenceLogs[dateKey] = absenceLogs[dateKey].filter(x => x.teacher !== name);
                 
-                // Parse extra
                 let jam = '';
                 let penanggulangan = '';
                 if (extraVal.includes('|')) {
@@ -3033,7 +3015,6 @@
                 renderRekapPresensi();
 
             } else if (type === 'siswa') {
-                // Remove existing first
                 studentAbsenceList = studentAbsenceList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
                 studentLateList = studentLateList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
                 studentEarlyList = studentEarlyList.filter(x => !(x.date === dateKey && cleanClassName(x.class) === className && x.name === name));
@@ -3198,7 +3179,7 @@
 
         window.editTeacherMaster = function(index) {
             const oldName = teacherList[index];
-            const newName = prompt("Ubah Nama Guru (Penting: Mengubah nama di sini tidak akan otomatis mengubah nama di data rekap sebelumnya):", oldName);
+            const newName = prompt("Ubah Nama Guru (Penting: Mengubah nama di sini tidak otomatis mengubah nama di rekapan lama):", oldName);
             if (newName && newName.trim() && newName.trim() !== oldName) {
                 const cleanName = newName.trim();
                 if (!teacherList.includes(cleanName)) {
@@ -3208,70 +3189,73 @@
                     showToast('Nama guru berhasil diperbarui!');
                     pushToCloud();
                 } else {
-                    showToast('Gagal! Nama guru tersebut sudah terdaftar.');
-                }
-            }
-        };
-
-        window.openAddTeacherModal = function() {
-            const name = prompt("Masukkan Nama Lengkap Guru Baru (beserta Gelar):");
-            if (name && name.trim()) {
-                const cleanName = name.trim();
-                // Cegah penambahan jika nama sudah ada
-                if (!teacherList.includes(cleanName)) {
-                    teacherList.push(cleanName);
-                    localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                    renderMasterTeacherList();
-                    showToast('Guru baru berhasil ditambahkan!');
-                    pushToCloud();
-                } else {
-                    showToast('Nama guru tersebut sudah terdaftar di master data!');
+                    showToast('Nama guru sudah ada di master!');
                 }
             }
         };
 
         window.removeTeacherMaster = function(index) {
-            showConfirmModal("Hapus Guru", "Hapus guru ini dari daftar master?", () => {
+            showConfirmModal("Hapus Guru", "Hapus guru ini dari master data?", () => {
                 teacherList.splice(index, 1);
                 localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                 renderMasterTeacherList();
-                showToast('Guru berhasil dihapus!');
+                showToast('Guru dihapus dari master!');
                 pushToCloud();
             });
         };
 
-        let pendingPinCallback = null;
+        window.openAddTeacherModal = function() {
+            const newName = prompt("Masukkan Nama Guru Baru:");
+            if (newName && newName.trim()) {
+                const cleanName = newName.trim();
+                if (!teacherList.includes(cleanName)) {
+                    teacherList.push(cleanName);
+                    localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                    renderMasterTeacherList();
+                    showToast('Guru baru ditambahkan!');
+                    pushToCloud();
+                } else {
+                    showToast('Nama guru sudah ada di master!');
+                }
+            }
+        };
+
+        window.filterTable = function(tbodyId, val) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            const query = val.toLowerCase();
+            const rows = tbody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.innerText.toLowerCase().includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        };
+
         window.openPinModal = function(callback) {
-            pendingPinCallback = callback;
-            document.getElementById('input-pin-code').value = '';
             document.getElementById('modal-pin-auth').classList.remove('hidden');
+            document.getElementById('input-pin-code').value = '';
+            document.getElementById('input-pin-code').focus();
+            window._pinSuccessCallback = callback;
         };
 
         window.closePinModal = function() {
             document.getElementById('modal-pin-auth').classList.add('hidden');
-            pendingPinCallback = null;
         };
 
         window.verifyPinCode = function() {
-            const input = document.getElementById('input-pin-code').value.trim();
-            if (input === DEFAULT_PIN) {
+            const pin = document.getElementById('input-pin-code').value;
+            if (pin === DEFAULT_PIN) {
                 isAdminUnlocked = true;
                 updateAdminStatusBadge();
                 closePinModal();
-                showToast('Akses Rekapitulasi Terbuka!');
-                if (pendingPinCallback) pendingPinCallback();
+                showToast('Akses Admin Dibuka!');
+                if (window._pinSuccessCallback) window._pinSuccessCallback();
             } else {
-                showToast('Kode PIN Salah!');
-            }
-        };
-
-        window.handleAdminBadgeClick = function() {
-            if (isAdminUnlocked) {
-                isAdminUnlocked = false;
-                updateAdminStatusBadge();
-                showToast('Rekapitulasi terkunci kembali.');
-            } else {
-                openPinModal(null);
+                showToast('PIN Salah!');
             }
         };
 
@@ -3280,391 +3264,142 @@
             const icon = document.getElementById('admin-status-icon');
             const text = document.getElementById('admin-status-text');
             if (!badge) return;
-            
             if (isAdminUnlocked) {
-                badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
-                icon.className = "fa-solid fa-lock-open text-xs";
-                text.innerText = "Rekap Terbuka";
+                badge.className = "cursor-pointer flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
+                icon.className = "fa-solid fa-unlock text-xs";
+                text.innerText = "Rekap Terbuka (Admin)";
             } else {
                 badge.className = "cursor-pointer flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow transition";
                 icon.className = "fa-solid fa-lock text-xs";
                 text.innerText = "Rekap Terkunci";
             }
         }
+        window.handleAdminBadgeClick = function() {
+            if (isAdminUnlocked) {
+                isAdminUnlocked = false;
+                updateAdminStatusBadge();
+                switchTab('home');
+                showToast('Akses Admin Dikunci!');
+            } else {
+                openPinModal();
+            }
+        };
 
-        let pendingConfirmYesCallback = null;
-        function showConfirmModal(title, msg, onYes) {
+        window.showConfirmModal = function(title, msg, onConfirm) {
             document.getElementById('confirm-dialog-title').innerText = title;
             document.getElementById('confirm-dialog-msg').innerText = msg;
-            pendingConfirmYesCallback = onYes;
             document.getElementById('modal-confirm-dialog').classList.remove('hidden');
-        }
-
-        window.closeConfirmModal = function(isYes) {
+            window._confirmCallback = onConfirm;
+        };
+        window.closeConfirmModal = function(confirm) {
             document.getElementById('modal-confirm-dialog').classList.add('hidden');
-            if (isYes && pendingConfirmYesCallback) {
-                pendingConfirmYesCallback();
+            if (confirm && window._confirmCallback) {
+                window._confirmCallback();
             }
-            pendingConfirmYesCallback = null;
+        };
+
+        window.exportToExcel = function(type) {
+            if (typeof XLSX === 'undefined') {
+                showToast('Library Excel belum dimuat!');
+                return;
+            }
+            let tableId = '';
+            let fileName = '';
+            if (type === 'mengaji') { tableId = 'table-rekap-mengaji'; fileName = 'Rekap_Mengaji_Guru.xlsx'; }
+            else if (type === 'presensi') { tableId = 'table-rekap-presensi'; fileName = 'Rekap_Presensi_Guru.xlsx'; }
+            else if (type === 'siswa') { tableId = 'table-rekap-siswa'; fileName = 'Rekap_Presensi_Siswa.xlsx'; }
+            
+            const table = document.getElementById(tableId);
+            if (table) {
+                const wb = XLSX.utils.table_to_book(table, {sheet: "Sheet1"});
+                XLSX.writeFile(wb, fileName);
+            }
+        };
+        
+        window.printFormMengajiHarian = function() {
+            document.body.classList.add('print-mengaji-only');
+            const tbody = document.getElementById('print-form-mengaji-body');
+            tbody.innerHTML = '';
+            let classes = ALL_CLASSES;
+            let rowsHtml = '';
+            
+            for(let i=0; i<classes.length; i+=3) {
+                let row = '<tr>';
+                for(let j=0; j<3; j++) {
+                    if (i+j < classes.length) {
+                        let cls = classes[i+j];
+                        row += `<td class="border border-black p-1">${i+j+1}</td>
+                                <td class="border border-black p-1 font-bold">${cls}</td>
+                                <td class="border border-black p-1"></td>
+                                <td class="border border-black p-1"></td>`;
+                    } else {
+                        row += `<td class="border border-black p-1"></td><td class="border border-black p-1"></td><td class="border border-black p-1"></td><td class="border border-black p-1"></td>`;
+                    }
+                }
+                row += '</tr>';
+                rowsHtml += row;
+            }
+            tbody.innerHTML = rowsHtml;
+            
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('print-mengaji-only');
+            }, 1000);
+        };
+
+        window.openExcelImportModal = function() {
+            document.getElementById('excel-import-modal').classList.remove('hidden');
+        };
+        window.closeExcelImportModal = function() {
+            document.getElementById('excel-import-modal').classList.add('hidden');
+        };
+        window.processExcelUpload = function() {
+             showToast('Fitur upload Excel sedang dalam pengembangan. Gunakan format tabel untuk sementara.');
+             closeExcelImportModal();
         };
 
         window.openMasterJadwalModal = function() {
             document.getElementById('modal-master-jadwal').classList.remove('hidden');
             renderMasterJadwalDayForm();
         };
-
         window.closeMasterJadwalModal = function() {
             document.getElementById('modal-master-jadwal').classList.add('hidden');
         };
-
         window.renderMasterJadwalDayForm = function() {
             const day = document.getElementById('select-master-day').value;
             const container = document.getElementById('master-jadwal-day-form-container');
-            if (!container) return;
             container.innerHTML = '';
             
-            const daySchedule = masterJadwalMengaji[day] || {};
             ALL_CLASSES.forEach(cls => {
-                const currentTeacher = daySchedule[cls] || '';
+                const currentTeacher = masterJadwalMengaji[day]?.[cls] || '';
                 const div = document.createElement('div');
-                div.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2";
+                div.className = "p-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2";
                 div.innerHTML = `
-                    <span class="font-bold text-xs text-slate-700 w-16">${cls}</span>
-                    <select id="master-schedule-select-${cls.replace(/\s+/g, '-')}" class="flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium">
+                    <span class="font-bold text-slate-700 text-xs w-12">${cls}</span>
+                    <select class="master-jadwal-select w-full text-[10px] p-1 border border-slate-300 rounded" data-class="${cls}">
                         <option value="">-- Kosong --</option>
-                        ${teacherList.map(t => `<option value="${t}" ${t === currentTeacher ? 'selected' : ''}>${t}</option>`).join('')}
+                        ${teacherList.map(t => `<option value="${t}" ${t===currentTeacher ? 'selected':''}>${t}</option>`).join('')}
                     </select>
                 `;
                 container.appendChild(div);
             });
         };
-
         window.saveMasterJadwalDayForm = function() {
             const day = document.getElementById('select-master-day').value;
-            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
+            const selects = document.querySelectorAll('.master-jadwal-select');
             
-            ALL_CLASSES.forEach(cls => {
-                const sel = document.getElementById(`master-schedule-select-${cls.replace(/\s+/g, '-')}`);
-                if (sel) masterJadwalMengaji[day][cls] = sel.value;
+            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
+            selects.forEach(sel => {
+                const cls = sel.getAttribute('data-class');
+                masterJadwalMengaji[day][cls] = sel.value;
             });
             
             localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
-            closeMasterJadwalModal();
-            showToast(`Master jadwal mengaji hari ${day} berhasil disimpan!`);
-            resetToMasterSchedule();
+            showToast(`Jadwal Baku ${day} berhasil disimpan!`);
             pushToCloud();
+            closeMasterJadwalModal();
         };
 
-        window.exportToExcel = function(type) {
-            let tableId = '';
-            let filename = '';
-            if (type === 'mengaji') { tableId = 'table-rekap-mengaji'; filename = 'Rekap_Mengaji_Bulanan.xlsx'; }
-            if (type === 'presensi') { tableId = 'table-rekap-presensi'; filename = 'Rekap_Presensi_Guru_Bulanan.xlsx'; }
-            if (type === 'siswa') { tableId = 'table-rekap-siswa'; filename = 'Rekap_Presensi_Siswa_Periode.xlsx'; }
-            
-            const table = document.getElementById(tableId);
-            if (!table) return;
-            
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Rekap" });
-            XLSX.writeFile(wb, filename);
-            showToast(`File Excel (${filename}) berhasil diunduh!`);
-        };
-
-        window.filterTable = function(tbodyId, query) {
-            const tbody = document.getElementById(tbodyId);
-            if (!tbody) return;
-            const q = query.toLowerCase();
-            const rows = tbody.getElementsByTagName('tr');
-            
-            for (let i = 0; i < rows.length; i++) {
-                const text = rows[i].innerText.toLowerCase();
-                if (text.includes(q)) {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        };
-
-        window.printFormMengajiHarian = function() {
-            const tbody = document.getElementById('print-form-mengaji-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            
-            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
-            const todayLog = mengaji36Logs[todayKey] || {};
-            
-            for (let i = 0; i < 12; i++) {
-                const clsX = ALL_CLASSES[i];
-                const clsXI = ALL_CLASSES[i + 12];
-                const clsXII = ALL_CLASSES[i + 24];
-                
-                const logX = todayLog[clsX] || { teacher: "", present: true };
-                const logXI = todayLog[clsXI] || { teacher: "", present: true };
-                const logXII = todayLog[clsXII] || { teacher: "", present: true };
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="border border-black p-1">${i+1}</td>
-                    <td class="border border-black p-1 font-bold">${clsX}</td>
-                    <td class="border border-black p-1 text-left">${logX.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logX.present ? '✓' : 'X'}</td>
-                    <td class="border border-black p-1 font-bold">${clsXI}</td>
-                    <td class="border border-black p-1 text-left">${logXI.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logXI.present ? '✓' : 'X'}</td>
-                    <td class="border border-black p-1 font-bold">${clsXII}</td>
-                    <td class="border border-black p-1 text-left">${logXII.teacher || '-'}</td>
-                    <td class="border border-black p-1 font-bold">${logXII.present ? '✓' : 'X'}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-            
-            document.body.classList.add('print-mengaji-only');
-            window.print();
-            setTimeout(() => { document.body.classList.remove('print-mengaji-only'); }, 500);
-        };
-
-        window.openExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.remove('hidden');
-        };
-
-        window.closeExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.add('hidden');
-        };
-
-        window.processExcelUpload = function() {
-            const fileInput = document.getElementById('excel-file-input');
-            const file = fileInput?.files?.[0];
-            if (!file) {
-                showToast('Pilih file Excel jadwal terlebih dahulu!');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-                    let newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
-                    let teacherCodeMap = {}; 
-                    let totalParsedCount = 0;
-                    let tempTeacherList = []; // PERBAIKAN: Array khusus agar bisa di-sort berdasarkan nomor urut di file
-                    
-                    // PASS 1: BACA TABEL KODE & NAMA GURU SECARA KETAT
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (!rows || rows.length === 0) return;
-                        
-                        const isCodeSheet = sheetName.toUpperCase().includes('KODE') || sheetName.toUpperCase().includes('GURU');
-                        
-                        for (let r = 0; r < rows.length; r++) {
-                            const row = rows[r];
-                            if (!row || row.length === 0) continue;
-                            
-                            let codeCol = -1;
-                            for (let c = 0; c < row.length; c++) {
-                                const val = String(row[c] || "").trim().toUpperCase();
-                                if (val === 'NO. KODE' || val === 'NO KODE' || val === 'KODE GURU' || val === 'KODE' || val === 'NO.') {
-                                    codeCol = c;
-                                    break;
-                                }
-                            }
-                            
-                            if (codeCol !== -1) {
-                                // Ketemu tabel dengan header yang jelas
-                                for (let rNext = r + 1; rNext < rows.length; rNext++) {
-                                    const rRow = rows[rNext];
-                                    if (!rRow) continue;
-                                    const codeRaw = String(rRow[codeCol] || '').trim();
-                                    
-                                    if (codeRaw.match(/^\d+$/)) {
-                                        const nameRaw = String(rRow[codeCol + 1] || rRow[codeCol + 2] || '').trim();
-                                        let mapelRaw = '';
-                                        for (let offset = 2; offset <= 5; offset++) {
-                                            const candidate = String(rRow[codeCol + offset] || '').trim();
-                                            if (candidate && !candidate.match(/^\d+$/) && !candidate.includes('19') && candidate.length > 2) {
-                                                if (!candidate.toUpperCase().includes('NIP') && !candidate.toUpperCase().includes('NUPTK')) {
-                                                    mapelRaw = candidate;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if (nameRaw && !nameRaw.toUpperCase().includes('NAMA GURU') && !nameRaw.match(/^\d+$/)) {
-                                            const codeNum = parseInt(codeRaw, 10);
-                                            teacherCodeMap[codeRaw] = { name: nameRaw, subject: mapelRaw || 'Mata Pelajaran' };
-                                            if (!tempTeacherList.find(t => t.code === codeNum)) {
-                                                tempTeacherList.push({code: codeNum, name: nameRaw});
-                                            }
-                                        }
-                                    }
-                                }
-                            } else if (isCodeSheet) {
-                                // Fallback deteksi baris jika nama sheet "KODE" tanpa header eksplisit
-                                let cRaw = String(row[0] || row[1] || '').trim();
-                                if (cRaw.match(/^\d+$/)) {
-                                    let cOffset = (row[0] == cRaw) ? 0 : 1;
-                                    let nRaw = String(row[cOffset + 1] || row[cOffset + 2] || '').trim();
-                                    let mRaw = String(row[cOffset + 2] || row[cOffset + 3] || '').trim();
-                                    
-                                    if (nRaw && !nRaw.toUpperCase().includes('NAMA') && !nRaw.match(/^\d+$/)) {
-                                        const codeNum = parseInt(cRaw, 10);
-                                        teacherCodeMap[cRaw] = { name: nRaw, subject: mRaw || 'Mata Pelajaran' };
-                                        if (!tempTeacherList.find(t => t.code === codeNum)) {
-                                            tempTeacherList.push({code: codeNum, name: nRaw});
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // PERBAIKAN: Menimpa master data guru agar urutannya SAMA PERSIS dengan nomor (kode) di file Excel
-                    if (tempTeacherList.length > 0) {
-                        tempTeacherList.sort((a, b) => a.code - b.code);
-                        teacherList = tempTeacherList.map(t => t.name);
-                    }
-
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (!rows || rows.length === 0) return;
-                        
-                        for (let r = 0; r < rows.length; r++) {
-                            const row = rows[r];
-                            if (!row || row.length === 0) continue;
-                            for (let c = 0; c < row.length; c++) {
-                                const val = String(row[c] || "").trim().toUpperCase();
-                                if (val === 'NO. KODE' || val === 'NO KODE' || val === 'KODE GURU' || val === 'NO.') {
-                                    for (let rNext = r + 1; rNext < rows.length; rNext++) {
-                                        const rRow = rows[rNext];
-                                        if (!rRow) continue;
-                                        const codeRaw = String(rRow[c] || '').trim();
-                                        const nameRaw = String(rRow[c + 1] || rRow[c + 2] || '').trim();
-                                        let mapelRaw = '';
-                                        for (let offset = 2; offset <= 5; offset++) {
-                                            const candidate = String(rRow[c + offset] || '').trim();
-                                            if (candidate && !candidate.match(/^\d+$/) && !candidate.includes('19') && candidate.length > 2) {
-                                                if (!candidate.toUpperCase().includes('NIP') && !candidate.toUpperCase().includes('NUPTK')) {
-                                                    mapelRaw = candidate;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if (codeRaw && nameRaw && !nameRaw.toUpperCase().includes('NAMA GURU') && codeRaw.match(/^\d+$/)) {
-                                            teacherCodeMap[codeRaw] = { name: nameRaw, subject: mapelRaw || 'Mata Pelajaran' };
-                                            if (!teacherList.includes(nameRaw)) teacherList.push(nameRaw);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    workbook.SheetNames.forEach(sheetName => {
-                        const ws = workbook.Sheets[sheetName];
-                        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                        if (!rows || rows.length === 0) return;
-                        
-                        let currentDay = days.find(d => sheetName.toLowerCase().includes(d.toLowerCase())) || 'Senin';
-                        let colToClassMap = {};
-                        
-                        for (let r = 0; r < rows.length; r++) {
-                            const row = rows[r];
-                            if (!row || row.length === 0) continue;
-                            
-                            const rowFirstText = String(row[0] || row[1] || row[2] || '').trim().toUpperCase();
-                            const matchedDay = days.find(d => rowFirstText === d.toUpperCase() || rowFirstText === `HARI ${d.toUpperCase()}`);
-                            if (matchedDay) currentDay = matchedDay;
-                            
-                            let currentGradePrefix = "";
-                            for (let c = 0; c < row.length; c++) {
-                                const cellVal = String(row[c] || '').trim();
-                                if (cellVal.toUpperCase().includes('KELAS X') || cellVal.toUpperCase() === 'KELAS 10') {
-                                    currentGradePrefix = cellVal.toUpperCase().includes('XI') ? (cellVal.toUpperCase().includes('XII') ? 'XII ' : 'XI ') : 'X ';
-                                } else if (cellVal.toUpperCase().includes('KELAS XI')) {
-                                    currentGradePrefix = 'XI ';
-                                } else if (cellVal.toUpperCase().includes('KELAS XII')) {
-                                    currentGradePrefix = 'XII ';
-                                }
-                                
-                                const cleanCls = cleanClassName(cellVal);
-                                if (ALL_CLASSES.includes(cleanCls)) {
-                                    colToClassMap[c] = cleanCls;
-                                } else if (currentGradePrefix && cellVal.match(/^[1-9]$|^1[0-2]$/)) {
-                                    const constructedCls = `${currentGradePrefix}${cellVal}`.trim();
-                                    if (ALL_CLASSES.includes(constructedCls)) colToClassMap[c] = constructedCls;
-                                }
-                            }
-                            
-                            let hourNum = 0;
-                            const hourText = String(row[0] || row[1] || row[2] || '').trim();
-                            const hourMatch = hourText.match(/^([1-9]|10)$/);
-                            if (hourMatch) hourNum = parseInt(hourMatch[1], 10);
-                            
-                            if (hourNum >= 1 && hourNum <= 10 && Object.keys(colToClassMap).length > 0) {
-                                const times = ['07.15-08.00', '08.00-08.45', '08.45-09.30', '09.45 - 10.30', '10.30-11.15', '11.15-12.00', '12.45-13.30', '13.30 - 14.15', '14.15-15.00', '15.00-15.45'];
-                                Object.keys(colToClassMap).forEach(colIdx => {
-                                    const className = colToClassMap[colIdx];
-                                    const cellVal = String(row[colIdx] || "").trim();
-                                    
-                                    if (!cellVal || cellVal === '-' || cellVal.toLowerCase().includes('pembiasaan')) return;
-                                    
-                                    let teacherName = '-';
-                                    let subjectName = 'KBM';
-                                    if (teacherCodeMap[cellVal]) {
-                                        teacherName = teacherCodeMap[cellVal].name;
-                                        subjectName = teacherCodeMap[cellVal].subject;
-                                    } else {
-                                        const codeExtract = cellVal.match(/\b\d+\b/);
-                                        if (codeExtract && teacherCodeMap[codeExtract[0]]) {
-                                            teacherName = teacherCodeMap[codeExtract[0]].name;
-                                            subjectName = teacherCodeMap[codeExtract[0]].subject;
-                                        } else if (teacherList.includes(cellVal)) {
-                                            teacherName = cellVal;
-                                        }
-                                    }
-                                    
-                                    const exists = newJadwalKBM[currentDay].some(x => x.class === className && x.hour === hourNum);
-                                    if (!exists) {
-                                        newJadwalKBM[currentDay].push({
-                                            class: className,
-                                            hour: hourNum,
-                                            time: times[hourNum - 1] || '08.00-08.45',
-                                            subject: subjectName,
-                                            teacher: teacherName
-                                        });
-                                        totalParsedCount++;
-                                    }
-                                });
-                            }
-                        }
-                    });
-
-                    if (totalParsedCount > 0) {
-                        jadwalKBM = newJadwalKBM;
-                        
-                        // Bersihkan duplikat sesaat setelah import Excel selesai
-                        teacherList = deduplicateList(teacherList);
-                        
-                        localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
-                        localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                        renderScheduleGrid();
-                        renderMasterTeacherList();
-                        closeExcelImportModal();
-                        showToast(`Berhasil mengimpor ${totalParsedCount} slot Jadwal KBM!`);
-                        pushToCloud();
-                    } else {
-                        showToast('Gagal memproses file Excel. Silakan pastikan format sesuai.');
-                    }
-                } catch (err) {
-                    console.error("Error processing excel:", err);
-                    showToast('Terjadi kesalahan saat memproses file Excel!');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        };
     </script>
 </body>
 </html>
