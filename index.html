@@ -1153,7 +1153,7 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const DEFAULT_PIN = "112233";
-        const appId = typeof _app_id !== 'undefined' ? _app_id : 'piket-sman11-bandung';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'piket-sman11-bandung';
         
         const DEFAULT_FIREBASE_CONFIG = {
             apiKey: "AIzaSyBwa38sTXQKuo7d7uQQY_I6T9WXWlFsCfw",
@@ -1166,8 +1166,8 @@
 
         let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
         try {
-            if (typeof _firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(_firebase_config);
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
             }
         } catch(e) {}
 
@@ -1235,7 +1235,7 @@
         }
 
         async function setupFirebase() {
-            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('KODE_ASLI_ANDA')) {
+            if (!firebaseConfig || !firebaseConfig.apiKey) {
                 updateCloudStatusBadge(false, "Offline Mode (Local)");
                 return;
             }
@@ -1245,8 +1245,8 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                if (typeof _initial_auth_token !== 'undefined' && _initial_auth_token) {
-                    await signInWithCustomToken(auth, _initial_auth_token);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
