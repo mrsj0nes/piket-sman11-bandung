@@ -1255,6 +1255,7 @@
                 const dataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'piket_app', 'main_doc');
 
                 onSnapshot(dataDocRef, (snapshot) => {
+                    updateCloudStatusBadge(true, "Firebase Realtime Active");
                     if (snapshot.exists()) {
                         const data = snapshot.data();
                         isRemoteUpdate = true;
@@ -1287,6 +1288,9 @@
                         renderScheduleGrid();
 
                         setTimeout(() => { isRemoteUpdate = false; }, 200);
+                    } else {
+                        // Inisialisasi dokumen pertama jika Firestore masih kosong
+                        pushToCloud();
                     }
                 }, (error) => {
                     console.warn("Firestore connection fallback:", error);
@@ -1294,7 +1298,7 @@
                 });
 
             } catch (err) {
-                console.info("Firebase offline fallback mode.");
+                console.info("Firebase offline fallback mode:", err);
                 updateCloudStatusBadge(false, "Offline Mode (Local)");
             }
         }
@@ -1901,23 +1905,36 @@
             document.getElementById('modal-cloud-sync').classList.add('hidden');
         };
 
+        function parseFlexibleConfig(str) {
+            try {
+                return JSON.parse(str);
+            } catch(e) {
+                // Parsing otomatis jika user mempaste format objek JavaScript (tanpa quote di key)
+                const sanitized = str
+                    .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+                    .replace(/'/g, '"');
+                return JSON.parse(sanitized);
+            }
+        }
+
         window.saveCustomFirebaseConfig = function() {
             const raw = document.getElementById('input-firebase-config').value.trim();
             if (raw) {
                 try {
-                    JSON.parse(raw);
-                    localStorage.setItem('piket_custom_firebase_config', raw);
+                    const parsed = parseFlexibleConfig(raw);
+                    const formattedJson = JSON.stringify(parsed, null, 2);
+                    localStorage.setItem('piket_custom_firebase_config', formattedJson);
                     showToast('Konfigurasi Firebase berhasil disimpan! Memuat ulang...');
                     setTimeout(() => location.reload(), 1000);
                 } catch(e) {
-                    showToast('Format JSON Firebase Config Tidak Valid!');
+                    showToast('Format Konfigurasi Firebase Tidak Valid!');
                 }
             }
         };
 
         window.resetFirebaseConfig = function() {
             localStorage.removeItem('piket_custom_firebase_config');
-            showToast('Konfigurasi Firebase direset!');
+            showToast('Konfigurasi Firebase direset ke default!');
             setTimeout(() => location.reload(), 1000);
         };
 
