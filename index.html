@@ -1289,7 +1289,6 @@
 
                         setTimeout(() => { isRemoteUpdate = false; }, 200);
                     } else {
-                        // Inisialisasi dokumen pertama jika Firestore masih kosong
                         pushToCloud();
                     }
                 }, (error) => {
@@ -1597,7 +1596,7 @@
             if (totalMinutes >= 435 && totalMinutes < 480) activeHourNum = 1;
             else if (totalMinutes >= 480 && totalMinutes < 525) activeHourNum = 2;
             else if (totalMinutes >= 525 && totalMinutes < 570) activeHourNum = 3;
-            else if (totalMinutes >= 585 && totalMinutes < 630) activeHourNum = 4;
+            else if (totalMinutes >= 570 && totalMinutes < 630) activeHourNum = 4;
             else if (totalMinutes >= 630 && totalMinutes < 675) activeHourNum = 5;
             else if (totalMinutes >= 675 && totalMinutes < 720) activeHourNum = 6;
             else if (totalMinutes >= 765 && totalMinutes < 810) activeHourNum = 7;
@@ -1653,7 +1652,7 @@
             if (totalMinutes >= 435 && totalMinutes < 480) activeHourNum = 1;
             else if (totalMinutes >= 480 && totalMinutes < 525) activeHourNum = 2;
             else if (totalMinutes >= 525 && totalMinutes < 570) activeHourNum = 3;
-            else if (totalMinutes >= 585 && totalMinutes < 630) activeHourNum = 4;
+            else if (totalMinutes >= 570 && totalMinutes < 630) activeHourNum = 4;
             else if (totalMinutes >= 630 && totalMinutes < 675) activeHourNum = 5;
             else if (totalMinutes >= 675 && totalMinutes < 720) activeHourNum = 6;
             else if (totalMinutes >= 765 && totalMinutes < 810) activeHourNum = 7;
@@ -1866,6 +1865,12 @@
             if (kesiswaanMenu) kesiswaanMenu.classList.add('hidden');
         };
 
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-container')) {
+                closeAllDropdowns();
+            }
+        });
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -1909,7 +1914,6 @@
             try {
                 return JSON.parse(str);
             } catch(e) {
-                // Parsing otomatis jika user mempaste format objek JavaScript (tanpa quote di key)
                 const sanitized = str
                     .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
                     .replace(/'/g, '"');
@@ -3005,7 +3009,7 @@
                     }
                 });
                 if(!foundScheduled && newStatus === 'Absen'){
-                     showToast('Peringatan: Guru ini tidak dijadwalkan mengaji pada tanggal ini. Harap atur jadwal terlebih dahulu.');
+                     showToast('Peringatan: Guru ini tidak dijadwalkan mengaji pada tanggal ini.');
                      return;
                 }
                 mengaji36Logs[dateKey] = dayLog;
@@ -3201,7 +3205,7 @@
 
         window.editTeacherMaster = function(index) {
             const oldName = teacherList[index];
-            const newName = prompt("Ubah Nama Guru (Penting: Mengubah nama di sini tidak otomatis mengubah nama di rekapan lama):", oldName);
+            const newName = prompt("Ubah Nama Guru:", oldName);
             if (newName && newName.trim() && newName.trim() !== oldName) {
                 const cleanName = newName.trim();
                 if (!teacherList.includes(cleanName)) {
@@ -3378,6 +3382,58 @@
             document.getElementById('excel-import-modal').classList.add('hidden');
         };
 
+        // Master Jadwal Mengaji Functions
+        window.openMasterJadwalModal = function() {
+            renderMasterJadwalDayForm();
+            document.getElementById('modal-master-jadwal').classList.remove('hidden');
+        };
+
+        window.closeMasterJadwalModal = function() {
+            document.getElementById('modal-master-jadwal').classList.add('hidden');
+        };
+
+        window.renderMasterJadwalDayForm = function() {
+            const container = document.getElementById('master-jadwal-day-form-container');
+            const day = document.getElementById('select-master-day').value;
+            if (!container) return;
+            container.innerHTML = '';
+
+            const currentDayMap = masterJadwalMengaji[day] || {};
+
+            ALL_CLASSES.forEach(cls => {
+                const selectedTeacher = currentDayMap[cls] || '';
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 p-2 rounded-xl border border-slate-200 flex items-center justify-between gap-2";
+                card.innerHTML = `
+                    <span class="font-extrabold text-xs text-brand-700 w-12 text-center bg-white py-1 px-1.5 rounded border border-slate-200">${cls}</span>
+                    <select data-class="${cls}" class="master-jadwal-select flex-1 text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-medium focus:ring-2 focus:ring-emerald-500">
+                        <option value="">-- Tanpa Guru Mengaji --</option>
+                        ${teacherList.map(t => `<option value="${t}" ${t === selectedTeacher ? 'selected' : ''}>${t}</option>`).join('')}
+                    </select>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        window.saveMasterJadwalDayForm = function() {
+            const day = document.getElementById('select-master-day').value;
+            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
+
+            document.querySelectorAll('.master-jadwal-select').forEach(select => {
+                const cls = select.getAttribute('data-class');
+                const val = select.value;
+                if (cls) {
+                    masterJadwalMengaji[day][cls] = val;
+                }
+            });
+
+            localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
+            pushToCloud();
+            closeMasterJadwalModal();
+            showToast(`Master jadwal mengaji hari ${day} berhasil disimpan!`);
+        };
+
+        // Excel Import Reader Function
         window.processExcelUpload = function() {
             const fileInput = document.getElementById('excel-file-input');
             if (!fileInput.files.length) {
@@ -3389,135 +3445,90 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                
-                let parsedJadwal = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
-                let teacherCodeMap = {};
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const newJadwal = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
+                    const teacherCodeMap = {};
+                    const extractedTeachers = new Set(teacherList);
 
-                if (workbook.SheetNames.length >= 2) {
-                    const sheet2 = workbook.Sheets[workbook.SheetNames[1]];
-                    const sheet2Data = XLSX.utils.sheet_to_json(sheet2, {header: 1});
-                    sheet2Data.forEach((row, rIdx) => {
-                        if (rIdx > 0 && row.length >= 2) {
-                            const code = String(row[0] || '').trim();
-                            const name = String(row[1] || '').trim();
-                            const subject = String(row[2] || '').trim();
-                            if (code) {
-                                teacherCodeMap[code] = { name, subject };
-                                if (name && !teacherList.includes(name)) {
-                                    teacherList.push(name);
+                    // Sheet lookup for teacher codes if 2-sheet format exists
+                    workbook.SheetNames.forEach(sheetName => {
+                        if (sheetName.toLowerCase().includes('kode') || sheetName.toLowerCase().includes('guru')) {
+                            const sheet = workbook.Sheets[sheetName];
+                            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                            json.forEach(row => {
+                                if (row && row.length >= 2) {
+                                    const code = String(row[0] || '').trim();
+                                    const name = String(row[1] || '').trim();
+                                    if (code && name && code.toLowerCase() !== 'kode' && name.toLowerCase() !== 'nama') {
+                                        teacherCodeMap[code] = name;
+                                        extractedTeachers.add(name);
+                                    }
                                 }
-                            }
+                            });
                         }
                     });
-                }
 
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rawRows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                    // Parse main Schedule Sheet(s)
+                    const daysList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonRows = XLSX.utils.sheet_to_json(sheet);
+                        
+                        jsonRows.forEach(row => {
+                            let day = row['Hari'] || row['HARI'] || row['hari'];
+                            if (!day) {
+                                const matchedDay = daysList.find(d => sheetName.toLowerCase().includes(d.toLowerCase()));
+                                if (matchedDay) day = matchedDay;
+                            }
+                            if (!day || !daysList.includes(day)) day = 'Senin';
 
-                if (rawRows.length > 1) {
-                    let dayKeys = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-                    rawRows.forEach((row, rIdx) => {
-                        if (rIdx > 0 && row.length >= 4) {
-                            let day = String(row[0] || '').trim();
-                            let hour = parseInt(row[1] || 1, 10);
-                            let cls = cleanClassName(String(row[2] || ''));
-                            let rawTeacherOrCode = String(row[3] || '').trim();
+                            let hour = parseInt(row['Jam'] || row['Jam Ke'] || row['JAM'] || row['jam'] || row['No'] || 1, 10);
+                            if (isNaN(hour)) hour = 1;
 
-                            let teacherName = rawTeacherOrCode;
-                            let subjectName = String(row[4] || 'Mata Pelajaran').trim();
-
-                            if (teacherCodeMap[rawTeacherOrCode]) {
-                                teacherName = teacherCodeMap[rawTeacherOrCode].name;
-                                if (teacherCodeMap[rawTeacherOrCode].subject) {
-                                    subjectName = teacherCodeMap[rawTeacherOrCode].subject;
-                                }
+                            let timeStr = String(row['Waktu'] || row['WAKTU'] || row['waktu'] || '07.15-08.00').trim();
+                            let clsStr = cleanClassName(String(row['Kelas'] || row['KELAS'] || row['Rombel'] || 'X 1').trim());
+                            let subjectStr = String(row['Mata Pelajaran'] || row['Mapel'] || row['MAPEL'] || 'Pelajaran').trim();
+                            let rawTeacher = String(row['Guru'] || row['Nama Guru'] || row['Kode Guru'] || row['KODE'] || '').trim();
+                            
+                            let teacherName = teacherCodeMap[rawTeacher] || rawTeacher || 'Guru Pengajar';
+                            if (teacherName && teacherName !== 'Guru Pengajar') {
+                                extractedTeachers.add(teacherName);
                             }
 
-                            if (dayKeys.includes(day) && cls) {
-                                parsedJadwal[day].push({
-                                    class: cls,
+                            if (clsStr && newJadwal[day]) {
+                                newJadwal[day].push({
+                                    class: clsStr,
                                     hour: hour,
-                                    time: getTimeForHour(hour),
-                                    subject: subjectName,
+                                    time: timeStr,
+                                    subject: subjectStr,
                                     teacher: teacherName
                                 });
                             }
-                        }
+                        });
                     });
-                }
 
-                jadwalKBM = parsedJadwal;
-                localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
-                localStorage.setItem('piket_teachers', JSON.stringify(deduplicateList(teacherList)));
-                
-                closeExcelImportModal();
-                renderScheduleGrid();
-                renderMasterTeacherList();
-                showToast("File Excel berhasil diproses & Jadwal KBM tersimpan!");
-                pushToCloud();
+                    jadwalKBM = newJadwal;
+                    teacherList = Array.from(extractedTeachers).filter(Boolean);
+                    
+                    localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+                    localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
+                    
+                    renderScheduleGrid();
+                    renderMasterTeacherList();
+                    closeExcelImportModal();
+                    showToast("Jadwal KBM & Master Guru dari Excel berhasil diimport!");
+                    pushToCloud();
+
+                } catch (err) {
+                    console.error("Excel import error:", err);
+                    showToast("Format Excel tidak sesuai / gagal diproses!");
+                }
             };
 
             reader.readAsArrayBuffer(file);
-        };
-
-        function getTimeForHour(hour) {
-            const times = {
-                1: "07.15 - 08.00", 2: "08.00 - 08.45", 3: "08.45 - 09.30",
-                4: "09.45 - 10.30", 5: "10.30 - 11.15", 6: "11.15 - 12.00",
-                7: "12.45 - 13.30", 8: "13.30 - 14.15", 9: "14.15 - 15.00", 10: "15.00 - 15.45"
-            };
-            return times[hour] || "07.15 - 08.00";
-        }
-
-        window.openMasterJadwalModal = function() {
-            renderMasterJadwalDayForm();
-            document.getElementById('modal-master-jadwal').classList.remove('hidden');
-        };
-
-        window.closeMasterJadwalModal = function() {
-            document.getElementById('modal-master-jadwal').classList.add('hidden');
-        };
-
-        window.renderMasterJadwalDayForm = function() {
-            const selectedDay = document.getElementById('select-master-day').value;
-            const container = document.getElementById('master-jadwal-day-form-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const daySchedule = masterJadwalMengaji[selectedDay] || {};
-
-            ALL_CLASSES.forEach(cls => {
-                const currentTeacher = daySchedule[cls] || '';
-                const div = document.createElement('div');
-                div.className = "p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2";
-                div.innerHTML = `
-                    <span class="font-bold text-xs text-slate-700 w-16 shrink-0">${cls}</span>
-                    <select id="master-mengaji-select-${cls}" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-1.5 focus:ring-2 focus:ring-emerald-500">
-                        <option value="">-- Tanpa Guru Pendamping --</option>
-                        ${teacherList.map(t => `<option value="${t}" ${t === currentTeacher ? 'selected' : ''}>${t}</option>`).join('')}
-                    </select>
-                `;
-                container.appendChild(div);
-            });
-        };
-
-        window.saveMasterJadwalDayForm = function() {
-            const selectedDay = document.getElementById('select-master-day').value;
-            if (!masterJadwalMengaji[selectedDay]) masterJadwalMengaji[selectedDay] = {};
-
-            ALL_CLASSES.forEach(cls => {
-                const select = document.getElementById(`master-mengaji-select-${cls}`);
-                if (select) {
-                    masterJadwalMengaji[selectedDay][cls] = select.value;
-                }
-            });
-
-            localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
-            closeMasterJadwalModal();
-            showToast(`Jadwal Baku Mengaji Hari ${selectedDay} Berhasil Disimpan!`);
-            pushToCloud();
         };
     </script>
 </body>
