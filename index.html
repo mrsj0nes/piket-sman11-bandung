@@ -1227,7 +1227,8 @@
                     hour: 1,
                     time: "07.15-08.00",
                     subject: "Matematika",
-                    teacher: "Ahmad Fauzi, S.Pd"
+                    teacher: "Ahmad Fauzi, S.Pd",
+                    code: "AD"
                 }];
                 localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
             }
@@ -1374,7 +1375,6 @@
 
             const totalMinutes = now.getHours() * 60 + now.getMinutes();
 
-            // Based on exact schedule from image
             if (dayName === 'Senin') {
                 if (totalMinutes < 390) hourElem.innerText = "Belum Mulai KBM";
                 else if (totalMinutes >= 390 && totalMinutes < 405) hourElem.innerText = "Pembiasaan Membaca Kitab Suci (06.30 - 06.45)";
@@ -1486,7 +1486,47 @@
                 if (totalMinutes >= 750 && totalMinutes < 790) return 6;
                 if (totalMinutes >= 790 && totalMinutes < 830) return 7;
             }
-            return 0; // Means out of standard KBM hours
+            return 0;
+        }
+
+        // Helper untuk ekstrak Kode Guru, Mapel, dan Nama Guru dari sel jadwal
+        function parseScheduleCell(cellVal, teacherCodes) {
+            const raw = String(cellVal || '').trim();
+            if (!raw) return null;
+
+            if (teacherCodes[raw]) {
+                const info = teacherCodes[raw];
+                return {
+                    code: raw,
+                    teacher: info.name,
+                    subject: info.subject || `Mata Pelajaran (${raw})`
+                };
+            }
+
+            const delimiters = ['-', '/', ':', '(', ')'];
+            for (const delim of delimiters) {
+                if (raw.includes(delim)) {
+                    const parts = raw.split(delim).map(p => p.trim()).filter(Boolean);
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (teacherCodes[part]) {
+                            const info = teacherCodes[part];
+                            const otherParts = parts.filter((_, idx) => idx !== i).join(' ');
+                            return {
+                                code: part,
+                                teacher: info.name,
+                                subject: info.subject || otherParts || `Mapel (${part})`
+                            };
+                        }
+                    }
+                }
+            }
+
+            return {
+                code: raw.length <= 4 ? raw : '',
+                teacher: raw,
+                subject: `Mapel (${raw})`
+            };
         }
 
         function renderScheduleTable(filteredData) {
@@ -1509,8 +1549,11 @@
                         <td class="p-3 text-center font-bold text-brand-700 bg-slate-50/50">${item.hour}</td>
                         <td class="p-3 text-center text-slate-500 font-mono text-[11px]">${item.time}</td>
                         <td class="p-3 text-center font-bold text-slate-800 bg-yellow-50/40 rounded-lg">${item.class}</td>
-                        <td class="p-3 font-semibold text-slate-700">${item.subject}</td>
-                        <td class="p-3 text-slate-800 font-medium">${item.teacher}</td>
+                        <td class="p-3 font-semibold text-slate-700">${item.subject || '-'}</td>
+                        <td class="p-3 text-slate-800 font-medium">
+                            <span>${item.teacher || '-'}</span>
+                            ${item.code ? `<span class="inline-block bg-slate-100 text-brand-700 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 ml-1.5" title="Kode Guru">[${item.code}]</span>` : ''}
+                        </td>
                         <td class="p-3 text-center">
                             ${isActive ? 
                                 `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white animate-pulse">
@@ -1560,8 +1603,11 @@
                         <div class="p-2 text-[11px] ${bgClass} border-b border-slate-100 flex items-center justify-between gap-2">
                             <span class="font-bold text-brand-700 w-12 shrink-0">Jam ${item.hour}</span>
                             <div class="flex-1 min-w-0">
-                                <div class="font-semibold text-slate-800 truncate">${item.subject}</div>
-                                <div class="text-[10px] text-slate-500 truncate">${item.teacher}</div>
+                                <div class="font-semibold text-slate-800 truncate">${item.subject || '-'}</div>
+                                <div class="text-[10px] text-slate-500 truncate">
+                                    ${item.teacher || '-'}
+                                    ${item.code ? `<span class="font-mono text-brand-600 font-bold ml-1">(${item.code})</span>` : ''}
+                                </div>
                             </div>
                             <span class="text-[10px] text-slate-400 font-mono shrink-0">${item.time}</span>
                         </div>
@@ -1585,6 +1631,34 @@
                 container.appendChild(card);
             });
         }
+
+        window.renderScheduleGrid = function() {
+            const searchVal = (document.getElementById('search-schedule-input')?.value || '').toLowerCase();
+            const gradeVal = document.getElementById('filter-schedule-grade')?.value || 'SEMUA';
+            const heading = document.getElementById('schedule-title-heading');
+            const countBadge = document.getElementById('schedule-count-badge');
+
+            if (heading) heading.innerText = `Jadwal Pelajaran Hari ${currentDayFilter}`;
+
+            const dayData = jadwalKBM[currentDayFilter] || [];
+            
+            const filtered = dayData.filter(item => {
+                const matchesGrade = gradeVal === 'SEMUA' || item.class.startsWith(gradeVal);
+                const matchesSearch = item.class.toLowerCase().includes(searchVal) ||
+                                      (item.subject && item.subject.toLowerCase().includes(searchVal)) ||
+                                      (item.teacher && item.teacher.toLowerCase().includes(searchVal)) ||
+                                      (item.code && item.code.toLowerCase().includes(searchVal));
+                return matchesGrade && matchesSearch;
+            });
+
+            if (countBadge) countBadge.innerText = `${filtered.length} Slot Pelajaran`;
+
+            if (currentScheduleViewMode === 'table') {
+                renderScheduleTable(filtered);
+            } else {
+                renderScheduleCards(filtered);
+            }
+        };
 
         window.renderMengaji36Grid = function() {
             const container = document.getElementById('mengaji-36-grid-container');
@@ -1619,31 +1693,31 @@
                 grade.classes.forEach((cls, idx) => {
                     const log = todayLog[cls] || { teacher: '', present: true };
                     const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/70';
+                    const isPresent = log.present !== false;
+                    
                     rowsHtml += `
                         <div class="p-2.5 ${rowBg} border-b border-slate-100 flex items-center justify-between gap-2 hover:bg-slate-100/60 transition">
                             <div class="w-14 shrink-0 font-extrabold text-xs text-slate-800 bg-slate-200/70 px-2 py-1.5 rounded text-center shadow-xs">
                                 ${cls}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <select onchange="updateMengajiTeacher('${cls}', this.value)" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-medium focus:ring-2 focus:ring-brand-500 truncate">
-                                    <option value="">-- Pilih Guru --</option>
+                                <select onchange="updateMengajiTeacher('${cls}', this.value)" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-1 font-medium focus:ring-1 focus:ring-brand-500 truncate">
+                                    <option value="">-- Kosong --</option>
                                     ${teacherList.map(t => `<option value="${t}" ${t === log.teacher ? 'selected' : ''}>${t}</option>`).join('')}
                                 </select>
                             </div>
-                            <button type="button" onclick="toggleMengajiPresence('${cls}')" title="Klik untuk ubah status" class="shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm ${log.present ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-rose-500 hover:bg-rose-600 text-white'}">
-                                ${log.present ? '<i class="fa-solid fa-check"></i> Hadir' : '<i class="fa-solid fa-xmark"></i> Absen'}
+                            <button onclick="toggleMengajiStatus('${cls}')" class="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-xs ${isPresent ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-rose-100 text-rose-800 hover:bg-rose-200'}">
+                                <i class="fa-solid ${isPresent ? 'fa-check' : 'fa-xmark'}"></i>
+                                <span>${isPresent ? 'Hadir' : 'Absen'}</span>
                             </button>
                         </div>
                     `;
                 });
 
                 columnCard.innerHTML = `
-                    <div class="${grade.bg} text-white px-4 py-3 flex items-center justify-between shadow-sm">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-book-open-reader text-sm"></i>
-                            <h3 class="font-extrabold text-xs sm:text-sm tracking-wide uppercase">${grade.title}</h3>
-                        </div>
-                        <span class="text-[11px] bg-white/20 backdrop-blur-sm px-2.5 py-0.5 rounded-full font-semibold">${grade.headerText}</span>
+                    <div class="${grade.bg} text-white px-4 py-3 font-bold text-xs sm:text-sm flex justify-between items-center">
+                        <span>${grade.title}</span>
+                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-semibold">${grade.headerText}</span>
                     </div>
                     <div class="divide-y divide-slate-100 flex-1">
                         ${rowsHtml}
@@ -1653,50 +1727,51 @@
             });
         };
 
-        window.updateMengajiTeacher = function(cls, teacherName) {
-            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
-            if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
-            if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { present: true };
-            mengaji36Logs[todayKey][cls].teacher = teacherName;
-            localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
-            pushToCloud();
-        };
-
-        window.toggleMengajiPresence = function(cls) {
+        window.toggleMengajiStatus = function(cls) {
             const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
             if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
             if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { teacher: '', present: true };
-
+            
             mengaji36Logs[todayKey][cls].present = !mengaji36Logs[todayKey][cls].present;
             localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
             renderMengaji36Grid();
             pushToCloud();
         };
 
-        window.saveMengaji36Classes = function() {
+        window.updateMengajiTeacher = function(cls, teacherName) {
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            if (!mengaji36Logs[todayKey]) mengaji36Logs[todayKey] = {};
+            if (!mengaji36Logs[todayKey][cls]) mengaji36Logs[todayKey][cls] = { teacher: '', present: true };
+            
+            mengaji36Logs[todayKey][cls].teacher = teacherName;
             localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
             pushToCloud();
-            showToast('Data pemantauan mengaji berhasil disimpan!');
         };
 
         window.resetToMasterSchedule = function() {
-            showConfirmModal("Muat Ulang Jadwal", "Apakah Anda yakin ingin mengembalikan jadwal mengaji hari ini ke Jadwal Baku?", () => {
-                const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
-                const dateParts = todayKey.split('-');
-                const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
-                const todayDay = getDayNameID(dateObj);
-                
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            const dateParts = todayKey.split('-');
+            const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
+            const todayDay = getDayNameID(dateObj);
+
+            showConfirmModal("Muat Ulang Jadwal Baku", `Kembalikan jadwal mengaji tanggal ${todayKey} ke Jadwal Baku hari ${todayDay}?`, () => {
                 mengaji36Logs[todayKey] = {};
                 ALL_CLASSES.forEach(cls => {
                     const presetTeacher = masterJadwalMengaji[todayDay]?.[cls] || '';
                     mengaji36Logs[todayKey][cls] = { teacher: presetTeacher, present: true };
                 });
-                
                 localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
                 renderMengaji36Grid();
                 pushToCloud();
-                showToast('Jadwal berhasil dimuat ulang dari jadwal baku!');
+                showToast("Jadwal mengaji dimuat ulang dari master!");
             });
+        };
+
+        window.saveMengaji36Classes = function() {
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            localStorage.setItem('piket_mengaji_logs', JSON.stringify(mengaji36Logs));
+            pushToCloud();
+            showToast(`Data pemantauan mengaji tanggal ${todayKey} berhasil disimpan!`);
         };
 
         window.filterScheduleDay = function(day) {
@@ -1732,33 +1807,6 @@
             renderScheduleGrid();
         };
 
-        window.renderScheduleGrid = function() {
-            const searchVal = (document.getElementById('search-schedule-input')?.value || '').toLowerCase();
-            const gradeVal = document.getElementById('filter-schedule-grade')?.value || 'SEMUA';
-            const heading = document.getElementById('schedule-title-heading');
-            const countBadge = document.getElementById('schedule-count-badge');
-
-            if (heading) heading.innerText = `Jadwal Pelajaran Hari ${currentDayFilter}`;
-
-            const dayData = jadwalKBM[currentDayFilter] || [];
-            
-            const filtered = dayData.filter(item => {
-                const matchesGrade = gradeVal === 'SEMUA' || item.class.startsWith(gradeVal);
-                const matchesSearch = item.class.toLowerCase().includes(searchVal) ||
-                                      item.subject.toLowerCase().includes(searchVal) ||
-                                      item.teacher.toLowerCase().includes(searchVal);
-                return matchesGrade && matchesSearch;
-            });
-
-            if (countBadge) countBadge.innerText = `${filtered.length} Slot Pelajaran`;
-
-            if (currentScheduleViewMode === 'table') {
-                renderScheduleTable(filtered);
-            } else {
-                renderScheduleCards(filtered);
-            }
-        };
-        
         function getTodayKey() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -1892,6 +1940,7 @@
             }
             
             if (tabId === 'home') renderScheduleGrid();
+            if (tabId === 'input-mengaji') renderMengaji36Grid();
             if (tabId === 'rekap-mengaji') renderRekapMengaji();
             if (tabId === 'rekap-presensi') renderRekapPresensi();
             if (tabId === 'rekap-siswa') renderRekapSiswa();
@@ -3541,17 +3590,34 @@
                     let teacherCodes = {};
                     let parsedSchedule = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
                     
-                    // Parse Guru Sheet if exists
                     const guruSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('guru') || n.toLowerCase().includes('kode'));
                     if (guruSheetName) {
                         const wsGuru = workbook.Sheets[guruSheetName];
                         const guruData = XLSX.utils.sheet_to_json(wsGuru, {header: 1});
+
+                        let kodeCol = 0, nameCol = 1, mapelCol = 2;
+                        if (guruData.length > 0 && Array.isArray(guruData[0])) {
+                            const header = guruData[0].map(c => String(c).toLowerCase().trim());
+                            const kIdx = header.findIndex(h => h.includes('kode'));
+                            const nIdx = header.findIndex(h => h.includes('nama') || h.includes('guru'));
+                            const mIdx = header.findIndex(h => h.includes('mapel') || h.includes('mata') || h.includes('pelajaran'));
+                            if (kIdx !== -1) kodeCol = kIdx;
+                            if (nIdx !== -1) nameCol = nIdx;
+                            if (mIdx !== -1) mapelCol = mIdx;
+                        }
+
                         guruData.forEach(row => {
-                            if (row.length >= 2) {
-                                const code = String(row[0]).trim();
-                                const name = String(row[1]).trim();
-                                if (code && name && code.toLowerCase() !== 'kode') {
-                                    teacherCodes[code] = name;
+                            if (row && row.length >= 2) {
+                                const code = String(row[kodeCol] || '').trim();
+                                const name = String(row[nameCol] || '').trim();
+                                const subject = row[mapelCol] ? String(row[mapelCol]).trim() : '';
+
+                                if (code && name && code.toLowerCase() !== 'kode' && name.toLowerCase() !== 'nama guru') {
+                                    teacherCodes[code] = {
+                                        code: code,
+                                        name: name,
+                                        subject: subject
+                                    };
                                     if (!teacherList.includes(name)) teacherList.push(name);
                                 }
                             }
@@ -3559,69 +3625,11 @@
                         localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                     }
                     
-                    const jadSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('jadwal') || n.toLowerCase().includes('kbm'));
-                    if (jadSheetName) {
-                        const ws = workbook.Sheets[jadSheetName];
-                        const dataGrid = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
-                        
-                        let currentDay = "";
-                        let colClasses = {}; // index -> class
-                        
-                        for (let r = 0; r < dataGrid.length; r++) {
-                            const row = dataGrid[r];
-                            if (!row || row.length === 0) continue;
-                            
-                            const firstCell = String(row[0]).trim().toLowerCase();
-                            if (['senin', 'selasa', 'rabu', 'kamis', 'jumat'].includes(firstCell)) {
-                                currentDay = firstCell.charAt(0).toUpperCase() + firstCell.slice(1);
-                                continue;
-                            }
-                            
-                            if (row.some(cell => String(cell).toUpperCase().startsWith('X ') || String(cell).toUpperCase().startsWith('XI ') || String(cell).toUpperCase().startsWith('XII '))) {
-                                for(let c = 2; c < row.length; c++) {
-                                    const val = String(row[c]).trim().toUpperCase();
-                                    if (val.startsWith('X') || val.startsWith('XI') || val.startsWith('XII')) {
-                                        colClasses[c] = cleanClassName(val);
-                                    }
-                                }
-                                continue;
-                            }
-                            
-                            let isHourRow = !isNaN(parseInt(firstCell)) && parseInt(firstCell) > 0 && parseInt(firstCell) <= 15;
-                            if (currentDay && isHourRow) {
-                                const hourNum = parseInt(firstCell);
-                                const timeStr = String(row[1] || '').trim();
-                                
-                                for(let c = 2; c < row.length; c++) {
-                                    const cellVal = String(row[c]).trim();
-                                    if (cellVal && colClasses[c]) {
-                                        const clsName = colClasses[c];
-                                        let subject = cellVal;
-                                        let teacherName = cellVal;
-                                        
-                                        if (teacherCodes[cellVal]) {
-                                            teacherName = teacherCodes[cellVal];
-                                            subject = "Mapel " + cellVal;
-                                        } else if (cellVal.includes('-')) {
-                                            const pts = cellVal.split('-');
-                                            teacherName = pts[pts.length-1].trim();
-                                            if (teacherCodes[teacherName]) teacherName = teacherCodes[teacherName];
-                                            subject = pts.slice(0, pts.length-1).join('-').trim();
-                                        }
-                                        
-                                        parsedSchedule[currentDay].push({
-                                            class: clsName,
-                                            hour: hourNum,
-                                            time: timeStr,
-                                            subject: subject,
-                                            teacher: teacherName
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        // Multi sheet parsing fallback
+                    const hasDaySheets = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].some(day => 
+                        workbook.SheetNames.some(n => n.toLowerCase() === day.toLowerCase())
+                    );
+
+                    if (hasDaySheets) {
                         ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].forEach(day => {
                             const dSheet = workbook.SheetNames.find(n => n.toLowerCase() === day.toLowerCase());
                             if (dSheet) {
@@ -3631,35 +3639,108 @@
                                 
                                 for (let r = 0; r < dataGrid.length; r++) {
                                     const row = dataGrid[r];
-                                    if (r === 0 || row.some(cell => String(cell).toUpperCase().startsWith('X'))) {
-                                        for(let c = 2; c < row.length; c++) {
+                                    
+                                    if (Object.keys(colClasses).length === 0 && row.some(cell => String(cell).toUpperCase().replace(/\s+/g, '').match(/^(X|XI|XII)\d+$/))) {
+                                        for(let c = 0; c < row.length; c++) {
                                             const val = String(row[c]).trim().toUpperCase();
-                                            if (val.startsWith('X')) colClasses[c] = cleanClassName(val);
+                                            const cleanVal = val.replace(/\s+/g, ' '); 
+                                            if (cleanVal.match(/^(X|XI|XII)\s*\d+$/) || cleanVal.replace(' ','').match(/^(X|XI|XII)\d+$/)) {
+                                                let finalClass = cleanVal;
+                                                if (!finalClass.includes(' ')) {
+                                                    finalClass = finalClass.replace(/^(X|XI|XII)/, '$1 ');
+                                                }
+                                                colClasses[c] = cleanClassName(finalClass);
+                                            }
                                         }
                                         continue;
                                     }
                                     
+                                    if (Object.keys(colClasses).length === 0) continue; 
+                                    
                                     const firstCell = String(row[0]).trim();
-                                    if (!isNaN(parseInt(firstCell))) {
+                                    if (firstCell !== "" && !isNaN(parseInt(firstCell)) && parseInt(firstCell) > 0) {
                                         const hourNum = parseInt(firstCell);
                                         const timeStr = String(row[1] || '').trim();
                                         
-                                        for(let c = 2; c < row.length; c++) {
+                                        for(let c = 0; c < row.length; c++) {
                                             const cellVal = String(row[c]).trim();
-                                            if (cellVal && colClasses[c]) {
-                                                parsedSchedule[day].push({
-                                                    class: colClasses[c],
-                                                    hour: hourNum,
-                                                    time: timeStr,
-                                                    subject: cellVal,
-                                                    teacher: teacherCodes[cellVal] || cellVal
-                                                });
+                                            if (cellVal && colClasses[c] && cellVal.toLowerCase() !== 'istirahat' && !cellVal.toLowerCase().includes('pembiasaan')) {
+                                                const parsedCell = parseScheduleCell(cellVal, teacherCodes);
+                                                if (parsedCell) {
+                                                    parsedSchedule[day].push({
+                                                        class: colClasses[c],
+                                                        hour: hourNum,
+                                                        time: timeStr,
+                                                        subject: parsedCell.subject,
+                                                        teacher: parsedCell.teacher,
+                                                        code: parsedCell.code
+                                                    });
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         });
+                    } else {
+                        const jadSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('jadwal') || n.toLowerCase().includes('kbm'));
+                        if (jadSheetName) {
+                            const ws = workbook.Sheets[jadSheetName];
+                            const dataGrid = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+                            
+                            let currentDay = "";
+                            let colClasses = {}; 
+                            
+                            for (let r = 0; r < dataGrid.length; r++) {
+                                const row = dataGrid[r];
+                                if (!row || row.length === 0) continue;
+                                
+                                const firstCell = String(row[0]).trim().toLowerCase();
+                                if (['senin', 'selasa', 'rabu', 'kamis', 'jumat'].includes(firstCell)) {
+                                    currentDay = firstCell.charAt(0).toUpperCase() + firstCell.slice(1);
+                                    continue;
+                                }
+                                
+                                if (row.some(cell => String(cell).toUpperCase().replace(/\s+/g, '').match(/^(X|XI|XII)\d+$/))) {
+                                    for(let c = 0; c < row.length; c++) {
+                                        const val = String(row[c]).trim().toUpperCase();
+                                        const cleanVal = val.replace(/\s+/g, ' '); 
+                                        if (cleanVal.match(/^(X|XI|XII)\s*\d+$/) || cleanVal.replace(' ','').match(/^(X|XI|XII)\d+$/)) {
+                                            let finalClass = cleanVal;
+                                            if (!finalClass.includes(' ')) {
+                                                finalClass = finalClass.replace(/^(X|XI|XII)/, '$1 ');
+                                            }
+                                            colClasses[c] = cleanClassName(finalClass);
+                                        }
+                                    }
+                                    continue;
+                                }
+                                
+                                let isHourRow = !isNaN(parseInt(firstCell)) && parseInt(firstCell) > 0;
+                                if (currentDay && isHourRow) {
+                                    const hourNum = parseInt(firstCell);
+                                    const timeStr = String(row[1] || '').trim();
+                                    
+                                    for(let c = 0; c < row.length; c++) {
+                                        const cellVal = String(row[c]).trim();
+                                        if (cellVal && colClasses[c] && cellVal.toLowerCase() !== 'istirahat' && !cellVal.toLowerCase().includes('pembiasaan')) {
+                                            const clsName = colClasses[c];
+                                            const parsedCell = parseScheduleCell(cellVal, teacherCodes);
+                                            if (parsedCell) {
+                                                parsedSchedule[currentDay].push({
+                                                    class: clsName,
+                                                    hour: hourNum,
+                                                    time: timeStr,
+                                                    subject: parsedCell.subject,
+                                                    teacher: parsedCell.teacher,
+                                                    code: parsedCell.code
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     
                     let hasData = false;
