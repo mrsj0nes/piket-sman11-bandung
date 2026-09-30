@@ -1354,8 +1354,7 @@
             const now = new Date();
             const dayName = getDayNameID(now);
             const isWeekend = (dayName === 'Sabtu' || dayName === 'Minggu');
-            const isFriday = dayName === 'Jumat';
-
+            
             if (dayBadge) {
                 if (isWeekend) {
                     dayBadge.className = "inline-block mt-1 text-[10px] bg-rose-500/30 text-rose-200 px-2.5 py-0.5 rounded-full border border-rose-400/30";
@@ -1375,73 +1374,70 @@
 
             const totalMinutes = now.getHours() * 60 + now.getMinutes();
 
-            if (totalMinutes < 420) {
-                // Before 07:00
-                hourElem.innerText = "Belum Mulai KBM (Sebelum 07.00)";
-            } else if (totalMinutes >= 420 && totalMinutes < 435) {
-                // 07:00 - 07:15
-                hourElem.innerText = "Pembiasaan / Mengaji (07.00 - 07.15)";
-            } else if (totalMinutes >= 435 && totalMinutes < 480) {
-                // 07:15 - 08:00
-                hourElem.innerText = "Jam Ke-1 (07.15 - 08.00)";
-            } else if (totalMinutes >= 480 && totalMinutes < 525) {
-                // 08:00 - 08:45
-                hourElem.innerText = "Jam Ke-2 (08.00 - 08.45)";
-            } else if (totalMinutes >= 525 && totalMinutes < 570) {
-                // 08:45 - 09:30
-                hourElem.innerText = "Jam Ke-3 (08.45 - 09.30)";
-            } else if (totalMinutes >= 570 && totalMinutes < 585) {
-                // 09:30 - 09:45
-                hourElem.innerText = "Istirahat Ke-1 (09.30 - 09.45)";
-            } else if (totalMinutes >= 585 && totalMinutes < 630) {
-                // 09:45 - 10:30
-                hourElem.innerText = "Jam Ke-4 (09.45 - 10.30)";
-            } else if (totalMinutes >= 630 && totalMinutes < 675) {
-                // 10:30 - 11:15
-                hourElem.innerText = "Jam Ke-5 (10.30 - 11.15)";
-            } else if (isFriday) {
-                // Friday specific timings
-                if (totalMinutes >= 675 && totalMinutes < 770) {
-                    // 11:15 - 12:50 (Ishoma Jum'at is usually longer)
-                    hourElem.innerText = "Ishoma Jum'at (11.15 - 12.50)";
-                } else if (totalMinutes >= 770 && totalMinutes < 815) {
-                    // 12:50 - 13:35
-                    hourElem.innerText = "Jam Ke-6 (12.50 - 13.35)";
-                } else if (totalMinutes >= 815 && totalMinutes < 860) {
-                    // 13:35 - 14:20
-                    hourElem.innerText = "Jam Ke-7 (13.35 - 14.20)";
-                } else if (totalMinutes >= 860 && totalMinutes < 905) {
-                    // 14:20 - 15:05
-                    hourElem.innerText = "Jam Ke-8 (14.20 - 15.05)";
-                } else if (totalMinutes >= 905 && totalMinutes < 950) {
-                     // 15:05 - 15:50
-                    hourElem.innerText = "Jam Ke-9 (15.05 - 15.50)";
-                } else {
-                    hourElem.innerText = "KBM Selesai Hari Ini";
-                }
-            } else {
-                // Monday - Thursday timings
-                if (totalMinutes >= 675 && totalMinutes < 720) {
-                    // 11:15 - 12:00
-                    hourElem.innerText = "Jam Ke-6 (11.15 - 12.00)";
-                } else if (totalMinutes >= 720 && totalMinutes < 765) {
-                    // 12:00 - 12:45
-                    hourElem.innerText = "Ishoma (12.00 - 12.45)";
-                } else if (totalMinutes >= 765 && totalMinutes < 810) {
-                    // 12:45 - 13:30
-                    hourElem.innerText = "Jam Ke-7 (12.45 - 13.30)";
-                } else if (totalMinutes >= 810 && totalMinutes < 855) {
-                    // 13:30 - 14:15
-                    hourElem.innerText = "Jam Ke-8 (13.30 - 14.15)";
-                } else if (totalMinutes >= 855 && totalMinutes < 900) {
-                    // 14:15 - 15:00
-                    hourElem.innerText = "Jam Ke-9 (14.15 - 15.00)";
-                } else if (totalMinutes >= 900 && totalMinutes < 945) {
-                    // 15:00 - 15:45
-                    hourElem.innerText = "Jam Ke-10 (15.00 - 15.45)";
-                } else {
-                    hourElem.innerText = "KBM Selesai Hari Ini";
-                }
+            // Based on exact schedule from image
+            if (dayName === 'Senin') {
+                if (totalMinutes < 390) hourElem.innerText = "Belum Mulai KBM";
+                else if (totalMinutes >= 390 && totalMinutes < 405) hourElem.innerText = "Pembiasaan Membaca Kitab Suci (06.30 - 06.45)";
+                else if (totalMinutes >= 405 && totalMinutes < 450) hourElem.innerText = "Upacara / Pembinaan Walas (06.45 - 07.30)";
+                else if (totalMinutes >= 450 && totalMinutes < 495) hourElem.innerText = "Jam Ke-1 (07.30 - 08.15)";
+                else if (totalMinutes >= 495 && totalMinutes < 540) hourElem.innerText = "Jam Ke-2 (08.15 - 09.00)";
+                else if (totalMinutes >= 540 && totalMinutes < 555) hourElem.innerText = "Istirahat Ke-1 (09.00 - 09.15)";
+                else if (totalMinutes >= 555 && totalMinutes < 600) hourElem.innerText = "Jam Ke-3 (09.15 - 10.00)";
+                else if (totalMinutes >= 600 && totalMinutes < 645) hourElem.innerText = "Jam Ke-4 (10.00 - 10.45)";
+                else if (totalMinutes >= 645 && totalMinutes < 690) hourElem.innerText = "Jam Ke-5 (10.45 - 11.30)";
+                else if (totalMinutes >= 690 && totalMinutes < 750) hourElem.innerText = "Istirahat Ke-2 (11.30 - 12.30)";
+                else if (totalMinutes >= 750 && totalMinutes < 790) hourElem.innerText = "Jam Ke-6 (12.30 - 13.10)";
+                else if (totalMinutes >= 790 && totalMinutes < 830) hourElem.innerText = "Jam Ke-7 (13.10 - 13.50)";
+                else if (totalMinutes >= 830 && totalMinutes < 870) hourElem.innerText = "Jam Ke-8 (13.50 - 14.30)";
+                else if (totalMinutes >= 870 && totalMinutes < 910) hourElem.innerText = "Jam Ke-9 (14.30 - 15.10)";
+                else hourElem.innerText = "KBM Selesai Hari Ini";
+            } else if (dayName === 'Selasa' || dayName === 'Kamis') {
+                if (totalMinutes < 390) hourElem.innerText = "Belum Mulai KBM";
+                else if (totalMinutes >= 390 && totalMinutes < 405) hourElem.innerText = "Pembiasaan Membaca Kitab Suci (06.30 - 06.45)";
+                else if (totalMinutes >= 405 && totalMinutes < 450) hourElem.innerText = "Jam Ke-1 (06.45 - 07.30)";
+                else if (totalMinutes >= 450 && totalMinutes < 495) hourElem.innerText = "Jam Ke-2 (07.30 - 08.15)";
+                else if (totalMinutes >= 495 && totalMinutes < 540) hourElem.innerText = "Jam Ke-3 (08.15 - 09.00)";
+                else if (totalMinutes >= 540 && totalMinutes < 585) hourElem.innerText = "Jam Ke-4 (09.00 - 09.45)";
+                else if (totalMinutes >= 585 && totalMinutes < 600) hourElem.innerText = "Istirahat Ke-1 (09.45 - 10.00)";
+                else if (totalMinutes >= 600 && totalMinutes < 645) hourElem.innerText = "Jam Ke-5 (10.00 - 10.45)";
+                else if (totalMinutes >= 645 && totalMinutes < 690) hourElem.innerText = "Jam Ke-6 (10.45 - 11.30)";
+                else if (totalMinutes >= 690 && totalMinutes < 750) hourElem.innerText = "Istirahat Ke-2 (11.30 - 12.30)";
+                else if (totalMinutes >= 750 && totalMinutes < 790) hourElem.innerText = "Jam Ke-7 (12.30 - 13.10)";
+                else if (totalMinutes >= 790 && totalMinutes < 830) hourElem.innerText = "Jam Ke-8 (13.10 - 13.50)";
+                else if (totalMinutes >= 830 && totalMinutes < 870) hourElem.innerText = "Jam Ke-9 (13.50 - 14.30)";
+                else if (totalMinutes >= 870 && totalMinutes < 910) hourElem.innerText = "Jam Ke-10 (14.30 - 15.10)";
+                else hourElem.innerText = "KBM Selesai Hari Ini";
+            } else if (dayName === 'Rabu') {
+                if (totalMinutes < 390) hourElem.innerText = "Belum Mulai KBM";
+                else if (totalMinutes >= 390 && totalMinutes < 405) hourElem.innerText = "Pembiasaan Membaca Kitab Suci (06.30 - 06.45)";
+                else if (totalMinutes >= 405 && totalMinutes < 435) hourElem.innerText = "Literasi (06.45 - 07.15)";
+                else if (totalMinutes >= 435 && totalMinutes < 480) hourElem.innerText = "Jam Ke-1 (07.15 - 08.00)";
+                else if (totalMinutes >= 480 && totalMinutes < 525) hourElem.innerText = "Jam Ke-2 (08.00 - 08.45)";
+                else if (totalMinutes >= 525 && totalMinutes < 570) hourElem.innerText = "Jam Ke-3 (08.45 - 09.30)";
+                else if (totalMinutes >= 570 && totalMinutes < 585) hourElem.innerText = "Istirahat Ke-1 (09.30 - 09.45)";
+                else if (totalMinutes >= 585 && totalMinutes < 630) hourElem.innerText = "Jam Ke-4 (09.45 - 10.30)";
+                else if (totalMinutes >= 630 && totalMinutes < 675) hourElem.innerText = "Jam Ke-5 (10.30 - 11.15)";
+                else if (totalMinutes >= 675 && totalMinutes < 720) hourElem.innerText = "Jam Ke-6 (11.15 - 12.00)";
+                else if (totalMinutes >= 720 && totalMinutes < 780) hourElem.innerText = "Istirahat Ke-2 (12.00 - 13.00)";
+                else if (totalMinutes >= 780 && totalMinutes < 820) hourElem.innerText = "Jam Ke-7 (13.00 - 13.40)";
+                else if (totalMinutes >= 820 && totalMinutes < 860) hourElem.innerText = "Jam Ke-8 (13.40 - 14.20)";
+                else if (totalMinutes >= 860 && totalMinutes < 900) hourElem.innerText = "Jam Ke-9 (14.20 - 15.00)";
+                else hourElem.innerText = "KBM Selesai Hari Ini";
+            } else if (dayName === 'Jumat') {
+                if (totalMinutes < 390) hourElem.innerText = "Belum Mulai KBM";
+                else if (totalMinutes >= 390 && totalMinutes < 405) hourElem.innerText = "Pembiasaan Membaca Kitab Suci (06.30 - 06.45)";
+                else if (totalMinutes >= 405 && totalMinutes < 420) hourElem.innerText = "Literasi (06.45 - 07.00)";
+                else if (totalMinutes >= 420 && totalMinutes < 465) hourElem.innerText = "Gerakan Memungut Sampah / Senam / Dhuha (07.00 - 07.45)";
+                else if (totalMinutes >= 465 && totalMinutes < 510) hourElem.innerText = "Jam Ke-1 (07.45 - 08.30)";
+                else if (totalMinutes >= 510 && totalMinutes < 555) hourElem.innerText = "Jam Ke-2 (08.30 - 09.15)";
+                else if (totalMinutes >= 555 && totalMinutes < 600) hourElem.innerText = "Jam Ke-3 (09.15 - 10.00)";
+                else if (totalMinutes >= 600 && totalMinutes < 615) hourElem.innerText = "Istirahat Ke-1 (10.00 - 10.15)";
+                else if (totalMinutes >= 615 && totalMinutes < 655) hourElem.innerText = "Jam Ke-4 (10.15 - 10.55)";
+                else if (totalMinutes >= 655 && totalMinutes < 695) hourElem.innerText = "Jam Ke-5 (10.55 - 11.35)";
+                else if (totalMinutes >= 695 && totalMinutes < 750) hourElem.innerText = "Istirahat Ke-2 (11.35 - 12.30)";
+                else if (totalMinutes >= 750 && totalMinutes < 790) hourElem.innerText = "Jam Ke-6 (12.30 - 13.10)";
+                else if (totalMinutes >= 790 && totalMinutes < 830) hourElem.innerText = "Jam Ke-7 (13.10 - 13.50)";
+                else hourElem.innerText = "KBM Selesai Hari Ini";
             }
         };
 
@@ -1449,28 +1445,46 @@
             const now = new Date();
             const totalMinutes = now.getHours() * 60 + now.getMinutes();
             const dayName = getDayNameID(now);
-            const isFriday = dayName === 'Jumat';
 
-            if (totalMinutes >= 435 && totalMinutes < 480) return 1;
-            if (totalMinutes >= 480 && totalMinutes < 525) return 2;
-            if (totalMinutes >= 525 && totalMinutes < 570) return 3;
-            // Break 1: 570-585
-            if (totalMinutes >= 585 && totalMinutes < 630) return 4;
-            if (totalMinutes >= 630 && totalMinutes < 675) return 5;
-            
-            if (isFriday) {
-                // Break 2 (Ishoma): 675-770
-                if (totalMinutes >= 770 && totalMinutes < 815) return 6;
-                if (totalMinutes >= 815 && totalMinutes < 860) return 7;
-                if (totalMinutes >= 860 && totalMinutes < 905) return 8;
-                if (totalMinutes >= 905 && totalMinutes < 950) return 9;
-            } else {
+            if (dayName === 'Senin') {
+                if (totalMinutes >= 450 && totalMinutes < 495) return 1;
+                if (totalMinutes >= 495 && totalMinutes < 540) return 2;
+                if (totalMinutes >= 555 && totalMinutes < 600) return 3;
+                if (totalMinutes >= 600 && totalMinutes < 645) return 4;
+                if (totalMinutes >= 645 && totalMinutes < 690) return 5;
+                if (totalMinutes >= 750 && totalMinutes < 790) return 6;
+                if (totalMinutes >= 790 && totalMinutes < 830) return 7;
+                if (totalMinutes >= 830 && totalMinutes < 870) return 8;
+                if (totalMinutes >= 870 && totalMinutes < 910) return 9;
+            } else if (dayName === 'Selasa' || dayName === 'Kamis') {
+                if (totalMinutes >= 405 && totalMinutes < 450) return 1;
+                if (totalMinutes >= 450 && totalMinutes < 495) return 2;
+                if (totalMinutes >= 495 && totalMinutes < 540) return 3;
+                if (totalMinutes >= 540 && totalMinutes < 585) return 4;
+                if (totalMinutes >= 600 && totalMinutes < 645) return 5;
+                if (totalMinutes >= 645 && totalMinutes < 690) return 6;
+                if (totalMinutes >= 750 && totalMinutes < 790) return 7;
+                if (totalMinutes >= 790 && totalMinutes < 830) return 8;
+                if (totalMinutes >= 830 && totalMinutes < 870) return 9;
+                if (totalMinutes >= 870 && totalMinutes < 910) return 10;
+            } else if (dayName === 'Rabu') {
+                if (totalMinutes >= 435 && totalMinutes < 480) return 1;
+                if (totalMinutes >= 480 && totalMinutes < 525) return 2;
+                if (totalMinutes >= 525 && totalMinutes < 570) return 3;
+                if (totalMinutes >= 585 && totalMinutes < 630) return 4;
+                if (totalMinutes >= 630 && totalMinutes < 675) return 5;
                 if (totalMinutes >= 675 && totalMinutes < 720) return 6;
-                // Break 2 (Ishoma): 720-765
-                if (totalMinutes >= 765 && totalMinutes < 810) return 7;
-                if (totalMinutes >= 810 && totalMinutes < 855) return 8;
-                if (totalMinutes >= 855 && totalMinutes < 900) return 9;
-                if (totalMinutes >= 900 && totalMinutes < 945) return 10;
+                if (totalMinutes >= 780 && totalMinutes < 820) return 7;
+                if (totalMinutes >= 820 && totalMinutes < 860) return 8;
+                if (totalMinutes >= 860 && totalMinutes < 900) return 9;
+            } else if (dayName === 'Jumat') {
+                if (totalMinutes >= 465 && totalMinutes < 510) return 1;
+                if (totalMinutes >= 510 && totalMinutes < 555) return 2;
+                if (totalMinutes >= 555 && totalMinutes < 600) return 3;
+                if (totalMinutes >= 615 && totalMinutes < 655) return 4;
+                if (totalMinutes >= 655 && totalMinutes < 695) return 5;
+                if (totalMinutes >= 750 && totalMinutes < 790) return 6;
+                if (totalMinutes >= 790 && totalMinutes < 830) return 7;
             }
             return 0; // Means out of standard KBM hours
         }
