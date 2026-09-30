@@ -187,7 +187,7 @@
                     <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20 text-center min-w-[210px]">
                         <span class="text-[11px] uppercase tracking-wider text-brand-100 block font-medium">Status Jam Sekarang</span>
                         <div id="current-lesson-hour" class="text-base sm:text-lg font-bold text-yellow-300 mt-0.5">
-                            Jam Ke-3 (08.45 - 09.30)
+                            Memuat...
                         </div>
                         <span id="current-day-badge" class="inline-block mt-1 text-[10px] bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
                             Hari Efektif KBM
@@ -1146,7 +1146,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1348,6 +1347,231 @@
             setInterval(updateLiveHourDisplay, 60000);
         };
 
+        window.updateLiveHourDisplay = function() {
+            const hourElem = document.getElementById('current-lesson-hour');
+            const dayBadge = document.getElementById('current-day-badge');
+
+            const now = new Date();
+            const dayName = getDayNameID(now);
+            const isWeekend = (dayName === 'Sabtu' || dayName === 'Minggu');
+            const isFriday = dayName === 'Jumat';
+
+            if (dayBadge) {
+                if (isWeekend) {
+                    dayBadge.className = "inline-block mt-1 text-[10px] bg-rose-500/30 text-rose-200 px-2.5 py-0.5 rounded-full border border-rose-400/30";
+                    dayBadge.innerText = "Hari Libur Akhir Pekan";
+                } else {
+                    dayBadge.className = "inline-block mt-1 text-[10px] bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30";
+                    dayBadge.innerText = "Hari Efektif KBM";
+                }
+            }
+
+            if (!hourElem) return;
+
+            if (isWeekend) {
+                hourElem.innerText = "KBM Libur (Akhir Pekan)";
+                return;
+            }
+
+            const totalMinutes = now.getHours() * 60 + now.getMinutes();
+
+            if (totalMinutes < 420) {
+                // Before 07:00
+                hourElem.innerText = "Belum Mulai KBM (Sebelum 07.00)";
+            } else if (totalMinutes >= 420 && totalMinutes < 435) {
+                // 07:00 - 07:15
+                hourElem.innerText = "Pembiasaan / Mengaji (07.00 - 07.15)";
+            } else if (totalMinutes >= 435 && totalMinutes < 480) {
+                // 07:15 - 08:00
+                hourElem.innerText = "Jam Ke-1 (07.15 - 08.00)";
+            } else if (totalMinutes >= 480 && totalMinutes < 525) {
+                // 08:00 - 08:45
+                hourElem.innerText = "Jam Ke-2 (08.00 - 08.45)";
+            } else if (totalMinutes >= 525 && totalMinutes < 570) {
+                // 08:45 - 09:30
+                hourElem.innerText = "Jam Ke-3 (08.45 - 09.30)";
+            } else if (totalMinutes >= 570 && totalMinutes < 585) {
+                // 09:30 - 09:45
+                hourElem.innerText = "Istirahat Ke-1 (09.30 - 09.45)";
+            } else if (totalMinutes >= 585 && totalMinutes < 630) {
+                // 09:45 - 10:30
+                hourElem.innerText = "Jam Ke-4 (09.45 - 10.30)";
+            } else if (totalMinutes >= 630 && totalMinutes < 675) {
+                // 10:30 - 11:15
+                hourElem.innerText = "Jam Ke-5 (10.30 - 11.15)";
+            } else if (isFriday) {
+                // Friday specific timings
+                if (totalMinutes >= 675 && totalMinutes < 770) {
+                    // 11:15 - 12:50 (Ishoma Jum'at is usually longer)
+                    hourElem.innerText = "Ishoma Jum'at (11.15 - 12.50)";
+                } else if (totalMinutes >= 770 && totalMinutes < 815) {
+                    // 12:50 - 13:35
+                    hourElem.innerText = "Jam Ke-6 (12.50 - 13.35)";
+                } else if (totalMinutes >= 815 && totalMinutes < 860) {
+                    // 13:35 - 14:20
+                    hourElem.innerText = "Jam Ke-7 (13.35 - 14.20)";
+                } else if (totalMinutes >= 860 && totalMinutes < 905) {
+                    // 14:20 - 15:05
+                    hourElem.innerText = "Jam Ke-8 (14.20 - 15.05)";
+                } else if (totalMinutes >= 905 && totalMinutes < 950) {
+                     // 15:05 - 15:50
+                    hourElem.innerText = "Jam Ke-9 (15.05 - 15.50)";
+                } else {
+                    hourElem.innerText = "KBM Selesai Hari Ini";
+                }
+            } else {
+                // Monday - Thursday timings
+                if (totalMinutes >= 675 && totalMinutes < 720) {
+                    // 11:15 - 12:00
+                    hourElem.innerText = "Jam Ke-6 (11.15 - 12.00)";
+                } else if (totalMinutes >= 720 && totalMinutes < 765) {
+                    // 12:00 - 12:45
+                    hourElem.innerText = "Ishoma (12.00 - 12.45)";
+                } else if (totalMinutes >= 765 && totalMinutes < 810) {
+                    // 12:45 - 13:30
+                    hourElem.innerText = "Jam Ke-7 (12.45 - 13.30)";
+                } else if (totalMinutes >= 810 && totalMinutes < 855) {
+                    // 13:30 - 14:15
+                    hourElem.innerText = "Jam Ke-8 (13.30 - 14.15)";
+                } else if (totalMinutes >= 855 && totalMinutes < 900) {
+                    // 14:15 - 15:00
+                    hourElem.innerText = "Jam Ke-9 (14.15 - 15.00)";
+                } else if (totalMinutes >= 900 && totalMinutes < 945) {
+                    // 15:00 - 15:45
+                    hourElem.innerText = "Jam Ke-10 (15.00 - 15.45)";
+                } else {
+                    hourElem.innerText = "KBM Selesai Hari Ini";
+                }
+            }
+        };
+
+        function getActiveHourNumber() {
+            const now = new Date();
+            const totalMinutes = now.getHours() * 60 + now.getMinutes();
+            const dayName = getDayNameID(now);
+            const isFriday = dayName === 'Jumat';
+
+            if (totalMinutes >= 435 && totalMinutes < 480) return 1;
+            if (totalMinutes >= 480 && totalMinutes < 525) return 2;
+            if (totalMinutes >= 525 && totalMinutes < 570) return 3;
+            // Break 1: 570-585
+            if (totalMinutes >= 585 && totalMinutes < 630) return 4;
+            if (totalMinutes >= 630 && totalMinutes < 675) return 5;
+            
+            if (isFriday) {
+                // Break 2 (Ishoma): 675-770
+                if (totalMinutes >= 770 && totalMinutes < 815) return 6;
+                if (totalMinutes >= 815 && totalMinutes < 860) return 7;
+                if (totalMinutes >= 860 && totalMinutes < 905) return 8;
+                if (totalMinutes >= 905 && totalMinutes < 950) return 9;
+            } else {
+                if (totalMinutes >= 675 && totalMinutes < 720) return 6;
+                // Break 2 (Ishoma): 720-765
+                if (totalMinutes >= 765 && totalMinutes < 810) return 7;
+                if (totalMinutes >= 810 && totalMinutes < 855) return 8;
+                if (totalMinutes >= 855 && totalMinutes < 900) return 9;
+                if (totalMinutes >= 900 && totalMinutes < 945) return 10;
+            }
+            return 0; // Means out of standard KBM hours
+        }
+
+        function renderScheduleTable(filteredData) {
+            const tbody = document.getElementById('schedule-tbody');
+            if (!tbody) return;
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 italic">Tidak ada data jadwal pelajaran yang cocok. Silakan import Excel atau ubah kata kunci pencarian.</td></tr>`;
+                return;
+            }
+
+            let activeHourNum = getActiveHourNumber();
+
+            tbody.innerHTML = filteredData.map((item) => {
+                const isActive = (item.hour == activeHourNum && currentDayFilter === getDayNameID());
+                const rowClass = isActive ? "bg-amber-50/90 font-bold border-l-4 border-l-amber-500" : "hover:bg-brand-50/50 transition border-b border-slate-100";
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td class="p-3 text-center font-bold text-brand-700 bg-slate-50/50">${item.hour}</td>
+                        <td class="p-3 text-center text-slate-500 font-mono text-[11px]">${item.time}</td>
+                        <td class="p-3 text-center font-bold text-slate-800 bg-yellow-50/40 rounded-lg">${item.class}</td>
+                        <td class="p-3 font-semibold text-slate-700">${item.subject}</td>
+                        <td class="p-3 text-slate-800 font-medium">${item.teacher}</td>
+                        <td class="p-3 text-center">
+                            ${isActive ? 
+                                `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white animate-pulse">
+                                    <i class="fa-solid fa-play text-[7px] mr-1"></i>BERLANGSUNG
+                                </span>` : 
+                                `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                    <i class="fa-solid fa-circle text-[7px] mr-1"></i>KBM
+                                </span>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderScheduleCards(filteredData) {
+            const container = document.getElementById('schedule-class-cards-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const gradeVal = document.getElementById('filter-schedule-grade')?.value || 'SEMUA';
+            let classesToDisplay = ALL_CLASSES;
+            if (gradeVal !== 'SEMUA') {
+                classesToDisplay = ALL_CLASSES.filter(c => c.startsWith(gradeVal));
+            }
+
+            if (classesToDisplay.length === 0) {
+                container.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 italic bg-white rounded-2xl border border-slate-200">Tidak ada rombel kelas yang ditemukan.</div>`;
+                return;
+            }
+
+            let activeHourNum = getActiveHourNumber();
+
+            classesToDisplay.forEach(cls => {
+                const classSchedule = filteredData.filter(x => x.class === cls).sort((a,b) => parseInt(a.hour) - parseInt(b.hour));
+                if (classSchedule.length === 0) return;
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col";
+                
+                let rowsHtml = '';
+                classSchedule.forEach(item => {
+                    const isActive = (item.hour == activeHourNum && currentDayFilter === getDayNameID());
+                    const bgClass = isActive ? "bg-amber-100/90 font-bold border-l-4 border-l-amber-500" : "hover:bg-slate-50";
+
+                    rowsHtml += `
+                        <div class="p-2 text-[11px] ${bgClass} border-b border-slate-100 flex items-center justify-between gap-2">
+                            <span class="font-bold text-brand-700 w-12 shrink-0">Jam ${item.hour}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-slate-800 truncate">${item.subject}</div>
+                                <div class="text-[10px] text-slate-500 truncate">${item.teacher}</div>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono shrink-0">${item.time}</span>
+                        </div>
+                    `;
+                });
+
+                let headerBgClass = "bg-brand-600";
+                if (cls.startsWith('X ')) headerBgClass = "bg-emerald-600";
+                else if (cls.startsWith('XI ')) headerBgClass = "bg-amber-500";
+                else if (cls.startsWith('XII ')) headerBgClass = "bg-rose-600";
+
+                card.innerHTML = `
+                    <div class="${headerBgClass} text-white px-3.5 py-2.5 font-bold text-xs flex justify-between items-center">
+                        <span>${cls}</span>
+                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">${classSchedule.length} Jam</span>
+                    </div>
+                    <div class="divide-y divide-slate-100 flex-1">
+                        ${rowsHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         window.renderMengaji36Grid = function() {
             const container = document.getElementById('mengaji-36-grid-container');
             if (!container) return;
@@ -1461,66 +1685,6 @@
             });
         };
 
-        window.updateLiveHourDisplay = function() {
-            const hourElem = document.getElementById('current-lesson-hour');
-            const dayBadge = document.getElementById('current-day-badge');
-
-            const now = new Date();
-            const dayName = getDayNameID(now);
-            const isWeekend = (dayName === 'Sabtu' || dayName === 'Minggu');
-
-            if (dayBadge) {
-                if (isWeekend) {
-                    dayBadge.className = "inline-block mt-1 text-[10px] bg-rose-500/30 text-rose-200 px-2.5 py-0.5 rounded-full border border-rose-400/30";
-                    dayBadge.innerText = "Hari Libur Akhir Pekan";
-                } else {
-                    dayBadge.className = "inline-block mt-1 text-[10px] bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30";
-                    dayBadge.innerText = "Hari Efektif KBM";
-                }
-            }
-
-            if (!hourElem) return;
-
-            if (isWeekend) {
-                hourElem.innerText = "KBM Libur (Akhir Pekan)";
-                return;
-            }
-
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-
-            if (totalMinutes < 420) {
-                hourElem.innerText = "Belum Mulai KBM (Sebelum 07.00)";
-            } else if (totalMinutes >= 420 && totalMinutes < 435) {
-                hourElem.innerText = "07.00 - 07.15 (Pembiasaan / Mengaji)";
-            } else if (totalMinutes >= 435 && totalMinutes < 480) {
-                hourElem.innerText = "Jam Ke-1 (07.15 - 08.00)";
-            } else if (totalMinutes >= 480 && totalMinutes < 525) {
-                hourElem.innerText = "Jam Ke-2 (08.00 - 08.45)";
-            } else if (totalMinutes >= 525 && totalMinutes < 570) {
-                hourElem.innerText = "Jam Ke-3 (08.45 - 09.30)";
-            } else if (totalMinutes >= 570 && totalMinutes < 585) {
-                hourElem.innerText = "Istirahat Ke-1 (09.30 - 09.45)";
-            } else if (totalMinutes >= 585 && totalMinutes < 630) {
-                hourElem.innerText = "Jam Ke-4 (09.45 - 10.30)";
-            } else if (totalMinutes >= 630 && totalMinutes < 675) {
-                hourElem.innerText = "Jam Ke-5 (10.30 - 11.15)";
-            } else if (totalMinutes >= 675 && totalMinutes < 720) {
-                hourElem.innerText = "Jam Ke-6 (11.15 - 12.00)";
-            } else if (totalMinutes >= 720 && totalMinutes < 765) {
-                hourElem.innerText = "Ishoma / Istirahat (12.00 - 12.45)";
-            } else if (totalMinutes >= 765 && totalMinutes < 810) {
-                hourElem.innerText = "Jam Ke-7 (12.45 - 13.30)";
-            } else if (totalMinutes >= 810 && totalMinutes < 855) {
-                hourElem.innerText = "Jam Ke-8 (13.30 - 14.15)";
-            } else if (totalMinutes >= 855 && totalMinutes < 900) {
-                hourElem.innerText = "Jam Ke-9 (14.15 - 15.00)";
-            } else if (totalMinutes >= 900 && totalMinutes < 945) {
-                hourElem.innerText = "Jam Ke-10 (15.00 - 15.45)";
-            } else {
-                hourElem.innerText = "KBM Selesai Hari Ini";
-            }
-        };
-
         window.filterScheduleDay = function(day) {
             currentDayFilter = day;
             document.querySelectorAll('.day-filter-btn').forEach(btn => {
@@ -1580,129 +1744,7 @@
                 renderScheduleCards(filtered);
             }
         };
-
-        function renderScheduleTable(filteredData) {
-            const tbody = document.getElementById('schedule-tbody');
-            if (!tbody) return;
-
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 italic">Tidak ada data jadwal pelajaran yang cocok. Silakan import Excel atau ubah kata kunci pencarian.</td></tr>`;
-                return;
-            }
-
-            const now = new Date();
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            let activeHourNum = 0;
-            if (totalMinutes >= 435 && totalMinutes < 480) activeHourNum = 1;
-            else if (totalMinutes >= 480 && totalMinutes < 525) activeHourNum = 2;
-            else if (totalMinutes >= 525 && totalMinutes < 570) activeHourNum = 3;
-            else if (totalMinutes >= 570 && totalMinutes < 630) activeHourNum = 4;
-            else if (totalMinutes >= 630 && totalMinutes < 675) activeHourNum = 5;
-            else if (totalMinutes >= 675 && totalMinutes < 720) activeHourNum = 6;
-            else if (totalMinutes >= 765 && totalMinutes < 810) activeHourNum = 7;
-            else if (totalMinutes >= 810 && totalMinutes < 855) activeHourNum = 8;
-            else if (totalMinutes >= 855 && totalMinutes < 900) activeHourNum = 9;
-            else if (totalMinutes >= 900 && totalMinutes < 945) activeHourNum = 10;
-
-            tbody.innerHTML = filteredData.map((item) => {
-                const isActive = (item.hour === activeHourNum && currentDayFilter === getDayNameID());
-                const rowClass = isActive ? "bg-amber-50/90 font-bold border-l-4 border-l-amber-500" : "hover:bg-brand-50/50 transition border-b border-slate-100";
-                
-                return `
-                    <tr class="${rowClass}">
-                        <td class="p-3 text-center font-bold text-brand-700 bg-slate-50/50">${item.hour}</td>
-                        <td class="p-3 text-center text-slate-500 font-mono text-[11px]">${item.time}</td>
-                        <td class="p-3 text-center font-bold text-slate-800 bg-yellow-50/40 rounded-lg">${item.class}</td>
-                        <td class="p-3 font-semibold text-slate-700">${item.subject}</td>
-                        <td class="p-3 text-slate-800 font-medium">${item.teacher}</td>
-                        <td class="p-3 text-center">
-                            ${isActive ? 
-                                `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white animate-pulse">
-                                    <i class="fa-solid fa-play text-[7px] mr-1"></i>BERLANGSUNG
-                                </span>` : 
-                                `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                    <i class="fa-solid fa-circle text-[7px] mr-1"></i>KBM
-                                </span>`
-                            }
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderScheduleCards(filteredData) {
-            const container = document.getElementById('schedule-class-cards-grid');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const gradeVal = document.getElementById('filter-schedule-grade')?.value || 'SEMUA';
-            let classesToDisplay = ALL_CLASSES;
-            if (gradeVal !== 'SEMUA') {
-                classesToDisplay = ALL_CLASSES.filter(c => c.startsWith(gradeVal));
-            }
-
-            if (classesToDisplay.length === 0) {
-                container.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 italic bg-white rounded-2xl border border-slate-200">Tidak ada rombel kelas yang ditemukan.</div>`;
-                return;
-            }
-
-            const now = new Date();
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            let activeHourNum = 0;
-            if (totalMinutes >= 435 && totalMinutes < 480) activeHourNum = 1;
-            else if (totalMinutes >= 480 && totalMinutes < 525) activeHourNum = 2;
-            else if (totalMinutes >= 525 && totalMinutes < 570) activeHourNum = 3;
-            else if (totalMinutes >= 570 && totalMinutes < 630) activeHourNum = 4;
-            else if (totalMinutes >= 630 && totalMinutes < 675) activeHourNum = 5;
-            else if (totalMinutes >= 675 && totalMinutes < 720) activeHourNum = 6;
-            else if (totalMinutes >= 765 && totalMinutes < 810) activeHourNum = 7;
-            else if (totalMinutes >= 810 && totalMinutes < 855) activeHourNum = 8;
-            else if (totalMinutes >= 855 && totalMinutes < 900) activeHourNum = 9;
-            else if (totalMinutes >= 900 && totalMinutes < 945) activeHourNum = 10;
-
-            classesToDisplay.forEach(cls => {
-                const classSchedule = filteredData.filter(x => x.class === cls).sort((a,b) => a.hour - b.hour);
-                if (classSchedule.length === 0) return;
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col";
-                
-                let rowsHtml = '';
-                classSchedule.forEach(item => {
-                    const isActive = (item.hour === activeHourNum && currentDayFilter === getDayNameID());
-                    const bgClass = isActive ? "bg-amber-100/90 font-bold border-l-4 border-l-amber-500" : "hover:bg-slate-50";
-
-                    rowsHtml += `
-                        <div class="p-2 text-[11px] ${bgClass} border-b border-slate-100 flex items-center justify-between gap-2">
-                            <span class="font-bold text-brand-700 w-12 shrink-0">Jam ${item.hour}</span>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-semibold text-slate-800 truncate">${item.subject}</div>
-                                <div class="text-[10px] text-slate-500 truncate">${item.teacher}</div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-mono shrink-0">${item.time}</span>
-                        </div>
-                    `;
-                });
-
-                let headerBgClass = "bg-brand-600";
-                if (cls.startsWith('X ')) headerBgClass = "bg-emerald-600";
-                else if (cls.startsWith('XI ')) headerBgClass = "bg-amber-500";
-                else if (cls.startsWith('XII ')) headerBgClass = "bg-rose-600";
-
-                card.innerHTML = `
-                    <div class="${headerBgClass} text-white px-3.5 py-2.5 font-bold text-xs flex justify-between items-center">
-                        <span>${cls}</span>
-                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">${classSchedule.length} Jam</span>
-                    </div>
-                    <div class="divide-y divide-slate-100 flex-1">
-                        ${rowsHtml}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // --- Helper & Utility Functions ---
+        
         function getTodayKey() {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -3326,66 +3368,9 @@
             }
         };
 
-        window.exportToExcel = function(type) {
-            if (typeof XLSX === 'undefined') {
-                showToast('Library Excel belum dimuat!');
-                return;
-            }
-            let tableId = '';
-            let fileName = '';
-            if (type === 'mengaji') { tableId = 'table-rekap-mengaji'; fileName = 'Rekap_Mengaji_Guru.xlsx'; }
-            else if (type === 'presensi') { tableId = 'table-rekap-presensi'; fileName = 'Rekap_Presensi_Guru.xlsx'; }
-            else if (type === 'siswa') { tableId = 'table-rekap-siswa'; fileName = 'Rekap_Presensi_Siswa.xlsx'; }
-            
-            const table = document.getElementById(tableId);
-            if (table) {
-                const wb = XLSX.utils.table_to_book(table, {sheet: "Sheet1"});
-                XLSX.writeFile(wb, fileName);
-            }
-        };
-        
-        window.printFormMengajiHarian = function() {
-            document.body.classList.add('print-mengaji-only');
-            const tbody = document.getElementById('print-form-mengaji-body');
-            tbody.innerHTML = '';
-            let classes = ALL_CLASSES;
-            let rowsHtml = '';
-            
-            for(let i = 0; i < classes.length; i += 3) {
-                let row = '<tr>';
-                for(let j = 0; j < 3; j++) {
-                    if (i + j < classes.length) {
-                        let cls = classes[i + j];
-                        row += `<td class="border border-black p-1 text-center font-bold">${i + j + 1}</td>
-                                <td class="border border-black p-1 font-bold text-center bg-slate-50">${cls}</td>
-                                <td class="border border-black p-1 text-left"></td>
-                                <td class="border border-black p-1 text-center"></td>`;
-                    } else {
-                        row += `<td class="border border-black p-1"></td><td class="border border-black p-1"></td><td class="border border-black p-1"></td><td class="border border-black p-1"></td>`;
-                    }
-                }
-                row += '</tr>';
-                rowsHtml += row;
-            }
-            tbody.innerHTML = rowsHtml;
-            window.print();
-            setTimeout(() => {
-                document.body.classList.remove('print-mengaji-only');
-            }, 1000);
-        };
-
-        window.openExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.remove('hidden');
-        };
-
-        window.closeExcelImportModal = function() {
-            document.getElementById('excel-import-modal').classList.add('hidden');
-        };
-
-        // Master Jadwal Mengaji Functions
         window.openMasterJadwalModal = function() {
-            renderMasterJadwalDayForm();
             document.getElementById('modal-master-jadwal').classList.remove('hidden');
+            renderMasterJadwalDayForm();
         };
 
         window.closeMasterJadwalModal = function() {
@@ -3397,300 +3382,293 @@
             const container = document.getElementById('master-jadwal-day-form-container');
             container.innerHTML = '';
             
+            const dayData = masterJadwalMengaji[day] || {};
+            
             ALL_CLASSES.forEach(cls => {
-                const presetVal = masterJadwalMengaji[day]?.[cls] || '';
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200";
-                div.innerHTML = `
-                    <span class="font-bold text-xs text-slate-700 w-12 text-center bg-white border border-slate-200 px-1 py-1 rounded">${cls}</span>
-                    <select id="master-select-${cls}" class="w-full text-xs bg-white border border-slate-300 rounded p-1.5 focus:ring-2 focus:ring-emerald-500">
+                const wrapper = document.createElement('div');
+                wrapper.className = "flex items-center gap-2 p-1 border-b border-slate-100 hover:bg-slate-50";
+                const teacherName = dayData[cls] || '';
+                
+                wrapper.innerHTML = `
+                    <span class="w-12 shrink-0 font-bold text-xs text-slate-700">${cls}</span>
+                    <select id="master-jdw-sel-${cls.replace(' ', '-')}" class="flex-1 text-xs bg-white border border-slate-300 rounded p-1 font-medium focus:ring-1 focus:ring-brand-500 truncate">
                         <option value="">-- Kosong --</option>
-                        ${teacherList.map(t => `<option value="${t}" ${t === presetVal ? 'selected' : ''}>${t}</option>`).join('')}
+                        ${teacherList.map(t => `<option value="${t}" ${t === teacherName ? 'selected' : ''}>${t}</option>`).join('')}
                     </select>
                 `;
-                container.appendChild(div);
+                container.appendChild(wrapper);
             });
         };
 
         window.saveMasterJadwalDayForm = function() {
             const day = document.getElementById('select-master-day').value;
-            if (!masterJadwalMengaji[day]) masterJadwalMengaji[day] = {};
+            const dayData = {};
             
             ALL_CLASSES.forEach(cls => {
-                const val = document.getElementById(`master-select-${cls}`).value;
-                masterJadwalMengaji[day][cls] = val;
+                const sel = document.getElementById(`master-jdw-sel-${cls.replace(' ', '-')}`);
+                if (sel && sel.value) {
+                    dayData[cls] = sel.value;
+                }
             });
             
+            masterJadwalMengaji[day] = dayData;
             localStorage.setItem('piket_master_jadwal', JSON.stringify(masterJadwalMengaji));
+            showToast(`Jadwal Baku hari ${day} tersimpan!`);
             pushToCloud();
-            showToast(`Jadwal Baku hari ${day} berhasil disimpan!`);
             closeMasterJadwalModal();
-            renderMengaji36Grid(); 
+        };
+
+        window.openExcelImportModal = function() {
+            document.getElementById('excel-file-input').value = '';
+            document.getElementById('excel-import-modal').classList.remove('hidden');
+        };
+
+        window.closeExcelImportModal = function() {
+            document.getElementById('excel-import-modal').classList.add('hidden');
+        };
+
+        window.printFormMengajiHarian = function() {
+            const todayKey = document.getElementById('mengaji-date-picker')?.value || getTodayKey();
+            const dateParts = todayKey.split('-');
+            const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
+            const todayDay = getDayNameID(dateObj);
+            const dateFormatted = `${todayDay}, ${getFormattedDateID(todayKey)}`;
+            
+            document.getElementById('print-form-mengaji-date').innerText = dateFormatted;
+            
+            const tbody = document.getElementById('print-form-mengaji-body');
+            tbody.innerHTML = '';
+            
+            const logData = mengaji36Logs[todayKey] || {};
+            
+            const groupX = ALL_CLASSES.filter(c => c.startsWith('X '));
+            const groupXI = ALL_CLASSES.filter(c => c.startsWith('XI '));
+            const groupXII = ALL_CLASSES.filter(c => c.startsWith('XII '));
+            
+            const maxRows = Math.max(groupX.length, groupXI.length, groupXII.length);
+            
+            for (let i = 0; i < maxRows; i++) {
+                const clsX = groupX[i] || '';
+                const clsXI = groupXI[i] || '';
+                const clsXII = groupXII[i] || '';
+                
+                const tX = logData[clsX]?.teacher || masterJadwalMengaji[todayDay]?.[clsX] || '';
+                const tXI = logData[clsXI]?.teacher || masterJadwalMengaji[todayDay]?.[clsXI] || '';
+                const tXII = logData[clsXII]?.teacher || masterJadwalMengaji[todayDay]?.[clsXII] || '';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="border border-black p-1 text-center font-bold">${i + 1}</td>
+                    <td class="border border-black p-1 text-center font-bold bg-slate-50">${clsX}</td>
+                    <td class="border border-black p-1 text-left truncate max-w-[120px]">${tX}</td>
+                    <td class="border border-black p-1"></td>
+                    <td class="border border-black p-1 text-center font-bold bg-slate-50">${clsXI}</td>
+                    <td class="border border-black p-1 text-left truncate max-w-[120px]">${tXI}</td>
+                    <td class="border border-black p-1"></td>
+                    <td class="border border-black p-1 text-center font-bold bg-slate-50">${clsXII}</td>
+                    <td class="border border-black p-1 text-left truncate max-w-[120px]">${tXII}</td>
+                    <td class="border border-black p-1"></td>
+                `;
+                tbody.appendChild(tr);
+            }
+            
+            document.body.classList.add('print-mengaji-only');
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('print-mengaji-only');
+            }, 500);
+        };
+
+        window.exportToExcel = function(type) {
+            if (typeof XLSX === 'undefined') {
+                showToast("Library Excel belum dimuat!");
+                return;
+            }
+            
+            let tableId = '';
+            let filename = '';
+            
+            if (type === 'mengaji') {
+                tableId = 'table-rekap-mengaji';
+                const m = document.getElementById('month-select-mengaji').value;
+                filename = `Rekap_Mengaji_${m}.xlsx`;
+            } else if (type === 'presensi') {
+                tableId = 'table-rekap-presensi';
+                const m = document.getElementById('month-select-presensi').value;
+                filename = `Rekap_Presensi_Guru_${m}.xlsx`;
+            } else if (type === 'siswa') {
+                tableId = 'table-rekap-siswa';
+                const cls = cleanClassName(document.getElementById('rekap-siswa-class-select').value);
+                filename = `Rekap_Presensi_Siswa_${cls.replace(' ', '_')}.xlsx`;
+            }
+            
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            
+            const wb = XLSX.utils.table_to_book(table, {sheet: "Rekap Data"});
+            XLSX.writeFile(wb, filename);
+            showToast(`Data diexport ke ${filename}`);
         };
 
         window.processExcelUpload = function() {
             const fileInput = document.getElementById('excel-file-input');
             if (!fileInput.files || fileInput.files.length === 0) {
-                showToast("Silakan pilih file Excel (.xlsx / .xls) terlebih dahulu!");
+                showToast('Pilih file Excel terlebih dahulu!');
                 return;
             }
-
             const file = fileInput.files[0];
             const reader = new FileReader();
-
+            
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, {type: 'array'});
                     
-                    const sheets = workbook.SheetNames.map(name => name.toLowerCase().trim());
-                    const isTwoSheetFormat = sheets.includes('jadwal') || sheets.includes('jadwal kbm') || sheets.includes('jadwal_kbm') || (workbook.SheetNames.length === 2 && sheets.some(s => s.includes('kode')));
+                    let teacherCodes = {};
+                    let parsedSchedule = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
                     
-                    if (isTwoSheetFormat) {
-                        processTwoSheetExcel(workbook);
-                    } else {
-                        processMultiSheetExcel(workbook);
+                    // Parse Guru Sheet if exists
+                    const guruSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('guru') || n.toLowerCase().includes('kode'));
+                    if (guruSheetName) {
+                        const wsGuru = workbook.Sheets[guruSheetName];
+                        const guruData = XLSX.utils.sheet_to_json(wsGuru, {header: 1});
+                        guruData.forEach(row => {
+                            if (row.length >= 2) {
+                                const code = String(row[0]).trim();
+                                const name = String(row[1]).trim();
+                                if (code && name && code.toLowerCase() !== 'kode') {
+                                    teacherCodes[code] = name;
+                                    if (!teacherList.includes(name)) teacherList.push(name);
+                                }
+                            }
+                        });
+                        localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
                     }
-                } catch (error) {
-                    console.error("Error reading Excel:", error);
-                    showToast("Gagal membaca file Excel. Pastikan formatnya benar.");
+                    
+                    const jadSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('jadwal') || n.toLowerCase().includes('kbm'));
+                    if (jadSheetName) {
+                        const ws = workbook.Sheets[jadSheetName];
+                        const dataGrid = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+                        
+                        let currentDay = "";
+                        let colClasses = {}; // index -> class
+                        
+                        for (let r = 0; r < dataGrid.length; r++) {
+                            const row = dataGrid[r];
+                            if (!row || row.length === 0) continue;
+                            
+                            const firstCell = String(row[0]).trim().toLowerCase();
+                            if (['senin', 'selasa', 'rabu', 'kamis', 'jumat'].includes(firstCell)) {
+                                currentDay = firstCell.charAt(0).toUpperCase() + firstCell.slice(1);
+                                continue;
+                            }
+                            
+                            if (row.some(cell => String(cell).toUpperCase().startsWith('X ') || String(cell).toUpperCase().startsWith('XI ') || String(cell).toUpperCase().startsWith('XII '))) {
+                                for(let c = 2; c < row.length; c++) {
+                                    const val = String(row[c]).trim().toUpperCase();
+                                    if (val.startsWith('X') || val.startsWith('XI') || val.startsWith('XII')) {
+                                        colClasses[c] = cleanClassName(val);
+                                    }
+                                }
+                                continue;
+                            }
+                            
+                            let isHourRow = !isNaN(parseInt(firstCell)) && parseInt(firstCell) > 0 && parseInt(firstCell) <= 15;
+                            if (currentDay && isHourRow) {
+                                const hourNum = parseInt(firstCell);
+                                const timeStr = String(row[1] || '').trim();
+                                
+                                for(let c = 2; c < row.length; c++) {
+                                    const cellVal = String(row[c]).trim();
+                                    if (cellVal && colClasses[c]) {
+                                        const clsName = colClasses[c];
+                                        let subject = cellVal;
+                                        let teacherName = cellVal;
+                                        
+                                        if (teacherCodes[cellVal]) {
+                                            teacherName = teacherCodes[cellVal];
+                                            subject = "Mapel " + cellVal;
+                                        } else if (cellVal.includes('-')) {
+                                            const pts = cellVal.split('-');
+                                            teacherName = pts[pts.length-1].trim();
+                                            if (teacherCodes[teacherName]) teacherName = teacherCodes[teacherName];
+                                            subject = pts.slice(0, pts.length-1).join('-').trim();
+                                        }
+                                        
+                                        parsedSchedule[currentDay].push({
+                                            class: clsName,
+                                            hour: hourNum,
+                                            time: timeStr,
+                                            subject: subject,
+                                            teacher: teacherName
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Multi sheet parsing fallback
+                        ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].forEach(day => {
+                            const dSheet = workbook.SheetNames.find(n => n.toLowerCase() === day.toLowerCase());
+                            if (dSheet) {
+                                const ws = workbook.Sheets[dSheet];
+                                const dataGrid = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+                                let colClasses = {};
+                                
+                                for (let r = 0; r < dataGrid.length; r++) {
+                                    const row = dataGrid[r];
+                                    if (r === 0 || row.some(cell => String(cell).toUpperCase().startsWith('X'))) {
+                                        for(let c = 2; c < row.length; c++) {
+                                            const val = String(row[c]).trim().toUpperCase();
+                                            if (val.startsWith('X')) colClasses[c] = cleanClassName(val);
+                                        }
+                                        continue;
+                                    }
+                                    
+                                    const firstCell = String(row[0]).trim();
+                                    if (!isNaN(parseInt(firstCell))) {
+                                        const hourNum = parseInt(firstCell);
+                                        const timeStr = String(row[1] || '').trim();
+                                        
+                                        for(let c = 2; c < row.length; c++) {
+                                            const cellVal = String(row[c]).trim();
+                                            if (cellVal && colClasses[c]) {
+                                                parsedSchedule[day].push({
+                                                    class: colClasses[c],
+                                                    hour: hourNum,
+                                                    time: timeStr,
+                                                    subject: cellVal,
+                                                    teacher: teacherCodes[cellVal] || cellVal
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    let hasData = false;
+                    Object.values(parsedSchedule).forEach(arr => { if(arr.length > 0) hasData = true; });
+                    
+                    if (hasData) {
+                        jadwalKBM = parsedSchedule;
+                        localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
+                        renderScheduleGrid();
+                        pushToCloud();
+                        closeExcelImportModal();
+                        showToast("Jadwal KBM berhasil diimport!");
+                    } else {
+                        showToast("Format Excel tidak dikenali atau kosong.");
+                    }
+                    
+                } catch(err) {
+                    console.error(err);
+                    showToast("Error membaca file Excel. Pastikan format benar.");
                 }
             };
             reader.readAsArrayBuffer(file);
         };
-
-        function getColumnClass(colIndex) {
-            let className = "";
-            let baseNum = colIndex - 1; 
-            if (baseNum >= 0 && baseNum < 12) {
-                className = `X ${baseNum + 1}`;
-            } else if (baseNum >= 12 && baseNum < 24) {
-                className = `XI ${baseNum - 11}`;
-            } else if (baseNum >= 24 && baseNum < 36) {
-                className = `XII ${baseNum - 23}`;
-            }
-            return className;
-        }
-
-        function extractTimeFromGrid(str) {
-            if(!str) return "";
-            const match = str.match(/(\d{1,2}[\.:]\d{2})\s*-\s*(\d{1,2}[\.:]\d{2})/);
-            if(match) return `${match[1].replace(':', '.')} - ${match[2].replace(':', '.')}`;
-            return "";
-        }
-
-        function extractHourFromGrid(str) {
-            if(!str) return 0;
-            if(str.toLowerCase().includes('istirahat') || str.toLowerCase().includes('pembiasaan')) return 0;
-            const match = str.match(/^(\d+)/);
-            if(match) return parseInt(match[1], 10);
-            return 0;
-        }
-
-        function processTwoSheetExcel(workbook) {
-            let jadwalSheetName = workbook.SheetNames[0];
-            let kodeSheetName = workbook.SheetNames.length > 1 ? workbook.SheetNames[1] : null;
-
-            workbook.SheetNames.forEach(name => {
-                const lowerName = name.toLowerCase().trim();
-                if (lowerName.includes('jadwal')) jadwalSheetName = name;
-                if (lowerName.includes('kode')) kodeSheetName = name;
-            });
-
-            if (!kodeSheetName) {
-                showToast("Peringatan: Sheet kode guru tidak ditemukan. Akan mengimpor kode langsung.");
-            }
-
-            let kodeGuruMap = {}; 
-            if (kodeSheetName) {
-                const kodeSheet = workbook.Sheets[kodeSheetName];
-                const kodeJson = XLSX.utils.sheet_to_json(kodeSheet, { header: 1 });
-                
-                kodeJson.forEach(row => {
-                    if (row && row.length >= 3) {
-                        const kode = String(row[0]).trim();
-                        const namaGuru = String(row[1]).trim();
-                        const mapel = String(row[2]).trim();
-                        
-                        if (kode && namaGuru && !isNaN(parseInt(kode.replace(/\D/g,'')))) {
-                            kodeGuruMap[kode] = { teacher: namaGuru, subject: mapel };
-                            if (!teacherList.includes(namaGuru)) {
-                                teacherList.push(namaGuru);
-                            }
-                        }
-                    }
-                });
-                
-                teacherList = deduplicateList(teacherList).sort((a,b) => a.localeCompare(b));
-                localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                renderMasterTeacherList();
-            }
-
-            const jadwalSheet = workbook.Sheets[jadwalSheetName];
-            const jadwalJson = XLSX.utils.sheet_to_json(jadwalSheet, { header: 1 });
-            
-            let currentDay = '';
-            const newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
-            
-            jadwalJson.forEach((row) => {
-                if (!row || row.length === 0) return;
-                
-                const col0 = String(row[0] || '').trim();
-                const col1 = String(row[1] || '').trim();
-                
-                if (['senin', 'selasa', 'rabu', 'kamis', 'jumat'].includes(col0.toLowerCase())) {
-                    currentDay = col0.charAt(0).toUpperCase() + col0.slice(1).toLowerCase();
-                    return; 
-                }
-                
-                if (!currentDay) return; 
-                
-                const hourNum = extractHourFromGrid(col0);
-                if (hourNum === 0) return; 
-                
-                const timeStr = extractTimeFromGrid(col1) || col1;
-
-                for (let c = 2; c < row.length && c < 38; c++) {
-                    const cellVal = String(row[c] || '').trim();
-                    if (cellVal && cellVal.toLowerCase() !== 'upacara' && cellVal.toLowerCase() !== 'pembiasaan') {
-                        const className = getColumnClass(c - 1);
-                        if (className) {
-                            let teacherName = cellVal;
-                            let subjectName = "Mapel " + cellVal;
-                            
-                            const codes = cellVal.split(/[\s,+/&]+/); 
-                            
-                            codes.forEach(code => {
-                                const cleanCode = code.trim();
-                                if(cleanCode) {
-                                     const mapped = kodeGuruMap[cleanCode];
-                                     if(mapped) {
-                                         newJadwalKBM[currentDay].push({
-                                            class: className,
-                                            hour: hourNum,
-                                            time: timeStr,
-                                            subject: mapped.subject,
-                                            teacher: mapped.teacher
-                                        });
-                                     } else {
-                                        newJadwalKBM[currentDay].push({
-                                            class: className,
-                                            hour: hourNum,
-                                            time: timeStr,
-                                            subject: subjectName,
-                                            teacher: teacherName
-                                        });
-                                     }
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-
-            saveAndApplyImportedSchedule(newJadwalKBM);
-        }
-
-        function processMultiSheetExcel(workbook) {
-            const validDays = ['senin', 'selasa', 'rabu', 'kamis', 'jumat'];
-            const newJadwalKBM = { "Senin": [], "Selasa": [], "Rabu": [], "Kamis": [], "Jumat": [] };
-            
-            let dataFound = false;
-
-            workbook.SheetNames.forEach(sheetName => {
-                const dayNameLower = sheetName.toLowerCase().trim();
-                
-                let targetDay = '';
-                if (validDays.includes(dayNameLower)) {
-                    targetDay = dayNameLower.charAt(0).toUpperCase() + dayNameLower.slice(1);
-                } else if (validDays.some(d => dayNameLower.includes(d))) {
-                    const match = validDays.find(d => dayNameLower.includes(d));
-                    targetDay = match.charAt(0).toUpperCase() + match.slice(1);
-                }
-
-                if (targetDay) {
-                    dataFound = true;
-                    const sheet = workbook.Sheets[sheetName];
-                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                    
-                    let headers = [];
-                    
-                    json.forEach((row, rowIndex) => {
-                        if(rowIndex === 0 || (!headers.length && row.some(cell => String(cell).toLowerCase().includes('kelas')))){
-                            headers = row.map(c => String(c||'').trim());
-                            return;
-                        }
-                        
-                        if(headers.length > 0) {
-                             const hourColIndex = headers.findIndex(h => h.toLowerCase().includes('jam'));
-                             const timeColIndex = headers.findIndex(h => h.toLowerCase().includes('waktu') || h.toLowerCase().includes('pukul'));
-                             
-                             let hourNum = 0;
-                             let timeStr = "";
-                             
-                             if(hourColIndex !== -1) hourNum = parseInt(String(row[hourColIndex]).replace(/\D/g, ''), 10) || 0;
-                             if(timeColIndex !== -1) timeStr = String(row[timeColIndex]).trim();
-                             
-                             if(hourNum === 0 && row.length > 0) {
-                                 hourNum = parseInt(String(row[0]).replace(/\D/g, ''), 10) || 0;
-                                 timeStr = String(row[1] || '').trim();
-                             }
-
-                             if(hourNum > 0) {
-                                 headers.forEach((h, colIndex) => {
-                                     const cleanH = cleanClassName(h);
-                                     if(ALL_CLASSES.includes(cleanH)) {
-                                         const cellVal = String(row[colIndex] || '').trim();
-                                         if(cellVal) {
-                                             let teacher = cellVal;
-                                             let subject = "Mapel";
-                                             
-                                             if(cellVal.includes('-')) {
-                                                 const parts = cellVal.split('-');
-                                                 subject = parts[0].trim();
-                                                 teacher = parts[1].trim();
-                                             }
-                                             
-                                             newJadwalKBM[targetDay].push({
-                                                class: cleanH,
-                                                hour: hourNum,
-                                                time: timeStr,
-                                                subject: subject,
-                                                teacher: teacher
-                                             });
-                                             
-                                             if (!teacherList.includes(teacher) && teacher.length > 3) {
-                                                teacherList.push(teacher);
-                                             }
-                                         }
-                                     }
-                                 });
-                             }
-                        }
-                    });
-                }
-            });
-
-            if (dataFound) {
-                teacherList = deduplicateList(teacherList).sort((a,b) => a.localeCompare(b));
-                localStorage.setItem('piket_teachers', JSON.stringify(teacherList));
-                renderMasterTeacherList();
-                saveAndApplyImportedSchedule(newJadwalKBM);
-            } else {
-                showToast("Format Excel tidak dikenali. Pastikan nama Sheet adalah hari (Senin, Selasa, dll).");
-            }
-        }
-
-        function saveAndApplyImportedSchedule(newJadwal) {
-            jadwalKBM = newJadwal;
-            localStorage.setItem('piket_jadwal_kbm', JSON.stringify(jadwalKBM));
-            
-            renderScheduleGrid();
-            closeExcelImportModal();
-            showToast("Jadwal KBM berhasil diimport dan disimpan!");
-            pushToCloud();
-        }
-
     </script>
 </body>
 </html>
