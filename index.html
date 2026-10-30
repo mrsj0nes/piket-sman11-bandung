@@ -640,9 +640,12 @@
                     </div>
 
                     <div class="flex items-center gap-1">
-                        <button onclick="setSiswaRangePreset('jul-aug')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Jul-Agt</button>
-                        <button onclick="setSiswaRangePreset('jul-sep')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Jul-Sep</button>
-                        <button onclick="setSiswaRangePreset('sem1')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold rounded-lg transition">Sem 1</button>
+                        <button type="button" onclick="setSiswaRangePreset('sem_ganjil')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-lg shadow-xs transition flex items-center gap-1">
+                            <i class="fa-solid fa-calendar-check text-[10px]"></i> SEM GANJIL
+                        </button>
+                        <button type="button" onclick="setSiswaRangePreset('sem_genap')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg shadow-xs transition flex items-center gap-1">
+                            <i class="fa-solid fa-calendar-check text-[10px]"></i> SEM GENAP
+                        </button>
                     </div>
                 </div>
 
@@ -2741,17 +2744,24 @@
         };
 
         window.setSiswaRangePreset = function(presetType) {
-            const now = new Date();
-            const year = now.getFullYear();
-            if (presetType === 'jul-aug') {
-                document.getElementById('month-start-siswa').value = `${year}-07`;
-                document.getElementById('month-end-siswa').value = `${year}-08`;
-            } else if (presetType === 'jul-sep') {
-                document.getElementById('month-start-siswa').value = `${year}-07`;
-                document.getElementById('month-end-siswa').value = `${year}-09`;
-            } else if (presetType === 'sem1') {
-                document.getElementById('month-start-siswa').value = `${year}-07`;
-                document.getElementById('month-end-siswa').value = `${year}-12`;
+            const startElem = document.getElementById('month-start-siswa');
+            const endElem = document.getElementById('month-end-siswa');
+            if (!startElem || !endElem) return;
+
+            let baseYear = new Date().getFullYear();
+            if (startElem.value) {
+                const yearFromInput = parseInt(startElem.value.split('-')[0], 10);
+                if (!isNaN(yearFromInput) && yearFromInput > 2000) {
+                    baseYear = yearFromInput;
+                }
+            }
+
+            if (presetType === 'sem_ganjil') {
+                startElem.value = `${baseYear}-07`;
+                endElem.value = `${baseYear}-12`;
+            } else if (presetType === 'sem_genap') {
+                startElem.value = `${baseYear}-01`;
+                endElem.value = `${baseYear}-06`;
             }
             renderRekapSiswa();
         };
